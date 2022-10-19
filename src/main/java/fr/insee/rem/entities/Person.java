@@ -35,19 +35,8 @@ public class Person implements Serializable {
     private String mnais;
     private String jnais;
     private String sexe;
-    private String identFoyerFisc;
-    private String ordreFoyerFisc;
-    private String presAnprec;
     private String statuMatri;
-    private String typeMenage;
-    private String statuFisc;
-    private Boolean presIndemniteChom;
-    private Integer niveauVie;
-    private Integer typeRevenuPrinc;
     private String mel;
-    private String adresseDac;
-    private String biloc;
-    private Double poidsFideli;
     private String infoComplInd1;
     private String infoComplInd2;
 
@@ -63,31 +52,17 @@ public class Person implements Serializable {
         this.mnais = mapPersons.get("mnais_" + index);
         this.jnais = mapPersons.get("jnais_" + index);
         this.sexe = mapPersons.get("sexe_" + index);
-        this.identFoyerFisc = mapPersons.get("ident_foyfisc_" + index);
-        this.ordreFoyerFisc = mapPersons.get("ordre_foyfisc_" + index);
-        this.presAnprec = mapPersons.get("pres_anprec_" + index);
         this.statuMatri = mapPersons.get("statu_matri_" + index);
-        this.typeMenage = mapPersons.get("type_menage_" + index);
-        this.statuFisc = mapPersons.get("statu_fisc_" + index);
-        this.presIndemniteChom =
-            StringUtils.isNotBlank(mapPersons.get("pres_indemnite_chom_" + index))
-                ? Boolean.parseBoolean(mapPersons.get("pres_indemnite_chom_" + index)) : null;
-        this.niveauVie = StringUtils.isNotBlank(mapPersons.get("niveau_vie_" + index)) ? Integer.parseInt(mapPersons.get("niveau_vie_" + index)) : null;
-        this.typeRevenuPrinc =
-            StringUtils.isNotBlank(mapPersons.get("type_revenu_princ_" + index)) ? Integer.parseInt(mapPersons.get("type_revenu_princ_" + index)) : null;
         this.mel = mapPersons.get("mel_" + index);
-        this.adresseDac = mapPersons.get("adresse_dac_" + index);
-        this.biloc = mapPersons.get("biloc_" + index);
-        this.poidsFideli = StringUtils.isNotBlank(mapPersons.get("poids_fideli_" + index)) ? Double.parseDouble(mapPersons.get("poids_fideli_" + index)) : null;
         this.infoComplInd1 = mapPersons.get("info_compl_ind1_" + index);
         this.infoComplInd2 = mapPersons.get("info_compl_ind2_" + index);
         phonesNumbers = new ArrayList<>();
         if (StringUtils.isNotBlank(mapPersons.get("tel_port_" + index))) {
-            PhoneNumber phoneNumber = new PhoneNumber(Source.UNKNOWN, false, mapPersons.get("tel_port_" + index));
+            PhoneNumber phoneNumber = new PhoneNumber(Source.FISCAL, false, mapPersons.get("tel_port_" + index));
             phonesNumbers.add(phoneNumber);
         }
         if (StringUtils.isNotBlank(mapPersons.get("tel2_" + index))) {
-            PhoneNumber phoneNumber = new PhoneNumber(Source.UNKNOWN, false, mapPersons.get("tel2_" + index));
+            PhoneNumber phoneNumber = new PhoneNumber(Source.FISCAL, false, mapPersons.get("tel2_" + index));
             phonesNumbers.add(phoneNumber);
         }
     }

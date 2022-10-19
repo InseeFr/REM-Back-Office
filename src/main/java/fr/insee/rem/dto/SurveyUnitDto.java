@@ -18,18 +18,12 @@ public class SurveyUnitDto {
     private String anneeFideli;
     @CsvBindByName(column = "ident_unite")
     private Long identUnite;
-    @CsvBindByName(column = "identifiant_strate")
-    private String identifiantStrate;
-    @CsvBindByName(column = "filtre_strate")
-    private String filtreStrate;
     @CsvBindByName(column = "type_unite")
     private String typeUnite;
     @CsvBindByName(column = "ident_up_fin")
     private String identUpFin;
     @CsvBindByName
     private Double alea;
-    @CsvBindByName(column = "id_log_associe")
-    private String idLogAssocie;
     @CsvBindByName
     private String depcom;
     @CsvBindByName(column = "depcom_n")
@@ -40,20 +34,14 @@ public class SurveyUnitDto {
     private String btqPrioritaire;
     @CsvBindByName(column = "libvoie_prioritaire")
     private String libvoiePrioritaire;
-    @CsvBindByName(column = "origine_adr_prioritaire")
-    private String origineAdrPrioritaire;
     @CsvBindByName(column = "imm_supplementaire")
     private String immSupplementaire;
     @CsvBindByName(column = "btq_supplementaire")
     private String btqSupplementaire;
     @CsvBindByName(column = "libvoie_supplementaire")
     private String libvoieSupplementaire;
-    @CsvBindByName(column = "origine_adr_supplementaire")
-    private String origineAdrSupplementaire;
     @CsvBindByName(column = "compladr_aft")
     private String compladrAft;
-    @CsvBindByName(column = "compladr_foncier")
-    private String compladrFoncier;
     @CsvBindByName(column = "code_postal")
     private String codePostal;
     @CsvBindByName(column = "libelle_commune")
@@ -78,12 +66,8 @@ public class SurveyUnitDto {
     private String etage;
     @CsvBindByName
     private String porte;
-    @CsvBindByName(column = "type_res")
-    private String typeRes;
     @CsvBindByName
     private Integer surface;
-    @CsvBindByName(column = "nb_niveau")
-    private String nbNiveau;
     @CsvBindByName
     private String ascenseur;
     @CsvBindByName(column = "annee_const")
@@ -98,28 +82,8 @@ public class SurveyUnitDto {
     private String statutOccupation;
     @CsvBindByName(column = "date_entree_pers")
     private Integer dateEntreePers;
-    @CsvBindByName
-    private String dependance;
-    @CsvBindByName(column = "type_bati")
-    private Integer typeBati;
     @CsvBindByName(column = "nb_pers_log")
     private Integer nbPersLog;
-    @CsvBindByName(column = "logement_fictif")
-    private Boolean logementFictif;
-    @CsvBindByName(column = "nb_log_adr")
-    private Integer nbLogAdr;
-    @CsvBindByName(column = "pres_cmt")
-    private Boolean presCmt;
-    @CsvBindByName(column = "cat_cmt")
-    private String catCmt;
-    @CsvBindByName(column = "nom_cmt")
-    private String nomCmt;
-    @CsvBindByName(column = "pres_rh")
-    private String presRh;
-    @CsvBindByName(column = "cat_rh")
-    private String catRh;
-    @CsvBindByName(column = "nom_rh")
-    private String nomRh;
     @CsvBindByName(column = "info_compl_lgt1")
     private String infoComplLgt1;
     @CsvBindByName(column = "info_compl_lgt2")
@@ -146,8 +110,6 @@ public class SurveyUnitDto {
     private String bs;
     @CsvBindByName
     private String ec;
-    @CsvBindByName
-    private String v;
     @CsvBindByName(column = "pole_gestion_opale")
     private String poleGestionOpale;
     @CsvBindByName(column = "affectation_idep")
@@ -158,10 +120,6 @@ public class SurveyUnitDto {
     private String noGrap;
     @CsvBindByName
     private String noLog;
-    @CsvBindByName
-    private String cil;
-    @CsvBindByName
-    private String fil;
     @CsvBindByName(column = "adr_rang")
     private String adrRang;
     @CsvBindByName(column = "logRang")
@@ -192,18 +150,6 @@ public class SurveyUnitDto {
     private String sr5;
     @CsvBindByName(column = "sr_6")
     private String sr6;
-    @CsvBindByName(column = "pc_1")
-    private String pc1;
-    @CsvBindByName(column = "pc_2")
-    private String pc2;
-    @CsvBindByName(column = "pc_3")
-    private String pc3;
-    @CsvBindByName(column = "pc_4")
-    private String pc4;
-    @CsvBindByName(column = "pc_5")
-    private String pc5;
-    @CsvBindByName(column = "pc_6")
-    private String pc6;
     @CsvBindAndJoinByName(column = ".+_\\d+", elementType = String.class)
     private MultiValuedMap<String, String> persons;
 
