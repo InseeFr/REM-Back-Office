@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,6 +38,7 @@ public class Sample implements Serializable {
     @SequenceGenerator(name = "seq_sample", allocationSize = 1)
     private Long id;
 
+    @Column(unique = true)
     private String label;
 
     @OneToMany(mappedBy = "sample", orphanRemoval = true)

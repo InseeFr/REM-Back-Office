@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
+import fr.insee.rem.dto.SampleDto;
+import fr.insee.rem.dto.SurveyUnitCsvDto;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.entities.Sample;
@@ -62,11 +65,11 @@ public class SampleServiceImpl implements SampleService {
 
         try (Reader reader = new BufferedReader(new InputStreamReader(sampleFile.getInputStream()))) {
 
-            CsvToBean<SurveyUnitDto> csvToBean =
-                new CsvToBeanBuilder<SurveyUnitDto>(reader).withType(SurveyUnitDto.class).withSeparator(';').withIgnoreLeadingWhiteSpace(true)
+            CsvToBean<SurveyUnitCsvDto> csvToBean =
+                new CsvToBeanBuilder<SurveyUnitCsvDto>(reader).withType(SurveyUnitCsvDto.class).withSeparator(';').withIgnoreLeadingWhiteSpace(true)
                     .withEscapeChar('\0').build();
 
-            List<SurveyUnitDto> surveyUnitsDto = csvToBean.parse();
+            List<SurveyUnitCsvDto> surveyUnitsDto = csvToBean.parse();
 
             List<SurveyUnit> surveyUnits = surveyUnitsDto.stream().map(SurveyUnit::new).collect(Collectors.toList());
 
@@ -104,10 +107,11 @@ public class SampleServiceImpl implements SampleService {
     }
 
     @Override
-    public List<SurveyUnit> getSurveyUnitsBySample(Long sampleId) {
+    public List<SurveyUnitDto> getSurveyUnitsBySample(Long sampleId) {
         Optional<Sample> findSample = sampleRepository.findById(sampleId);
         if (findSample.isPresent()) {
-            return surveyUnitRepository.findAllBySample(findSample.get());
+            List<SurveyUnit> surveyUnits = surveyUnitRepository.findAllBySample(findSample.get());
+            return surveyUnits.stream().map(su -> new SurveyUnitDto(su.getId(), su.getSurveyUnitData())).collect(Collectors.toList());
         }
         else {
             return Collections.emptyList();
@@ -119,22 +123,29 @@ public class SampleServiceImpl implements SampleService {
     public Response putSample(String label) {
         Sample sample = new Sample();
         sample.setLabel(label);
-        sample = sampleRepository.save(sample);
+        try {
+            sample = sampleRepository.save(sample);
+        }
+        catch (DataIntegrityViolationException e) {
+            return new Response(String.format("sample %s already exists", label), HttpStatus.BAD_REQUEST);
+        }
         return new Response(String.format("sample %s create", sample.getId()), HttpStatus.OK);
     }
 
     @Override
-    public Sample getSample(Long sampleId) throws SampleNotFoundException {
+    public SampleDto getSample(Long sampleId) throws SampleNotFoundException {
         Optional<Sample> findSample = sampleRepository.findById(sampleId);
         if ( !findSample.isPresent()) {
             throw new SampleNotFoundException(sampleId);
         }
-        return findSample.get();
+        Sample s = findSample.get();
+        return new SampleDto(s.getId(), s.getLabel());
     }
 
     @Override
-    public List<Sample> getAllSamples() {
-        return sampleRepository.findAll();
+    public List<SampleDto> getAllSamples() {
+        List<Sample> samples = sampleRepository.findAll();
+        return samples.stream().map(s -> new SampleDto(s.getId(), s.getLabel())).collect(Collectors.toList());
     }
 
 }

@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import fr.insee.rem.dto.SurveyUnitDto;
+import fr.insee.rem.dto.SurveyUnitCsvDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +28,7 @@ public class SurveyUnitData implements Serializable {
      */
     private static final long serialVersionUID = 811623138921050269L;
 
-    private List<Person> persons;
+    private List<Person> persons = new ArrayList<>();
 
     private String anneeFideli;
 
@@ -166,8 +166,7 @@ public class SurveyUnitData implements Serializable {
 
     private String sr6;
 
-    public SurveyUnitData(SurveyUnitDto dto) {
-        this.persons = new ArrayList<>();
+    public SurveyUnitData(SurveyUnitCsvDto dto) {
         Map<String, String> mapPersons = new HashMap<>();
         dto.getPersons().asMap().forEach((key, value) -> mapPersons.put(key, value.iterator().next()));
         for (var index = 1; index < 50; index ++ ) {
@@ -176,7 +175,7 @@ public class SurveyUnitData implements Serializable {
                 persons.add(person);
             }
         }
-        BeanUtils.copyProperties(dto, this, "persons");
+        BeanUtils.copyProperties(dto, this);
 
     }
 

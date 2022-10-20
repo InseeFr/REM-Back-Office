@@ -21,7 +21,7 @@ import org.hibernate.annotations.TypeDef;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
-import fr.insee.rem.dto.SurveyUnitDto;
+import fr.insee.rem.dto.SurveyUnitCsvDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -57,7 +57,7 @@ public class SurveyUnit implements Serializable {
     @ToString.Exclude
     private Set<SampleSurveyUnit> sampleSurveyUnit = new HashSet<>();
 
-    public SurveyUnit(SurveyUnitDto dto) {
+    public SurveyUnit(SurveyUnitCsvDto dto) {
         this.surveyUnitData = new SurveyUnitData(dto);
     }
 

@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import fr.insee.rem.dto.SampleDto;
+import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
-import fr.insee.rem.entities.Sample;
-import fr.insee.rem.entities.SurveyUnit;
 import fr.insee.rem.exception.CsvFileException;
 import fr.insee.rem.exception.SampleNotFoundException;
 
@@ -16,12 +16,12 @@ public interface SampleService {
 
     Response deleteSample(Long sampleId) throws SampleNotFoundException;
 
-    List<SurveyUnit> getSurveyUnitsBySample(Long sampleId);
+    List<SurveyUnitDto> getSurveyUnitsBySample(Long sampleId);
 
     Response putSample(String label);
 
-    Sample getSample(Long sampleId) throws SampleNotFoundException;
+    SampleDto getSample(Long sampleId) throws SampleNotFoundException;
 
-    List<Sample> getAllSamples();
+    List<SampleDto> getAllSamples();
 
 }

@@ -40,7 +40,7 @@ public class Person implements Serializable {
     private String infoComplInd1;
     private String infoComplInd2;
 
-    private List<PhoneNumber> phonesNumbers;
+    private List<PhoneNumber> phonesNumbers = new ArrayList<>();
 
     public Person(int index, Map<String, String> mapPersons) {
         this.index = index;
@@ -56,7 +56,6 @@ public class Person implements Serializable {
         this.mel = mapPersons.get("mel_" + index);
         this.infoComplInd1 = mapPersons.get("info_compl_ind1_" + index);
         this.infoComplInd2 = mapPersons.get("info_compl_ind2_" + index);
-        phonesNumbers = new ArrayList<>();
         if (StringUtils.isNotBlank(mapPersons.get("tel_port_" + index))) {
             PhoneNumber phoneNumber = new PhoneNumber(Source.FISCAL, false, mapPersons.get("tel_port_" + index));
             phonesNumbers.add(phoneNumber);

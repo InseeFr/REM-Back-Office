@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import fr.insee.rem.dto.SampleDto;
+import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
-import fr.insee.rem.entities.Sample;
-import fr.insee.rem.entities.SurveyUnit;
 import fr.insee.rem.exception.CsvFileException;
 import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.service.SampleService;
@@ -70,13 +70,13 @@ public class SampleController {
         @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @GetMapping(path = "/{sampleId}/survey-units", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SurveyUnit>> getSurveyUnitsBySample(HttpServletRequest request, @PathVariable("sampleId") final Long sampleId) {
+    public ResponseEntity<List<SurveyUnitDto>> getSurveyUnitsBySample(HttpServletRequest request, @PathVariable("sampleId") final Long sampleId) {
         log.info("Get SurveyUnits by Sample {}", sampleId);
         return new ResponseEntity<>(sampleService.getSurveyUnitsBySample(sampleId), HttpStatus.OK);
     }
 
     @Operation(summary = "Create sample", responses = {
-        @ApiResponse(responseCode = "200", description = "Sample successfully created"),
+        @ApiResponse(responseCode = "200", description = "Sample successfully created")
     })
     @PutMapping(path = "/create")
     public ResponseEntity<Object> putSample(HttpServletRequest request, @RequestBody String label) {
@@ -90,7 +90,7 @@ public class SampleController {
         @ApiResponse(responseCode = "200", description = "Sample successfully recovered"), @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @GetMapping(path = "/{sampleId}")
-    public ResponseEntity<Sample> getSample(HttpServletRequest request, @PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException {
+    public ResponseEntity<SampleDto> getSample(HttpServletRequest request, @PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException {
         log.info("Get sample {}", sampleId);
         return new ResponseEntity<>(sampleService.getSample(sampleId), HttpStatus.OK);
     }
@@ -99,7 +99,7 @@ public class SampleController {
         @ApiResponse(responseCode = "200", description = "Samples successfully recovered"), @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @GetMapping(path = "/")
-    public ResponseEntity<List<Sample>> getAllSamples(HttpServletRequest request) {
+    public ResponseEntity<List<SampleDto>> getAllSamples(HttpServletRequest request) {
         log.info("Get all samples");
         return new ResponseEntity<>(sampleService.getAllSamples(), HttpStatus.OK);
     }
