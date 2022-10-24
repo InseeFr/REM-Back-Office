@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import fr.insee.rem.dto.SurveyUnitDto;
+import fr.insee.rem.dto.SurveyUnitCsvDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,25 +28,17 @@ public class SurveyUnitData implements Serializable {
      */
     private static final long serialVersionUID = 811623138921050269L;
 
-    private List<Person> persons;
-
-    private String commune;
+    private List<Person> persons = new ArrayList<>();
 
     private String anneeFideli;
 
     private Long identUnite;
-
-    private String identifiantStrate;
-
-    private String filtreStrate;
 
     private String typeUnite;
 
     private String identUpFin;
 
     private Double alea;
-
-    private String idLogAssocie;
 
     private String depcom;
 
@@ -58,19 +50,13 @@ public class SurveyUnitData implements Serializable {
 
     private String libvoiePrioritaire;
 
-    private String origineAdrPrioritaire;
-
     private String immSupplementaire;
 
     private String btqSupplementaire;
 
     private String libvoieSupplementaire;
 
-    private String origineAdrSupplementaire;
-
     private String compladrAft;
-
-    private String compladrFoncier;
 
     private String codePostal;
 
@@ -96,11 +82,7 @@ public class SurveyUnitData implements Serializable {
 
     private String porte;
 
-    private String typeRes;
-
     private Integer surface;
-
-    private String nbNiveau;
 
     private String ascenseur;
 
@@ -116,27 +98,7 @@ public class SurveyUnitData implements Serializable {
 
     private Integer dateEntreePers;
 
-    private String dependance;
-
-    private Integer typeBati;
-
     private Integer nbPersLog;
-
-    private Boolean logementFictif;
-
-    private Integer nbLogAdr;
-
-    private Boolean presCmt;
-
-    private String catCmt;
-
-    private String nomCmt;
-
-    private String presRh;
-
-    private String catRh;
-
-    private String nomRh;
 
     private String infoComplLgt1;
 
@@ -164,8 +126,6 @@ public class SurveyUnitData implements Serializable {
 
     private String ec;
 
-    private String v;
-
     private String poleGestionOpale;
 
     private String affectationIdep;
@@ -175,10 +135,6 @@ public class SurveyUnitData implements Serializable {
     private String noGrap;
 
     private String noLog;
-
-    private String cil;
-
-    private String fil;
 
     private String adrRang;
 
@@ -210,20 +166,7 @@ public class SurveyUnitData implements Serializable {
 
     private String sr6;
 
-    private String pc1;
-
-    private String pc2;
-
-    private String pc3;
-
-    private String pc4;
-
-    private String pc5;
-
-    private String pc6;
-
-    public SurveyUnitData(SurveyUnitDto dto) {
-        this.persons = new ArrayList<>();
+    public SurveyUnitData(SurveyUnitCsvDto dto) {
         Map<String, String> mapPersons = new HashMap<>();
         dto.getPersons().asMap().forEach((key, value) -> mapPersons.put(key, value.iterator().next()));
         for (var index = 1; index < 50; index ++ ) {
@@ -232,7 +175,7 @@ public class SurveyUnitData implements Serializable {
                 persons.add(person);
             }
         }
-        BeanUtils.copyProperties(dto, this, "persons");
+        BeanUtils.copyProperties(dto, this);
 
     }
 

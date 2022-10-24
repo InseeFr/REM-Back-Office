@@ -2,30 +2,22 @@ package fr.insee.rem.entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "sample_survey_unit")
-@Getter
-@Setter
 public class SampleSurveyUnit implements Serializable {
 
     /**
@@ -33,20 +25,50 @@ public class SampleSurveyUnit implements Serializable {
      */
     private static final long serialVersionUID = 7546818970816616680L;
 
-    @Id
-    @GeneratedValue(generator = "seq_sample_survey_unit", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "seq_sample_survey_unit")
-    private Long id;
+    @EmbeddedId
+    private SampleSurveyUnitPK id;
 
-    @ManyToOne
-    @JoinColumn(name = "sample_id")
+    @Getter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("sampleId")
     private Sample sample;
 
-    @ManyToOne
-    @JoinColumn(name = "survey_unit_id")
+    @Getter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("surveyUnitId")
     private SurveyUnit surveyUnit;
 
     @Column(name = "registered_date")
     @Temporal(TemporalType.DATE)
-    private Date registeredDate;
+    private Date registeredDate = new Date();
+
+    @SuppressWarnings("unused")
+    private SampleSurveyUnit() {}
+
+    public SampleSurveyUnit(Sample sample, SurveyUnit surveyUnit) {
+        this.sample = sample;
+        this.surveyUnit = surveyUnit;
+        this.id = new SampleSurveyUnitPK(sample.getId(), surveyUnit.getId());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SampleSurveyUnit that = (SampleSurveyUnit) o;
+        return Objects.equals(sample, that.sample) && Objects.equals(surveyUnit, that.surveyUnit);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sample, surveyUnit);
+    }
+
+    @Override
+    public String toString() {
+        return "SampleSurveyUnit(id=" + id + ", createdOn=" + registeredDate + ")";
+    }
+
 }

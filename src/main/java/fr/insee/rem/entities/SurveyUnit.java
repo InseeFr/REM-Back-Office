@@ -21,17 +21,17 @@ import org.hibernate.annotations.TypeDef;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
-import fr.insee.rem.dto.SurveyUnitDto;
+import fr.insee.rem.dto.SurveyUnitCsvDto;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Table(name = "survey_unit")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class SurveyUnit implements Serializable {
@@ -43,7 +43,7 @@ public class SurveyUnit implements Serializable {
 
     @Id
     @GeneratedValue(generator = "seq_survey_unit", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "seq_survey_unit")
+    @SequenceGenerator(name = "seq_survey_unit", allocationSize = 100)
     private Long id;
 
     @Type(type = "jsonb")
@@ -51,11 +51,13 @@ public class SurveyUnit implements Serializable {
     @Basic(fetch = FetchType.LAZY)
     private SurveyUnitData surveyUnitData;
 
-    @OneToMany(mappedBy = "surveyUnit")
+    @OneToMany(mappedBy = "surveyUnit", orphanRemoval = true)
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<SampleSurveyUnit> sampleSurveyUnit = new HashSet<>();
 
-    public SurveyUnit(SurveyUnitDto dto) {
+    public SurveyUnit(SurveyUnitCsvDto dto) {
         this.surveyUnitData = new SurveyUnitData(dto);
     }
 
