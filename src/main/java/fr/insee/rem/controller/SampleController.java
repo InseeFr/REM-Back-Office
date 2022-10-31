@@ -78,12 +78,12 @@ public class SampleController {
     @Operation(summary = "Create sample", responses = {
         @ApiResponse(responseCode = "200", description = "Sample successfully created")
     })
-    @PutMapping(path = "/create")
-    public ResponseEntity<Object> putSample(HttpServletRequest request, @RequestBody String label) {
+    @PutMapping(path = "/create", consumes = {
+        MediaType.TEXT_PLAIN_VALUE
+    })
+    public ResponseEntity<SampleDto> putSample(HttpServletRequest request, @RequestBody String label) {
         log.info("PUT create sample {}", label);
-        Response response = sampleService.putSample(label);
-        log.info("PUT /sample/create resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+        return new ResponseEntity<>(sampleService.putSample(label), HttpStatus.OK);
     }
 
     @Operation(summary = "Get sample", responses = {
@@ -96,7 +96,7 @@ public class SampleController {
     }
 
     @Operation(summary = "Get all samples", responses = {
-        @ApiResponse(responseCode = "200", description = "Samples successfully recovered"), @ApiResponse(responseCode = "404", description = "Sample Not Found")
+        @ApiResponse(responseCode = "200", description = "Samples successfully recovered")
     })
     @GetMapping(path = "/")
     public ResponseEntity<List<SampleDto>> getAllSamples(HttpServletRequest request) {

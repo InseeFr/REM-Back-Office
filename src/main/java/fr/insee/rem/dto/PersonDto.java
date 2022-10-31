@@ -28,7 +28,7 @@ public class PersonDto {
     private List<PhoneNumberDto> phonesNumbers;
 
     public PersonDto(Person p) {
-        this.phonesNumbers = p.getPhonesNumbers().stream().map(pn -> new PhoneNumberDto(pn)).collect(Collectors.toList());
+        this.phonesNumbers = p.getPhonesNumbers().stream().map(PhoneNumberDto::new).collect(Collectors.toList());
         BeanUtils.copyProperties(p, this);
     }
 
