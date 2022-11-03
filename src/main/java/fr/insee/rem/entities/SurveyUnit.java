@@ -55,7 +55,7 @@ public class SurveyUnit implements Serializable {
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<SampleSurveyUnit> sampleSurveyUnit = new HashSet<>();
+    private Set<SampleSurveyUnit> sampleSurveyUnits = new HashSet<>();
 
     public SurveyUnit(SurveyUnitCsvDto dto) {
         this.surveyUnitData = new SurveyUnitData(dto);

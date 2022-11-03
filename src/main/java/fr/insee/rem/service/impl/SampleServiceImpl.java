@@ -98,13 +98,8 @@ public class SampleServiceImpl implements SampleService {
         if ( !findSample.isPresent()) {
             throw new SampleNotFoundException(sampleId);
         }
-        List<SampleSurveyUnit> sampleSurveyUnits = sampleSurveyUnitRepository.findBySample(findSample.get());
-        List<SurveyUnit> suWithSingleSsu =
-            sampleSurveyUnits.stream().filter(ssu -> ssu.getSurveyUnit().getSampleSurveyUnit().size() == 1).map(SampleSurveyUnit::getSurveyUnit)
-                .collect(Collectors.toList());
-
-        sampleSurveyUnitRepository.deleteAll(sampleSurveyUnits);
-        surveyUnitRepository.deleteAll(suWithSingleSsu);
+        sampleSurveyUnitRepository.deleteAll(sampleSurveyUnitRepository.findBySample(findSample.get()));
+        sampleRepository.delete(findSample.get());
         return new Response(String.format("sample %s deleted", sampleId), HttpStatus.OK);
     }
 
