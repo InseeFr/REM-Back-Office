@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -104,17 +103,14 @@ public class SampleServiceImpl implements SampleService {
     }
 
     @Override
-    public List<SurveyUnitDto> getSurveyUnitsBySample(Long sampleId) {
+    public List<SurveyUnitDto> getSurveyUnitsBySample(Long sampleId) throws SampleNotFoundException {
         Optional<Sample> findSample = sampleRepository.findById(sampleId);
-        if (findSample.isPresent()) {
-            List<SampleSurveyUnit> sampleSurveyUnits = sampleSurveyUnitRepository.findBySample(findSample.get());
-            return sampleSurveyUnits.stream().map(SampleSurveyUnit::getSurveyUnit).map(su -> new SurveyUnitDto(su.getId(), su.getSurveyUnitData()))
-                .collect(Collectors.toList());
+        if ( !findSample.isPresent()) {
+            throw new SampleNotFoundException(sampleId);
         }
-        else {
-            return Collections.emptyList();
-        }
-
+        List<SampleSurveyUnit> sampleSurveyUnits = sampleSurveyUnitRepository.findBySample(findSample.get());
+        return sampleSurveyUnits.stream().map(SampleSurveyUnit::getSurveyUnit).map(su -> new SurveyUnitDto(su.getId(), su.getSurveyUnitData()))
+            .collect(Collectors.toList());
     }
 
     @Override

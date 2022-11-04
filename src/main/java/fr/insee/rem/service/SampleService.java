@@ -16,7 +16,7 @@ public interface SampleService {
 
     Response deleteSample(Long sampleId) throws SampleNotFoundException;
 
-    List<SurveyUnitDto> getSurveyUnitsBySample(Long sampleId);
+    List<SurveyUnitDto> getSurveyUnitsBySample(Long sampleId) throws SampleNotFoundException;
 
     SampleDto putSample(String label);
 
