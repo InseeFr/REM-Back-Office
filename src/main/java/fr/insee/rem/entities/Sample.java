@@ -45,5 +45,5 @@ public class Sample implements Serializable {
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<SampleSurveyUnit> sampleSurveyUnit = new HashSet<>();
+    private Set<SampleSurveyUnit> sampleSurveyUnits = new HashSet<>();
 }

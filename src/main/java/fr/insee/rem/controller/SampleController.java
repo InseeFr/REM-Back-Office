@@ -23,6 +23,7 @@ import fr.insee.rem.dto.SampleDto;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.exception.CsvFileException;
+import fr.insee.rem.exception.SampleAlreadyExistsException;
 import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.service.SampleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,20 +71,23 @@ public class SampleController {
         @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @GetMapping(path = "/{sampleId}/survey-units", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SurveyUnitDto>> getSurveyUnitsBySample(HttpServletRequest request, @PathVariable("sampleId") final Long sampleId) {
+    public ResponseEntity<List<SurveyUnitDto>> getSurveyUnitsBySample(
+        HttpServletRequest request,
+        @PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException {
         log.info("Get SurveyUnits by Sample {}", sampleId);
         return new ResponseEntity<>(sampleService.getSurveyUnitsBySample(sampleId), HttpStatus.OK);
     }
 
     @Operation(summary = "Create sample", responses = {
-        @ApiResponse(responseCode = "200", description = "Sample successfully created")
+        @ApiResponse(responseCode = "200", description = "Sample successfully created"),
+        @ApiResponse(responseCode = "409", description = "Sample Already Exists")
     })
-    @PutMapping(path = "/create")
-    public ResponseEntity<Object> putSample(HttpServletRequest request, @RequestBody String label) {
+    @PutMapping(path = "/create", consumes = {
+        MediaType.TEXT_PLAIN_VALUE
+    })
+    public ResponseEntity<SampleDto> putSample(HttpServletRequest request, @RequestBody String label) throws SampleAlreadyExistsException {
         log.info("PUT create sample {}", label);
-        Response response = sampleService.putSample(label);
-        log.info("PUT /sample/create resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+        return new ResponseEntity<>(sampleService.putSample(label), HttpStatus.OK);
     }
 
     @Operation(summary = "Get sample", responses = {
@@ -96,9 +100,9 @@ public class SampleController {
     }
 
     @Operation(summary = "Get all samples", responses = {
-        @ApiResponse(responseCode = "200", description = "Samples successfully recovered"), @ApiResponse(responseCode = "404", description = "Sample Not Found")
+        @ApiResponse(responseCode = "200", description = "Samples successfully recovered")
     })
-    @GetMapping(path = "/")
+    @GetMapping(path = "/all")
     public ResponseEntity<List<SampleDto>> getAllSamples(HttpServletRequest request) {
         log.info("Get all samples");
         return new ResponseEntity<>(sampleService.getAllSamples(), HttpStatus.OK);

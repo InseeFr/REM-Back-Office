@@ -14,10 +14,11 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import lombok.Getter;
+import lombok.Data;
 
 @Entity
 @Table(name = "sample_survey_unit")
+@Data
 public class SampleSurveyUnit implements Serializable {
 
     /**
@@ -28,12 +29,10 @@ public class SampleSurveyUnit implements Serializable {
     @EmbeddedId
     private SampleSurveyUnitPK id;
 
-    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("sampleId")
     private Sample sample;
 
-    @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("surveyUnitId")
     private SurveyUnit surveyUnit;

@@ -1,14 +1,12 @@
 package fr.insee.rem.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +30,7 @@ public class SurveyUnitController {
         @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
         @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
-    @PostMapping(path = "{surveyUnitId}/sample/{sampleId}")
+    @PostMapping(path = "/{surveyUnitId}/sample/{sampleId}")
     public ResponseEntity<Object> addSurveyUnitToSample(
         HttpServletRequest request,
         @PathVariable("surveyUnitId") final Long surveyUnitId,
@@ -43,18 +41,32 @@ public class SurveyUnitController {
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Operation(summary = "Add SurveyUnits to Sample", responses = {
-        @ApiResponse(responseCode = "200", description = "SurveysUnits successfully added"),
+    @Operation(summary = "Delete SurveyUnit", responses = {
+        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully deleted"),
+        @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
+    })
+    @DeleteMapping(path = "/{surveyUnitId}")
+    public ResponseEntity<Object> deleteSurveyUnitToSample(
+        HttpServletRequest request,
+        @PathVariable("surveyUnitId") final Long surveyUnitId) throws SurveyUnitNotFoundException {
+        log.info("DELETE SurveyUnit {} ", surveyUnitId);
+        Response response = surveyUnitService.deleteSurveyUnit(surveyUnitId);
+        log.info("DELETE /survey-unit/{surveyUnitId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+    }
+
+    @Operation(summary = "Remove SurveyUnit from Sample", responses = {
+        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
         @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
-    @PostMapping(path = "/sample/{sampleId}")
-    public ResponseEntity<Object> addSurveyUnitsToSample(
+    @DeleteMapping(path = "/{surveyUnitId}/sample/{sampleId}")
+    public ResponseEntity<Object> removeSurveyUnitFromSample(
         HttpServletRequest request,
-        @PathVariable("sampleId") final Long sampleId,
-        @RequestBody List<Long> surveyUnitIds) throws SampleNotFoundException, SurveyUnitNotFoundException {
-        log.info("POST Add SurveyUnits to Sample {}", sampleId);
-        Response response = surveyUnitService.addSurveyUnitsToSample(surveyUnitIds, sampleId);
-        log.info("POST /survey-unit/sample/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+        @PathVariable("surveyUnitId") final Long surveyUnitId,
+        @PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException {
+        log.info("DELTE Remove SurveyUnit {} from Sample {}", surveyUnitId, sampleId);
+        Response response = surveyUnitService.removeSurveyUnitFromSample(surveyUnitId, sampleId);
+        log.info("DELETE /survey-unit/{surveyUnitId}/sample/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 

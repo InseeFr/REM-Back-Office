@@ -1,6 +1,5 @@
 package fr.insee.rem.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.entities.Sample;
 import fr.insee.rem.entities.SampleSurveyUnit;
+import fr.insee.rem.entities.SampleSurveyUnitPK;
 import fr.insee.rem.entities.SurveyUnit;
 import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.exception.SurveyUnitNotFoundException;
@@ -49,22 +49,31 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
     }
 
     @Override
-    public Response addSurveyUnitsToSample(List<Long> surveyUnitIds, Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException {
+    public Response deleteSurveyUnit(Long surveyUnitId) throws SurveyUnitNotFoundException {
+        Optional<SurveyUnit> findSurveyUnit = surveyUnitRepository.findById(surveyUnitId);
+        if ( !findSurveyUnit.isPresent()) {
+            throw new SurveyUnitNotFoundException(surveyUnitId);
+        }
+        SurveyUnit su = findSurveyUnit.get();
+        List<SampleSurveyUnit> sampleSurveyUnits = sampleSurveyUnitRepository.findBySurveyUnit(su);
+        sampleSurveyUnitRepository.deleteAll(sampleSurveyUnits);
+        surveyUnitRepository.delete(su);
+        return new Response(String.format("SurveyUnit %s deleted", surveyUnitId), HttpStatus.OK);
+    }
+
+    @Override
+    public Response removeSurveyUnitFromSample(Long surveyUnitId, Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException {
         Optional<Sample> findSample = sampleRepository.findById(sampleId);
         if ( !findSample.isPresent()) {
             throw new SampleNotFoundException(sampleId);
         }
-        List<SampleSurveyUnit> sampleSurveyUnits = new ArrayList<>();
-        for (Long id : surveyUnitIds) {
-            Optional<SurveyUnit> findSurveyUnit = surveyUnitRepository.findById(id);
-            if ( !findSurveyUnit.isPresent()) {
-                throw new SurveyUnitNotFoundException(id);
-            }
-            SampleSurveyUnit sampleSurveyUnit = new SampleSurveyUnit(findSample.get(), findSurveyUnit.get());
-            sampleSurveyUnits.add(sampleSurveyUnit);
+        Optional<SurveyUnit> findSurveyUnit = surveyUnitRepository.findById(surveyUnitId);
+        if ( !findSurveyUnit.isPresent()) {
+            throw new SurveyUnitNotFoundException(surveyUnitId);
         }
-        sampleSurveyUnitRepository.saveAll(sampleSurveyUnits);
-        return new Response(String.format("%s surveyUnits added to sample %s", surveyUnitIds.size(), sampleId), HttpStatus.OK);
+        SampleSurveyUnitPK ssuPK = new SampleSurveyUnitPK(sampleId, surveyUnitId);
+        sampleSurveyUnitRepository.deleteById(ssuPK);
+        return new Response(String.format("SurveyUnit %s removed from sample %s", surveyUnitId, sampleId), HttpStatus.OK);
     }
 
 }

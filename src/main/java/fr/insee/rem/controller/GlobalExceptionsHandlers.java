@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import fr.insee.rem.exception.CsvFileException;
+import fr.insee.rem.exception.SampleAlreadyExistsException;
 import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.exception.SurveyUnitNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,14 @@ public class GlobalExceptionsHandlers {
     public ResponseEntity<CsvFileException> exceptionCsvFileHandler(final HttpServletRequest req, final CsvFileException exception) {
         log.error("exceptionCsvFileHandler  : " + exception.getMessage());
         return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SampleAlreadyExistsException.class)
+    public ResponseEntity<SampleAlreadyExistsException> exceptionSampleAlreadyExistsHandler(
+        final HttpServletRequest req,
+        final SampleAlreadyExistsException exception) {
+        log.error("exceptionSampleAlreadyExistsHandler  : " + exception.getMessage());
+        return new ResponseEntity<>(exception, HttpStatus.CONFLICT);
     }
 
 }

@@ -153,7 +153,7 @@ public class SurveyUnitDto {
 
     public SurveyUnitDto(Long id, SurveyUnitData su) {
         this.id = id;
-        this.persons = su.getPersons().stream().map(p -> new PersonDto(p)).collect(Collectors.toList());
+        this.persons = su.getPersons().stream().map(PersonDto::new).collect(Collectors.toList());
         BeanUtils.copyProperties(su, this);
     }
 }
