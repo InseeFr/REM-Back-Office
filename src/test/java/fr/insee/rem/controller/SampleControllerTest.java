@@ -28,6 +28,7 @@ import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.entities.SurveyUnitData;
 import fr.insee.rem.exception.CsvFileException;
+import fr.insee.rem.exception.SampleAlreadyExistsException;
 import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.service.SampleService;
 
@@ -67,6 +68,15 @@ class SampleControllerTest {
         mockMvc
             .perform(MockMvcRequestBuilders.put("/sample/create").contentType(MediaType.TEXT_PLAIN_VALUE).accept(MediaType.APPLICATION_JSON).content("Sample1"))
             .andExpect(status().isOk()).andExpect(jsonPath("$", notNullValue())).andExpect(jsonPath("$.label", is("Sample1")));
+    }
+
+    @Test
+    void putSample_error_409() throws Exception {
+        SampleAlreadyExistsException ex = new SampleAlreadyExistsException("sample");
+        Mockito.when(sampleService.putSample("sample")).thenThrow(ex);
+        mockMvc
+            .perform(MockMvcRequestBuilders.put("/sample/create").contentType(MediaType.TEXT_PLAIN_VALUE).accept(MediaType.APPLICATION_JSON).content("sample"))
+            .andExpect(status().isConflict());
     }
 
     @Test

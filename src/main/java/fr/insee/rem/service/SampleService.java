@@ -8,6 +8,7 @@ import fr.insee.rem.dto.SampleDto;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.exception.CsvFileException;
+import fr.insee.rem.exception.SampleAlreadyExistsException;
 import fr.insee.rem.exception.SampleNotFoundException;
 
 public interface SampleService {
@@ -18,7 +19,7 @@ public interface SampleService {
 
     List<SurveyUnitDto> getSurveyUnitsBySample(Long sampleId) throws SampleNotFoundException;
 
-    SampleDto putSample(String label);
+    SampleDto putSample(String label) throws SampleAlreadyExistsException;
 
     SampleDto getSample(Long sampleId) throws SampleNotFoundException;
 

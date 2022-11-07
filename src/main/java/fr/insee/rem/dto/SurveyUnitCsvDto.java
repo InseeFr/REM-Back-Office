@@ -122,7 +122,7 @@ public class SurveyUnitCsvDto {
     private String noLog;
     @CsvBindByName(column = "adr_rang")
     private String adrRang;
-    @CsvBindByName(column = "logRang")
+    @CsvBindByName(column = "log_rang")
     private String logRang;
     @CsvBindByName
     private String posPM;

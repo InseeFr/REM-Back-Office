@@ -23,6 +23,7 @@ import fr.insee.rem.dto.SampleDto;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.exception.CsvFileException;
+import fr.insee.rem.exception.SampleAlreadyExistsException;
 import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.service.SampleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -78,12 +79,13 @@ public class SampleController {
     }
 
     @Operation(summary = "Create sample", responses = {
-        @ApiResponse(responseCode = "200", description = "Sample successfully created")
+        @ApiResponse(responseCode = "200", description = "Sample successfully created"),
+        @ApiResponse(responseCode = "409", description = "Sample Already Exists")
     })
     @PutMapping(path = "/create", consumes = {
         MediaType.TEXT_PLAIN_VALUE
     })
-    public ResponseEntity<SampleDto> putSample(HttpServletRequest request, @RequestBody String label) {
+    public ResponseEntity<SampleDto> putSample(HttpServletRequest request, @RequestBody String label) throws SampleAlreadyExistsException {
         log.info("PUT create sample {}", label);
         return new ResponseEntity<>(sampleService.putSample(label), HttpStatus.OK);
     }
