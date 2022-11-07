@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import fr.insee.rem.entities.Response;
@@ -28,6 +29,7 @@ import fr.insee.rem.repository.SurveyUnitRepository;
 import fr.insee.rem.service.impl.SurveyUnitServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class SurveyUnitServiceTest {
 
     @InjectMocks
