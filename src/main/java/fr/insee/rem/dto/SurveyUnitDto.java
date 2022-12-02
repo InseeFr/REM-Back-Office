@@ -1,7 +1,6 @@
 package fr.insee.rem.dto;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 
@@ -153,7 +152,7 @@ public class SurveyUnitDto {
 
     public SurveyUnitDto(Long id, SurveyUnitData su) {
         this.id = id;
-        this.persons = su.getPersons().stream().map(PersonDto::new).collect(Collectors.toList());
+        this.persons = su.getPersons().stream().map(PersonDto::new).toList();
         BeanUtils.copyProperties(su, this);
     }
 }
