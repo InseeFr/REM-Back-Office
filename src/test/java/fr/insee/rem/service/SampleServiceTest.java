@@ -9,8 +9,6 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +30,7 @@ import fr.insee.rem.repository.SampleRepository;
 import fr.insee.rem.repository.SampleSurveyUnitRepository;
 import fr.insee.rem.repository.SurveyUnitRepository;
 import fr.insee.rem.service.impl.SampleServiceImpl;
+import jakarta.persistence.EntityManager;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest

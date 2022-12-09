@@ -5,10 +5,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +30,8 @@ import fr.insee.rem.repository.SampleSurveyUnitRepository;
 import fr.insee.rem.repository.SurveyUnitRepository;
 import fr.insee.rem.service.SampleService;
 import fr.insee.rem.service.SurveyUnitService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -81,7 +79,7 @@ public class SampleServiceImpl implements SampleService {
                 throw new CsvFileException("File read error");
             }
 
-            List<SurveyUnit> surveyUnits = surveyUnitsDto.stream().map(SurveyUnit::new).collect(Collectors.toList());
+            List<SurveyUnit> surveyUnits = surveyUnitsDto.stream().map(SurveyUnit::new).toList();
 
             surveyUnitRepository.saveAll(surveyUnits);
 
@@ -116,8 +114,7 @@ public class SampleServiceImpl implements SampleService {
             throw new SampleNotFoundException(sampleId);
         }
         List<SampleSurveyUnit> sampleSurveyUnits = sampleSurveyUnitRepository.findBySample(findSample.get());
-        return sampleSurveyUnits.stream().map(SampleSurveyUnit::getSurveyUnit).map(su -> new SurveyUnitDto(su.getId(), su.getSurveyUnitData()))
-            .collect(Collectors.toList());
+        return sampleSurveyUnits.stream().map(SampleSurveyUnit::getSurveyUnit).map(su -> new SurveyUnitDto(su.getId(), su.getSurveyUnitData())).toList();
     }
 
     @Override
@@ -145,7 +142,7 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public List<SampleDto> getAllSamples() {
         List<Sample> samples = sampleRepository.findAll();
-        return samples.stream().map(s -> new SampleDto(s.getId(), s.getLabel())).collect(Collectors.toList());
+        return samples.stream().map(s -> new SampleDto(s.getId(), s.getLabel())).toList();
     }
 
 }

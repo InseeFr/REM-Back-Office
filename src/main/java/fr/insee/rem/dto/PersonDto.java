@@ -1,7 +1,6 @@
 package fr.insee.rem.dto;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 
@@ -28,7 +27,7 @@ public class PersonDto {
     private List<PhoneNumberDto> phonesNumbers;
 
     public PersonDto(Person p) {
-        this.phonesNumbers = p.getPhonesNumbers().stream().map(PhoneNumberDto::new).collect(Collectors.toList());
+        this.phonesNumbers = p.getPhonesNumbers().stream().map(PhoneNumberDto::new).toList();
         BeanUtils.copyProperties(p, this);
     }
 
