@@ -18,13 +18,22 @@ public class PropertiesConfiguration {
     @Value("${fr.insee.rem.springdoc.title:REM Api}")
     private String springDocTitle;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    @Value("${fr.insee.rem.keycloak.auth-server-url}")
     private String keycloakUrl;
+
+    @Value("${fr.insee.rem.keycloak.realm}")
+    private String keycloakRealm;
 
     @Value("${fr.insee.rem.role.administrator}")
     private String roleAdmin;
 
     @Value("#{'${fr.insee.rem.security.whitelist-matchers}'.split(',')}")
     private String[] whiteList;
+
+    @Value("${fr.insee.rem.security.auth.mode}")
+    private String authMode;
+
+    @Value("${fr.insee.rem.host}")
+    private String host;
 
 }

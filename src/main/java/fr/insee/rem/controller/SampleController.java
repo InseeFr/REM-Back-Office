@@ -26,14 +26,12 @@ import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.service.SampleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
 @RequestMapping(path = "/sample")
-@SecurityRequirement(name = "bearerAuth")
 public class SampleController {
 
     @Autowired

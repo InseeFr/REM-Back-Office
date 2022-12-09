@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -19,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@ConditionalOnProperty(name = "fr.insee.rem.security.auth.mode", havingValue = "OIDC")
 public class SecurityConfiguration {
 
     // Par défaut, spring sécurity prefixe les rôles avec cette chaine
@@ -26,7 +28,6 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, PropertiesConfiguration props) throws Exception {
-
         http.csrf().disable().authorizeHttpRequests().requestMatchers(props.getWhiteList()).permitAll().anyRequest().hasAnyRole(props.getRoleAdmin()).and()
             .oauth2ResourceServer(oauth2 -> oauth2.jwt().jwtAuthenticationConverter(jwtAuthenticationConverter()));
         return http.build();
