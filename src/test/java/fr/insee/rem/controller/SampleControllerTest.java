@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -23,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import fr.insee.rem.config.DefaultSecurityConfiguration;
 import fr.insee.rem.dto.SampleDto;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
@@ -34,6 +36,7 @@ import fr.insee.rem.service.SampleService;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(value = SampleController.class)
+@Import(DefaultSecurityConfiguration.class)
 class SampleControllerTest {
 
     @Autowired

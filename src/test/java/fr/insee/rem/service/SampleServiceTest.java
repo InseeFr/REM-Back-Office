@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import fr.insee.rem.config.PropertiesConfiguration;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.entities.Sample;
 import fr.insee.rem.exception.CsvFileException;
@@ -35,6 +36,9 @@ import jakarta.persistence.EntityManager;
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 class SampleServiceTest {
+
+    @Mock
+    PropertiesConfiguration props;
 
     @InjectMocks
     SampleServiceImpl sampleService;

@@ -8,12 +8,14 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import fr.insee.rem.config.DefaultSecurityConfiguration;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.exception.SurveyUnitNotFoundException;
@@ -21,6 +23,7 @@ import fr.insee.rem.service.SurveyUnitService;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(value = SurveyUnitController.class)
+@Import(DefaultSecurityConfiguration.class)
 class SurveyUnitControllerTest {
 
     @Autowired
