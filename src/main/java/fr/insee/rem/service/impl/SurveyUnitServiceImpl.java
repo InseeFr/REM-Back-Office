@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.entities.Sample;
 import fr.insee.rem.entities.SampleSurveyUnit;
@@ -74,6 +75,16 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
         SampleSurveyUnitPK ssuPK = new SampleSurveyUnitPK(sampleId, surveyUnitId);
         sampleSurveyUnitRepository.deleteById(ssuPK);
         return new Response(String.format("SurveyUnit %s removed from sample %s", surveyUnitId, sampleId), HttpStatus.OK);
+    }
+
+    @Override
+    public SurveyUnitDto getSurveyUnit(Long surveyUnitId) throws SurveyUnitNotFoundException {
+        Optional<SurveyUnit> findSurveyUnit = surveyUnitRepository.findById(surveyUnitId);
+        if ( !findSurveyUnit.isPresent()) {
+            throw new SurveyUnitNotFoundException(surveyUnitId);
+        }
+        SurveyUnit su = findSurveyUnit.get();
+        return new SurveyUnitDto(su.getId(), su.getSurveyUnitData());
     }
 
 }
