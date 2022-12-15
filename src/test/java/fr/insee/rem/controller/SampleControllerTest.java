@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import fr.insee.rem.config.DefaultSecurityConfiguration;
 import fr.insee.rem.dto.SampleDto;
+import fr.insee.rem.dto.SuIdsDto;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.entities.SurveyUnitData;
@@ -71,6 +72,15 @@ class SampleControllerTest {
         mockMvc
             .perform(MockMvcRequestBuilders.put("/sample/create").contentType(MediaType.TEXT_PLAIN_VALUE).accept(MediaType.APPLICATION_JSON).content("Sample1"))
             .andExpect(status().isOk()).andExpect(jsonPath("$", notNullValue())).andExpect(jsonPath("$.label", is("Sample1")));
+    }
+
+    @Test
+    void getListOfIds_success() throws Exception {
+        SuIdsDto suIdsDto = new SuIdsDto(1l, "test", Arrays.asList(1l, 2l, 3l));
+        Mockito.when(sampleService.getListOfIds(1l)).thenReturn(suIdsDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/sample/1/survey-units-ids").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+            .andExpect(jsonPath("$.listOfIds", hasSize(3))).andExpect(jsonPath("$.listOfIds[1]", is(2)));
     }
 
     @Test
@@ -148,6 +158,13 @@ class SampleControllerTest {
         SampleNotFoundException ex = new SampleNotFoundException(1l);
         Mockito.when(sampleService.getSurveyUnitsBySample(1l)).thenThrow(ex);
         mockMvc.perform(MockMvcRequestBuilders.get("/sample/1/survey-units").accept(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getListOfIds_erreur404() throws Exception {
+        SampleNotFoundException ex = new SampleNotFoundException(1l);
+        Mockito.when(sampleService.getListOfIds(1l)).thenThrow(ex);
+        mockMvc.perform(MockMvcRequestBuilders.get("/sample/1/survey-units-ids").accept(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
     }
 
 }

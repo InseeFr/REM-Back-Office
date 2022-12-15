@@ -1,13 +1,16 @@
 package fr.insee.rem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.exception.SurveyUnitNotFoundException;
@@ -38,6 +41,18 @@ public class SurveyUnitController {
         Response response = surveyUnitService.addSurveyUnitToSample(surveyUnitId, sampleId);
         log.info("POST /survey-unit/{surveyUnitId}/sample/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+    }
+
+    @Operation(summary = "Get SurveyUnit by Id", responses = {
+        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
+        @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
+    })
+    @GetMapping(path = "/{surveyUnitId}")
+    public ResponseEntity<SurveyUnitDto> getSurveyUnit(
+        HttpServletRequest request,
+        @PathVariable("surveyUnitId") final Long surveyUnitId) throws SurveyUnitNotFoundException {
+        log.info("GET SurveyUnit {} ", surveyUnitId);
+        return new ResponseEntity<>(surveyUnitService.getSurveyUnit(surveyUnitId), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete SurveyUnit", responses = {

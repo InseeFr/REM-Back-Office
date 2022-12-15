@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import fr.insee.rem.dto.SampleDto;
+import fr.insee.rem.dto.SuIdsDto;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.exception.CsvFileException;
@@ -24,5 +25,7 @@ public interface SampleService {
     SampleDto getSample(Long sampleId) throws SampleNotFoundException;
 
     List<SampleDto> getAllSamples();
+
+    SuIdsDto getListOfIds(Long sampleId) throws SampleNotFoundException;
 
 }

@@ -16,6 +16,7 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import fr.insee.rem.dto.SampleDto;
+import fr.insee.rem.dto.SuIdsDto;
 import fr.insee.rem.dto.SurveyUnitCsvDto;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
@@ -143,6 +144,17 @@ public class SampleServiceImpl implements SampleService {
     public List<SampleDto> getAllSamples() {
         List<Sample> samples = sampleRepository.findAll();
         return samples.stream().map(s -> new SampleDto(s.getId(), s.getLabel())).toList();
+    }
+
+    @Override
+    public SuIdsDto getListOfIds(Long sampleId) throws SampleNotFoundException {
+        Optional<Sample> findSample = sampleRepository.findById(sampleId);
+        if ( !findSample.isPresent()) {
+            throw new SampleNotFoundException(sampleId);
+        }
+        Sample sample = findSample.get();
+        List<Long> surveyUnitsIds = sampleSurveyUnitRepository.findAllIdsBySample(sampleId);
+        return new SuIdsDto(sampleId, sample.getLabel(), surveyUnitsIds);
     }
 
 }

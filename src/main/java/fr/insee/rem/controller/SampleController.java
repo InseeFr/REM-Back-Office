@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import fr.insee.rem.dto.SampleDto;
+import fr.insee.rem.dto.SuIdsDto;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.exception.CsvFileException;
@@ -105,5 +106,15 @@ public class SampleController {
     public ResponseEntity<List<SampleDto>> getAllSamples(HttpServletRequest request) {
         log.info("Get all samples");
         return new ResponseEntity<>(sampleService.getAllSamples(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get list of Survey Units Ids", responses = {
+        @ApiResponse(responseCode = "200", description = "List of Survey Units Ids successfully recovered"),
+        @ApiResponse(responseCode = "404", description = "Sample Not Found")
+    })
+    @GetMapping(path = "/{sampleId}/survey-units-ids")
+    public ResponseEntity<SuIdsDto> getListOfIds(HttpServletRequest request, @PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException {
+        log.info("Get list of Survey Units Ids for sample {}", sampleId);
+        return new ResponseEntity<>(sampleService.getListOfIds(sampleId), HttpStatus.OK);
     }
 }
