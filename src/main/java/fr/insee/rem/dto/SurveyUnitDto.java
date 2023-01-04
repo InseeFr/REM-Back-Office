@@ -1,5 +1,6 @@
 package fr.insee.rem.dto;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -12,6 +13,8 @@ public class SurveyUnitDto {
 
     private Long id;
 
+    private Date registeredDate;
+
     private List<PersonDto> persons;
 
     private String anneeFideli;
@@ -21,6 +24,8 @@ public class SurveyUnitDto {
     private String typeUnite;
 
     private String identUpFin;
+
+    private String identifiantStrate;
 
     private Double alea;
 
@@ -33,6 +38,8 @@ public class SurveyUnitDto {
     private String btqPrioritaire;
 
     private String libvoiePrioritaire;
+
+    private String origineAdrPrioritaire;
 
     private String immSupplementaire;
 
@@ -83,6 +90,8 @@ public class SurveyUnitDto {
     private Integer dateEntreePers;
 
     private Integer nbPersLog;
+
+    private Integer nbLogAdr;
 
     private String infoComplLgt1;
 
@@ -150,9 +159,12 @@ public class SurveyUnitDto {
 
     private String sr6;
 
-    public SurveyUnitDto(Long id, SurveyUnitData su) {
+    public SurveyUnitDto(Long id, SurveyUnitData su, String poleGestionOpale, String affectationIdep, Date registeredDate) {
         this.id = id;
         this.persons = su.getPersons().stream().map(PersonDto::new).toList();
         BeanUtils.copyProperties(su, this);
+        this.poleGestionOpale = poleGestionOpale;
+        this.affectationIdep = affectationIdep;
+        this.registeredDate = registeredDate;
     }
 }

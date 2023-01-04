@@ -40,7 +40,7 @@ public class Sample implements Serializable {
     @Column(unique = true)
     private String label;
 
-    @OneToMany(mappedBy = "sample", orphanRemoval = true)
+    @OneToMany(mappedBy = "sample", orphanRemoval = false)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

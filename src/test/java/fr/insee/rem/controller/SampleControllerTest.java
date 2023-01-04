@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -113,9 +114,9 @@ class SampleControllerTest {
         suData2.setIdentUnite(222222l);
         SurveyUnitData suData3 = new SurveyUnitData();
         suData3.setIdentUnite(333333l);
-        SurveyUnitDto su1 = new SurveyUnitDto(1l, suData1);
-        SurveyUnitDto su2 = new SurveyUnitDto(2l, suData2);
-        SurveyUnitDto su3 = new SurveyUnitDto(3l, suData3);
+        SurveyUnitDto su1 = new SurveyUnitDto(1l, suData1, null, null, new Date());
+        SurveyUnitDto su2 = new SurveyUnitDto(2l, suData2, null, null, new Date());
+        SurveyUnitDto su3 = new SurveyUnitDto(3l, suData3, null, null, new Date());
         List<SurveyUnitDto> suDtos = new ArrayList<>(Arrays.asList(su1, su2, su3));
         Mockito.when(sampleService.getSurveyUnitsBySample(1l)).thenReturn(suDtos);
 

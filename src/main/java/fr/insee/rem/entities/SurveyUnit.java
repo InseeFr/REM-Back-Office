@@ -48,7 +48,7 @@ public class SurveyUnit implements Serializable {
     @Basic(fetch = FetchType.LAZY)
     private SurveyUnitData surveyUnitData;
 
-    @OneToMany(mappedBy = "surveyUnit", orphanRemoval = true)
+    @OneToMany(mappedBy = "surveyUnit", orphanRemoval = false)
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

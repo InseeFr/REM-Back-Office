@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.exception.SampleNotFoundException;
+import fr.insee.rem.exception.SampleSurveyUnitNotFoundException;
 import fr.insee.rem.exception.SurveyUnitNotFoundException;
 import fr.insee.rem.service.SurveyUnitService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,15 +45,16 @@ public class SurveyUnitController {
     }
 
     @Operation(summary = "Get SurveyUnit by Id", responses = {
-        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
+        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully found"),
         @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
     })
-    @GetMapping(path = "/{surveyUnitId}")
+    @GetMapping(path = "/{surveyUnitId}/sample/{sampleId}")
     public ResponseEntity<SurveyUnitDto> getSurveyUnit(
         HttpServletRequest request,
-        @PathVariable("surveyUnitId") final Long surveyUnitId) throws SurveyUnitNotFoundException {
-        log.info("GET SurveyUnit {} ", surveyUnitId);
-        return new ResponseEntity<>(surveyUnitService.getSurveyUnit(surveyUnitId), HttpStatus.OK);
+        @PathVariable("surveyUnitId") final Long surveyUnitId,
+        @PathVariable("sampleId") final Long sampleId) throws SurveyUnitNotFoundException, SampleSurveyUnitNotFoundException {
+        log.info("GET SurveyUnit {} related to sample {}", surveyUnitId, sampleId);
+        return new ResponseEntity<>(surveyUnitService.getSurveyUnit(surveyUnitId, sampleId), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete SurveyUnit", responses = {

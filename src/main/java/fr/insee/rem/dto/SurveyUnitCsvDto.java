@@ -22,6 +22,8 @@ public class SurveyUnitCsvDto {
     private String typeUnite;
     @CsvBindByName(column = "ident_up_fin")
     private String identUpFin;
+    @CsvBindByName(column = "identifiant_strate")
+    private String identifiantStrate;
     @CsvBindByName
     private Double alea;
     @CsvBindByName
@@ -34,6 +36,8 @@ public class SurveyUnitCsvDto {
     private String btqPrioritaire;
     @CsvBindByName(column = "libvoie_prioritaire")
     private String libvoiePrioritaire;
+    @CsvBindByName(column = "origine_adr_prioritaire")
+    private String origineAdrPrioritaire;
     @CsvBindByName(column = "imm_supplementaire")
     private String immSupplementaire;
     @CsvBindByName(column = "btq_supplementaire")
@@ -84,6 +88,8 @@ public class SurveyUnitCsvDto {
     private Integer dateEntreePers;
     @CsvBindByName(column = "nb_pers_log")
     private Integer nbPersLog;
+    @CsvBindByName(column = "nb_log_adr")
+    private Integer nbLogAdr;
     @CsvBindByName(column = "info_compl_lgt1")
     private String infoComplLgt1;
     @CsvBindByName(column = "info_compl_lgt2")

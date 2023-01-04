@@ -38,6 +38,8 @@ public class SurveyUnitData implements Serializable {
 
     private String identUpFin;
 
+    private String identifiantStrate;
+
     private Double alea;
 
     private String depcom;
@@ -49,6 +51,8 @@ public class SurveyUnitData implements Serializable {
     private String btqPrioritaire;
 
     private String libvoiePrioritaire;
+
+    private String origineAdrPrioritaire;
 
     private String immSupplementaire;
 
@@ -100,6 +104,8 @@ public class SurveyUnitData implements Serializable {
 
     private Integer nbPersLog;
 
+    private Integer nbLogAdr;
+
     private String infoComplLgt1;
 
     private String infoComplLgt2;
@@ -125,10 +131,6 @@ public class SurveyUnitData implements Serializable {
     private String bs;
 
     private String ec;
-
-    private String poleGestionOpale;
-
-    private String affectationIdep;
 
     private String autresZae;
 
