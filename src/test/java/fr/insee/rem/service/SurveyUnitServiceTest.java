@@ -21,6 +21,7 @@ import fr.insee.rem.entities.Sample;
 import fr.insee.rem.entities.SampleSurveyUnit;
 import fr.insee.rem.entities.SampleSurveyUnitPK;
 import fr.insee.rem.entities.SurveyUnit;
+import fr.insee.rem.entities.SurveyUnitData;
 import fr.insee.rem.exception.SampleNotFoundException;
 import fr.insee.rem.exception.SurveyUnitNotFoundException;
 import fr.insee.rem.repository.SampleRepository;
@@ -50,7 +51,8 @@ class SurveyUnitServiceTest {
         sample.setId(1l);
         SurveyUnit su = new SurveyUnit();
         su.setId(1l);
-        SampleSurveyUnit ssu = new SampleSurveyUnit(sample, su);
+        su.setSurveyUnitData(new SurveyUnitData());
+        SampleSurveyUnit ssu = new SampleSurveyUnit(sample, su, null, null);
         when(sampleRepository.findById(1l)).thenReturn(Optional.of(sample));
         when(surveyUnitRepository.findById(1l)).thenReturn(Optional.of(su));
         when(sampleSurveyUnitRepository.save(ssu)).thenReturn(ssu);

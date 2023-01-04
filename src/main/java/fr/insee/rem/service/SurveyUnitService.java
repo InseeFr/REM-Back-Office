@@ -3,6 +3,7 @@ package fr.insee.rem.service;
 import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.exception.SampleNotFoundException;
+import fr.insee.rem.exception.SampleSurveyUnitNotFoundException;
 import fr.insee.rem.exception.SurveyUnitNotFoundException;
 
 public interface SurveyUnitService {
@@ -13,6 +14,6 @@ public interface SurveyUnitService {
 
     Response removeSurveyUnitFromSample(Long surveyUnitId, Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException;
 
-    SurveyUnitDto getSurveyUnit(Long surveyUnitId) throws SurveyUnitNotFoundException;
+    SurveyUnitDto getSurveyUnit(Long surveyUnitId, Long sampleId) throws SurveyUnitNotFoundException, SampleSurveyUnitNotFoundException;
 
 }

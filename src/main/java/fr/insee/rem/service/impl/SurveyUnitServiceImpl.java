@@ -15,6 +15,7 @@ import fr.insee.rem.entities.SampleSurveyUnit;
 import fr.insee.rem.entities.SampleSurveyUnitPK;
 import fr.insee.rem.entities.SurveyUnit;
 import fr.insee.rem.exception.SampleNotFoundException;
+import fr.insee.rem.exception.SampleSurveyUnitNotFoundException;
 import fr.insee.rem.exception.SurveyUnitNotFoundException;
 import fr.insee.rem.repository.SampleRepository;
 import fr.insee.rem.repository.SampleSurveyUnitRepository;
@@ -44,7 +45,7 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
         if ( !findSurveyUnit.isPresent()) {
             throw new SurveyUnitNotFoundException(surveyUnitId);
         }
-        SampleSurveyUnit sampleSurveyUnit = new SampleSurveyUnit(findSample.get(), findSurveyUnit.get());
+        SampleSurveyUnit sampleSurveyUnit = new SampleSurveyUnit(findSample.get(), findSurveyUnit.get(), null, null);
         sampleSurveyUnitRepository.save(sampleSurveyUnit);
         return new Response(String.format("SurveyUnit %s add to sample %s", surveyUnitId, sampleId), HttpStatus.OK);
     }
@@ -78,13 +79,18 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
     }
 
     @Override
-    public SurveyUnitDto getSurveyUnit(Long surveyUnitId) throws SurveyUnitNotFoundException {
+    public SurveyUnitDto getSurveyUnit(Long surveyUnitId, Long sampleId) throws SurveyUnitNotFoundException, SampleSurveyUnitNotFoundException {
         Optional<SurveyUnit> findSurveyUnit = surveyUnitRepository.findById(surveyUnitId);
         if ( !findSurveyUnit.isPresent()) {
             throw new SurveyUnitNotFoundException(surveyUnitId);
         }
+        Optional<SampleSurveyUnit> findSampleSurveyUnit = sampleSurveyUnitRepository.findById(new SampleSurveyUnitPK(sampleId, surveyUnitId));
+        if ( !findSampleSurveyUnit.isPresent()) {
+            throw new SampleSurveyUnitNotFoundException(sampleId, surveyUnitId);
+        }
         SurveyUnit su = findSurveyUnit.get();
-        return new SurveyUnitDto(su.getId(), su.getSurveyUnitData());
+        SampleSurveyUnit ssu = findSampleSurveyUnit.get();
+        return new SurveyUnitDto(su.getId(), su.getSurveyUnitData(), ssu.getPoleGestionOpale(), ssu.getAffectationIdep(), ssu.getRegisteredDate());
     }
 
 }

@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -62,7 +61,6 @@ class SampleServiceTest {
     void addSampleFromCSVFile_success() throws Exception {
         File file = new File(getClass().getClassLoader().getResource(sample1).getFile());
         MultipartFile sampleFile = new MockMultipartFile("sample", file.getName(), MediaType.TEXT_PLAIN_VALUE, new FileInputStream(file));
-        when(surveyUnitRepository.saveAll(Mockito.anyList())).thenReturn(new ArrayList<>());
         doNothing().when(entityManager).persist(Mockito.any());
         Sample sample = new Sample();
         sample.setId(1l);

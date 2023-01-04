@@ -22,6 +22,7 @@ import fr.insee.rem.dto.SurveyUnitDto;
 import fr.insee.rem.entities.Response;
 import fr.insee.rem.entities.Sample;
 import fr.insee.rem.entities.SampleSurveyUnit;
+import fr.insee.rem.entities.SampleSurveyUnitPK;
 import fr.insee.rem.entities.SurveyUnit;
 import fr.insee.rem.exception.CsvFileException;
 import fr.insee.rem.exception.SampleAlreadyExistsException;
@@ -80,13 +81,10 @@ public class SampleServiceImpl implements SampleService {
                 throw new CsvFileException("File read error");
             }
 
-            List<SurveyUnit> surveyUnits = surveyUnitsDto.stream().map(SurveyUnit::new).toList();
-
-            surveyUnitRepository.saveAll(surveyUnits);
-
-            for (SurveyUnit su : surveyUnits) {
-                SampleSurveyUnit sampleSurveyUnit = new SampleSurveyUnit(sample, su);
-                entityManager.persist(sampleSurveyUnit); // force inserts
+            for (SurveyUnitCsvDto suDto : surveyUnitsDto) {
+                SurveyUnit su = new SurveyUnit(suDto);
+                SampleSurveyUnit ssu = new SampleSurveyUnit(sample, su, suDto.getPoleGestionOpale(), suDto.getAffectationIdep());
+                entityManager.persist(ssu);
             }
 
             return new Response(String.format("%s surveyUnits created", surveyUnitsDto.size()), HttpStatus.OK);
@@ -103,8 +101,10 @@ public class SampleServiceImpl implements SampleService {
         if ( !findSample.isPresent()) {
             throw new SampleNotFoundException(sampleId);
         }
-        sampleSurveyUnitRepository.deleteAll(sampleSurveyUnitRepository.findBySample(findSample.get()));
-        sampleRepository.delete(findSample.get());
+        Sample sample = findSample.get();
+        List<SampleSurveyUnitPK> ssuPKList = sampleSurveyUnitRepository.findBySample(sample).stream().map(SampleSurveyUnit::getId).toList();
+        sampleSurveyUnitRepository.deleteAllById(ssuPKList);
+        sampleRepository.delete(sample);
         return new Response(String.format("sample %s deleted", sampleId), HttpStatus.OK);
     }
 
@@ -115,7 +115,8 @@ public class SampleServiceImpl implements SampleService {
             throw new SampleNotFoundException(sampleId);
         }
         List<SampleSurveyUnit> sampleSurveyUnits = sampleSurveyUnitRepository.findBySample(findSample.get());
-        return sampleSurveyUnits.stream().map(SampleSurveyUnit::getSurveyUnit).map(su -> new SurveyUnitDto(su.getId(), su.getSurveyUnitData())).toList();
+        return sampleSurveyUnits.stream().map(ssu -> new SurveyUnitDto(ssu.getSurveyUnit().getId(), ssu.getSurveyUnit().getSurveyUnitData(),
+            ssu.getAffectationIdep(), ssu.getPoleGestionOpale(), ssu.getRegisteredDate())).toList();
     }
 
     @Override

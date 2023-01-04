@@ -40,13 +40,21 @@ public class SampleSurveyUnit implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date registeredDate = new Date();
 
+    @Column(name = "pole_gestion_opale")
+    private String poleGestionOpale;
+
+    @Column(name = "affectation_idep")
+    private String affectationIdep;
+
     @SuppressWarnings("unused")
     private SampleSurveyUnit() {}
 
-    public SampleSurveyUnit(Sample sample, SurveyUnit surveyUnit) {
+    public SampleSurveyUnit(Sample sample, SurveyUnit surveyUnit, String poleGestionOpale, String affectationIdep) {
         this.sample = sample;
         this.surveyUnit = surveyUnit;
         this.id = new SampleSurveyUnitPK(sample.getId(), surveyUnit.getId());
+        this.poleGestionOpale = poleGestionOpale;
+        this.affectationIdep = affectationIdep;
     }
 
     @Override
