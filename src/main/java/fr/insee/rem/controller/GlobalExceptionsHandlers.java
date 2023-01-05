@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import fr.insee.rem.exception.CsvFileException;
 import fr.insee.rem.exception.SampleAlreadyExistsException;
 import fr.insee.rem.exception.SampleNotFoundException;
+import fr.insee.rem.exception.SampleSurveyUnitNotFoundException;
 import fr.insee.rem.exception.SurveyUnitNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,14 @@ public class GlobalExceptionsHandlers {
         final HttpServletRequest req,
         final SampleAlreadyExistsException exception) {
         log.error("exceptionSampleAlreadyExistsHandler  : " + exception.getMessage());
+        return new ResponseEntity<>(exception, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(SampleSurveyUnitNotFoundException.class)
+    public ResponseEntity<SampleSurveyUnitNotFoundException> exceptionSampleSurveyUnitNotFoundHandler(
+        final HttpServletRequest req,
+        final SampleSurveyUnitNotFoundException exception) {
+        log.error("exceptionSampleSurveyUnitNotFoundHandler  : " + exception.getMessage());
         return new ResponseEntity<>(exception, HttpStatus.CONFLICT);
     }
 
