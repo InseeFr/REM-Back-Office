@@ -114,9 +114,10 @@ public class SampleServiceImpl implements SampleService {
         if ( !findSample.isPresent()) {
             throw new SampleNotFoundException(sampleId);
         }
-        List<SampleSurveyUnit> sampleSurveyUnits = sampleSurveyUnitRepository.findBySample(findSample.get());
-        return sampleSurveyUnits.stream().map(ssu -> new SurveyUnitDto(ssu.getSurveyUnit().getId(), ssu.getSurveyUnit().getSurveyUnitData(),
-            ssu.getAffectationIdep(), ssu.getPoleGestionOpale(), ssu.getRegisteredDate())).toList();
+
+        List<SampleSurveyUnit> ssuList = sampleSurveyUnitRepository.findBySampleWithSurveyUnit(findSample.get());
+        return ssuList.stream().map(ssu -> new SurveyUnitDto(ssu.getSurveyUnit().getId(), ssu.getSurveyUnit().getSurveyUnitData(), ssu.getAffectationIdep(),
+            ssu.getPoleGestionOpale(), ssu.getRegisteredDate())).toList();
     }
 
     @Override

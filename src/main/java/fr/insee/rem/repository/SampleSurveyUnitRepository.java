@@ -21,4 +21,7 @@ public interface SampleSurveyUnitRepository extends JpaRepository<SampleSurveyUn
 
     List<SampleSurveyUnit> findBySurveyUnit(SurveyUnit surveyUnit);
 
+    @Query(value = "select ssu from SampleSurveyUnit ssu left join fetch ssu.surveyUnit su where ssu.sample = ?1")
+    List<SampleSurveyUnit> findBySampleWithSurveyUnit(Sample sample);
+
 }
