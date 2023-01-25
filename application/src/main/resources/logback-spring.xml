@@ -1,0 +1,39 @@
+<!--http://logback.qos.ch/manual/configuration.html -->
+<configuration>
+
+	<conversionRule conversionWord="user" converterClass="fr.insee.rem.application.config.UserConverter" />
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%-32.32(%-5level %d{dd-MM-yyyy HH:mm:ss} %user) --- %-60.60(%logger{26}:%L) : %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="file_rem" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_FILE}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}</fileNamePattern>
+
+			<!-- keep 90 days' worth of history capped at 2GB total size -->
+			<maxHistory>90</maxHistory>
+			<totalSizeCap>2GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%-32.32(%-5level %d{dd-MM-yyyy HH:mm:ss} %user) --- %-60.60(%logger{26}:%L) : %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="fr.insee.rem" level="DEBUG" additivity="false">
+		<appender-ref ref="console" />
+		<appender-ref ref="file_rem" />
+	</logger>
+
+	<!-- Niveau de log par defaut -->
+	<root level="INFO">
+		<appender-ref ref="console" />
+		<appender-ref ref="file_rem" />
+	</root>
+</configuration>
