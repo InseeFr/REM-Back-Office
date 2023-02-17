@@ -31,11 +31,10 @@ public class SampleServiceImpl implements SampleServicePort {
     @Override
     public SampleDto createSample(String label) throws SampleAlreadyExistsException {
         log.debug("domain: createSample({})", label);
-        Optional<SampleDto> findSampleDto = samplePersistencePort.findByLabel(label);
-        if (findSampleDto.isPresent()) {
+        if (samplePersistencePort.existsByLabel(label)) {
             throw new SampleAlreadyExistsException(label);
         }
-        return samplePersistencePort.save(SampleDto.builder().label(label).build());
+        return samplePersistencePort.createSample(label);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package fr.insee.rem.domain.exception;
+package fr.insee.rem.controller.exception;
 
 public class CsvFileException extends Exception {
 

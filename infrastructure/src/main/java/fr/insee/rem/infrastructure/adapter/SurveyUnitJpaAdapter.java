@@ -40,4 +40,9 @@ public class SurveyUnitJpaAdapter implements SurveyUnitPersistencePort {
         }
     }
 
+    @Override
+    public boolean existsById(Long surveyUnitId) {
+        return surveyUnitRepository.existsById(surveyUnitId);
+    }
+
 }

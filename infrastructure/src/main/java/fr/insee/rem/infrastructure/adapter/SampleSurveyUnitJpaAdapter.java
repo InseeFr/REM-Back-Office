@@ -7,14 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.insee.rem.domain.dtos.SampleDto;
 import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.domain.ports.spi.SampleSurveyUnitPersistencePort;
 import fr.insee.rem.infrastructure.entity.Sample;
 import fr.insee.rem.infrastructure.entity.SampleSurveyUnit;
 import fr.insee.rem.infrastructure.entity.SurveyUnit;
-import fr.insee.rem.infrastructure.mappers.SampleMapper;
 import fr.insee.rem.infrastructure.mappers.SampleSurveyUnitMapper;
 import fr.insee.rem.infrastructure.mappers.SurveyUnitMapper;
 import fr.insee.rem.infrastructure.repository.SampleRepository;
@@ -50,22 +48,25 @@ public class SampleSurveyUnitJpaAdapter implements SampleSurveyUnitPersistencePo
     }
 
     @Override
-    public SampleSurveyUnitDto save(SampleSurveyUnitDto sampleSurveyUnitDto) {
-        SampleSurveyUnit ssu = SampleSurveyUnitMapper.INSTANCE.dtoToEntity(sampleSurveyUnitDto);
+    public SampleSurveyUnitDto addSurveyUnitToSample(Long surveyUnitId, Long sampleId) {
+        Sample sample = entityManager.find(Sample.class, sampleId);
+        SurveyUnit surveyUnit = entityManager.find(SurveyUnit.class, surveyUnitId);
+        SampleSurveyUnit ssu = new SampleSurveyUnit(sample, surveyUnit);
         ssu = sampleSurveyUnitRepository.save(ssu);
         return SampleSurveyUnitMapper.INSTANCE.entityToDto(ssu);
     }
 
     @Override
-    public void delete(SampleSurveyUnitDto sampleSurveyUnitDto) {
-        SampleSurveyUnit ssu = SampleSurveyUnitMapper.INSTANCE.dtoToEntity(sampleSurveyUnitDto);
+    public void removeSurveyUnitFromSample(Long surveyUnitId, Long sampleId) {
+        Sample sample = entityManager.find(Sample.class, sampleId);
+        SurveyUnit surveyUnit = entityManager.find(SurveyUnit.class, surveyUnitId);
+        SampleSurveyUnit ssu = new SampleSurveyUnit(sample, surveyUnit);
         sampleSurveyUnitRepository.delete(ssu);
     }
 
     @Override
-    public List<SampleSurveyUnitDto> findBySampleWithSurveyUnit(SampleDto sampleDto) {
-        Sample sample = SampleMapper.INSTANCE.dtoToEntity(sampleDto);
-        List<SampleSurveyUnit> ssuList = sampleSurveyUnitRepository.findBySampleWithSurveyUnit(sample);
+    public List<SampleSurveyUnitDto> findSurveyUnitsBySampleId(Long sampleId) {
+        List<SampleSurveyUnit> ssuList = sampleSurveyUnitRepository.findAllSurveyUnitsBySampleId(sampleId);
         return SampleSurveyUnitMapper.INSTANCE.listEntityToListDto(ssuList);
     }
 

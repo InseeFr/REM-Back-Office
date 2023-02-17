@@ -10,4 +10,6 @@ public interface SurveyUnitPersistencePort {
 
     Optional<SurveyUnitDto> findById(Long surveyUnitId);
 
+    boolean existsById(Long surveyUnitId);
+
 }

@@ -9,7 +9,10 @@
 	</parent>
 	<artifactId>domain</artifactId>
 	<description>Survey unit repository - Business Logic</description>
-
+	<properties>
+		<pitest.version>1.11.0</pitest.version>
+		<pitest.junit.version>1.1.2</pitest.junit.version>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -21,5 +24,47 @@
             <artifactId>slf4j-api</artifactId>
             <scope>provided</scope>
      	</dependency>
+     	<dependency>
+		    <groupId>org.junit.jupiter</groupId>
+		    <artifactId>junit-jupiter</artifactId>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-core</artifactId>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-junit-jupiter</artifactId>
+		    <scope>test</scope>
+		</dependency>
 	</dependencies>	
+	<build>
+		<plugins>	
+			<plugin>
+			    <groupId>org.pitest</groupId>
+			    <artifactId>pitest-maven</artifactId>
+			    <version>${pitest.version}</version>
+			    <configuration>
+			        <targetClasses>
+			            <param>fr.insee.rem.domain.service.*</param>
+			        </targetClasses>
+			        <targetTests>
+			            <param>fr.insee.rem.domain.service.*</param>
+					</targetTests>
+					<mutators>
+					  <mutator>STRONGER</mutator>
+					</mutators>
+			     </configuration>			     
+			     <dependencies>
+	                <dependency>
+	                    <groupId>org.pitest</groupId>
+	                    <artifactId>pitest-junit5-plugin</artifactId>
+	                    <version>${pitest.junit.version}</version>
+	                </dependency>
+            	</dependencies>
+			</plugin>
+		</plugins>
+	</build>
 </project>

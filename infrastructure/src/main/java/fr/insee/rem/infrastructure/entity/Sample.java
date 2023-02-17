@@ -42,4 +42,8 @@ public class Sample implements Serializable {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<SampleSurveyUnit> sampleSurveyUnits = new HashSet<>();
+
+    public Sample(String label) {
+        this.label = label;
+    }
 }

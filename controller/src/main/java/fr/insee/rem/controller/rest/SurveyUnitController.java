@@ -42,14 +42,14 @@ public class SurveyUnitController {
     @Autowired
     HouseholdCsvAdapter householdCsvAdapter;
 
-    @Operation(summary = "Add SurveyUnits from CSV file to Sample", responses = {
+    @Operation(summary = "Add Household SurveyUnits to Sample from CSV file", responses = {
         @ApiResponse(responseCode = "200", description = "SurveysUnits successfully added"), @ApiResponse(responseCode = "400", description = "CSV File Error"),
         @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
-    @PostMapping(path = "/{sampleId}/addFromCSVFile", consumes = {
+    @PostMapping(path = "/{sampleId}/addHouseholdSuFromCSVFile", consumes = {
         MediaType.MULTIPART_FORM_DATA_VALUE
     })
-    public ResponseEntity<Object> addSampleFromCSVFile(
+    public ResponseEntity<Object> addHouseholdSuFromCSVFile(
         HttpServletRequest request,
         @PathVariable("sampleId") final Long sampleId,
         @RequestPart("sample") MultipartFile sampleFile) throws SampleNotFoundException, CsvFileException {

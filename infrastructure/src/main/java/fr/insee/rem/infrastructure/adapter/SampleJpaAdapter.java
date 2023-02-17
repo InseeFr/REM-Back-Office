@@ -48,20 +48,13 @@ public class SampleJpaAdapter implements SamplePersistencePort {
     }
 
     @Override
-    public Optional<SampleDto> findByLabel(String label) {
-        Optional<Sample> sample = sampleRepository.findByLabel(label);
-        if (sample.isPresent()) {
-            return Optional.of(SampleMapper.INSTANCE.entityToDto(sample.get()));
-        }
-        else {
-            return Optional.empty();
-        }
+    public boolean existsByLabel(String label) {
+        return sampleRepository.findByLabel(label).isPresent();
     }
 
     @Override
-    public SampleDto save(SampleDto sampleDto) {
-        Sample sample = SampleMapper.INSTANCE.dtoToEntity(sampleDto);
-        sample = sampleRepository.save(sample);
+    public SampleDto createSample(String label) {
+        Sample sample = sampleRepository.save(new Sample(label));
         return SampleMapper.INSTANCE.entityToDto(sample);
     }
 

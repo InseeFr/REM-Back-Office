@@ -3,7 +3,6 @@ package fr.insee.rem.domain.service;
 import java.util.List;
 import java.util.Optional;
 
-import fr.insee.rem.domain.dtos.SampleDto;
 import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
@@ -44,22 +43,19 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
     @Override
     public SampleSurveyUnitDto addSurveyUnitToSample(Long surveyUnitId, Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException {
         log.debug("domain: addSurveyUnitToSample({}, {})", surveyUnitId, sampleId);
-        Optional<SampleDto> findSampleDto = samplePersistencePort.findById(sampleId);
-        if ( !findSampleDto.isPresent()) {
+        if ( !samplePersistencePort.existsById(sampleId)) {
             throw new SampleNotFoundException(sampleId);
         }
-        Optional<SurveyUnitDto> findSurveyUnitDto = surveyUnitPersistencePort.findById(surveyUnitId);
-        if ( !findSurveyUnitDto.isPresent()) {
+        if ( !surveyUnitPersistencePort.existsById(surveyUnitId)) {
             throw new SurveyUnitNotFoundException(surveyUnitId);
         }
-        return sampleSurveyUnitPersistencePort.save(SampleSurveyUnitDto.builder().sample(findSampleDto.get()).surveyUnit(findSurveyUnitDto.get()).build());
+        return sampleSurveyUnitPersistencePort.addSurveyUnitToSample(surveyUnitId, sampleId);
     }
 
     @Override
     public void deleteSurveyUnitById(Long surveyUnitId) throws SurveyUnitNotFoundException {
         log.debug("domain: deleteSurveyUnitById({})", surveyUnitId);
-        Optional<SurveyUnitDto> findSurveyUnitDto = surveyUnitPersistencePort.findById(surveyUnitId);
-        if ( !findSurveyUnitDto.isPresent()) {
+        if ( !surveyUnitPersistencePort.existsById(surveyUnitId)) {
             throw new SurveyUnitNotFoundException(surveyUnitId);
         }
         surveyUnitPersistencePort.deleteById(surveyUnitId);
@@ -68,15 +64,13 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
     @Override
     public void removeSurveyUnitFromSample(Long surveyUnitId, Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException {
         log.debug("domain: removeSurveyUnitFromSample({},{})", surveyUnitId, sampleId);
-        Optional<SampleDto> findSampleDto = samplePersistencePort.findById(sampleId);
-        if ( !findSampleDto.isPresent()) {
+        if ( !samplePersistencePort.existsById(sampleId)) {
             throw new SampleNotFoundException(sampleId);
         }
-        Optional<SurveyUnitDto> findSurveyUnitDto = surveyUnitPersistencePort.findById(surveyUnitId);
-        if ( !findSurveyUnitDto.isPresent()) {
+        if ( !surveyUnitPersistencePort.existsById(surveyUnitId)) {
             throw new SurveyUnitNotFoundException(surveyUnitId);
         }
-        sampleSurveyUnitPersistencePort.delete(SampleSurveyUnitDto.builder().sample(findSampleDto.get()).surveyUnit(findSurveyUnitDto.get()).build());
+        sampleSurveyUnitPersistencePort.removeSurveyUnitFromSample(surveyUnitId, sampleId);
     }
 
     @Override
@@ -92,18 +86,16 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
     @Override
     public List<SampleSurveyUnitDto> getSurveyUnitsBySampleId(Long sampleId) throws SampleNotFoundException {
         log.debug("domain: getSurveyUnitsBySampleId({})", sampleId);
-        Optional<SampleDto> findSampleDto = samplePersistencePort.findById(sampleId);
-        if ( !findSampleDto.isPresent()) {
+        if ( !samplePersistencePort.existsById(sampleId)) {
             throw new SampleNotFoundException(sampleId);
         }
-        return sampleSurveyUnitPersistencePort.findBySampleWithSurveyUnit(findSampleDto.get());
+        return sampleSurveyUnitPersistencePort.findSurveyUnitsBySampleId(sampleId);
     }
 
     @Override
     public List<Long> getSurveyUnitIdsBySampleId(Long sampleId) throws SampleNotFoundException {
         log.debug("domain: getSurveyUnitIdsBySampleId({})", sampleId);
-        Optional<SampleDto> findSampleDto = samplePersistencePort.findById(sampleId);
-        if ( !findSampleDto.isPresent()) {
+        if ( !samplePersistencePort.existsById(sampleId)) {
             throw new SampleNotFoundException(sampleId);
         }
         return sampleSurveyUnitPersistencePort.findAllIdsBySampleId(sampleId);

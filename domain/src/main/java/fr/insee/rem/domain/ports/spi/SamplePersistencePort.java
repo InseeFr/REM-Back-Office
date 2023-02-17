@@ -13,10 +13,10 @@ public interface SamplePersistencePort {
 
     List<SampleDto> findAll();
 
-    Optional<SampleDto> findByLabel(String label);
-
-    SampleDto save(SampleDto sampleDto);
-
     boolean existsById(Long sampleId);
+
+    boolean existsByLabel(String label);
+
+    SampleDto createSample(String label);
 
 }
