@@ -54,7 +54,9 @@ public class SampleJpaAdapter implements SamplePersistencePort {
 
     @Override
     public SampleDto createSample(String label) {
-        Sample sample = sampleRepository.save(new Sample(label));
+        Sample sample = new Sample();
+        sample.setLabel(label);
+        sample = sampleRepository.save(sample);
         return SampleMapper.INSTANCE.entityToDto(sample);
     }
 

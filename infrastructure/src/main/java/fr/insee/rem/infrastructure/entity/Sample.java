@@ -17,11 +17,13 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
 @Table(name = "sample")
 @Data
+@NoArgsConstructor
 public class Sample implements Serializable {
 
     /**
@@ -43,7 +45,8 @@ public class Sample implements Serializable {
     @ToString.Exclude
     private Set<SampleSurveyUnit> sampleSurveyUnits = new HashSet<>();
 
-    public Sample(String label) {
+    public Sample(Long id, String label) {
+        this.id = id;
         this.label = label;
     }
 }
