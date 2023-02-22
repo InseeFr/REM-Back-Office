@@ -1,4 +1,4 @@
-package fr.insee.rem.application.response;
+package fr.insee.rem.controller.response;
 
 import org.springframework.http.HttpStatus;
 

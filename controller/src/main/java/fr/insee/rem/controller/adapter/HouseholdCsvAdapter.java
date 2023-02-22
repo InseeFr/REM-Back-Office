@@ -1,4 +1,4 @@
-package fr.insee.rem.application.adapter;
+package fr.insee.rem.controller.adapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import fr.insee.rem.application.sources.HouseholdCsvSource;
-import fr.insee.rem.application.utils.CoordinateConversionUtils;
+import fr.insee.rem.controller.sources.HouseholdCsvSource;
+import fr.insee.rem.controller.utils.CoordinateConversionUtils;
 import fr.insee.rem.domain.dtos.AdditionalInformationDto;
 import fr.insee.rem.domain.dtos.AddressDto;
 import fr.insee.rem.domain.dtos.EmailDto;

@@ -1,4 +1,4 @@
-package fr.insee.rem.application.controller;
+package fr.insee.rem.controller.rest;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import fr.insee.rem.application.response.Response;
+import fr.insee.rem.controller.response.Response;
 import fr.insee.rem.domain.dtos.SampleDto;
 import fr.insee.rem.domain.exception.SampleAlreadyExistsException;
 import fr.insee.rem.domain.exception.SampleNotFoundException;

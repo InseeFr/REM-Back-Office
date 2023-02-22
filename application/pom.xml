@@ -25,7 +25,7 @@
         
         <dependency>
             <groupId>fr.insee.rem</groupId>
-            <artifactId>interface</artifactId>
+            <artifactId>controller</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         

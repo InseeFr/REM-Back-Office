@@ -1,4 +1,4 @@
-package fr.insee.rem.application.utils;
+package fr.insee.rem.controller.utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.geotools.geometry.jts.JTS;

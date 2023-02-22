@@ -1,4 +1,4 @@
-package fr.insee.rem.application.utils;
+package fr.insee.rem.controller.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
-import fr.insee.rem.domain.exception.CsvFileException;
+import fr.insee.rem.controller.exception.CsvFileException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

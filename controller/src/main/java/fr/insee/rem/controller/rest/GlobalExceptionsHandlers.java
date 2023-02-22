@@ -1,14 +1,13 @@
-package fr.insee.rem.application.controller;
+package fr.insee.rem.controller.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import fr.insee.rem.domain.exception.CsvFileException;
+import fr.insee.rem.controller.exception.CsvFileException;
 import fr.insee.rem.domain.exception.SampleAlreadyExistsException;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
-import fr.insee.rem.domain.exception.SampleSurveyUnitNotFoundException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -42,14 +41,6 @@ public class GlobalExceptionsHandlers {
         final HttpServletRequest req,
         final SampleAlreadyExistsException exception) {
         log.error("exceptionSampleAlreadyExistsHandler  : " + exception.getMessage());
-        return new ResponseEntity<>(exception, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(SampleSurveyUnitNotFoundException.class)
-    public ResponseEntity<SampleSurveyUnitNotFoundException> exceptionSampleSurveyUnitNotFoundHandler(
-        final HttpServletRequest req,
-        final SampleSurveyUnitNotFoundException exception) {
-        log.error("exceptionSampleSurveyUnitNotFoundHandler  : " + exception.getMessage());
         return new ResponseEntity<>(exception, HttpStatus.CONFLICT);
     }
 

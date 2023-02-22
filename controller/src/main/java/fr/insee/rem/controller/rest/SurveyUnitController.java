@@ -1,4 +1,4 @@
-package fr.insee.rem.application.controller;
+package fr.insee.rem.controller.rest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.insee.rem.application.adapter.HouseholdCsvAdapter;
-import fr.insee.rem.application.response.Response;
-import fr.insee.rem.application.sources.HouseholdCsvSource;
-import fr.insee.rem.application.utils.CsvToBeanUtils;
+import fr.insee.rem.controller.adapter.HouseholdCsvAdapter;
+import fr.insee.rem.controller.exception.CsvFileException;
+import fr.insee.rem.controller.response.Response;
+import fr.insee.rem.controller.sources.HouseholdCsvSource;
+import fr.insee.rem.controller.utils.CsvToBeanUtils;
 import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
-import fr.insee.rem.domain.exception.CsvFileException;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
 import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
