@@ -4,13 +4,11 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import fr.insee.rem.infrastructure.entity.SampleSurveyUnit;
 import fr.insee.rem.infrastructure.entity.SampleSurveyUnitPK;
 import fr.insee.rem.infrastructure.entity.SurveyUnit;
 
-@Repository
 public interface SampleSurveyUnitRepository extends JpaRepository<SampleSurveyUnit, SampleSurveyUnitPK> {
 
     @Query(value = "select ssu.surveyUnit.id from SampleSurveyUnit ssu where ssu.sample.id = ?1")
