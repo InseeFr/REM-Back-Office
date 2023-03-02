@@ -113,7 +113,7 @@ public class HouseholdCsvAdapter {
     private Boolean buildBoolean(String test) {
         Pattern pattern = Pattern.compile("1|O|oui|vrai|true|yes", Pattern.CASE_INSENSITIVE);
         if (StringUtils.isBlank(test)) {
-            return null;
+            return null;// NOSONAR
         }
         else if (pattern.matcher(test).find()) {
             return true;
