@@ -80,16 +80,16 @@ public class HouseholdCsvAdapter {
         }
         List<EmailDto> emails = new ArrayList<>();
         if (StringUtils.isNotBlank(personMap.get("mel_" + index))) {
-            EmailDto email = EmailDto.builder().favorite(false).source(Source.FISCAL).mailAddress(personMap.get("mel_" + index)).build();
+            EmailDto email = EmailDto.builder().favorite(false).source(Source.INITIAL).mailAddress(personMap.get("mel_" + index)).build();
             emails.add(email);
         }
         List<PhoneNumberDto> phones = new ArrayList<>();
         if (StringUtils.isNotBlank(personMap.get("tel_port_" + index))) {
-            PhoneNumberDto number = PhoneNumberDto.builder().favorite(false).source(Source.FISCAL).number(personMap.get("tel_port_" + index)).build();
+            PhoneNumberDto number = PhoneNumberDto.builder().favorite(false).source(Source.INITIAL).number(personMap.get("tel_port_" + index)).build();
             phones.add(number);
         }
         if (StringUtils.isNotBlank(personMap.get("tel2_" + index))) {
-            PhoneNumberDto number = PhoneNumberDto.builder().favorite(false).source(Source.FISCAL).number(personMap.get("tel2_" + index)).build();
+            PhoneNumberDto number = PhoneNumberDto.builder().favorite(false).source(Source.INITIAL).number(personMap.get("tel2_" + index)).build();
             phones.add(number);
         }
         return PersonDto.builder().index(index).externalId(identInd).gender(personMap.get("sexe_" + index)).firstName(personMap.get("nom_nais_" + index))
