@@ -27,7 +27,7 @@ public class SecurityConfiguration {
     private static final String ROLE_PREFIX = "ROLE_";
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, PropertiesConfiguration props) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, PropertiesConfiguration props) throws Exception {
         http.csrf().disable().authorizeHttpRequests().requestMatchers(props.getWhiteList()).permitAll().anyRequest().hasAnyRole(props.getRoleAdmin()).and()
             .oauth2ResourceServer(oauth2 -> oauth2.jwt().jwtAuthenticationConverter(jwtAuthenticationConverter()));
         return http.build();
