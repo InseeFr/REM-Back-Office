@@ -27,6 +27,9 @@ public class PropertiesConfiguration {
     @Value("${fr.insee.rem.role.administrator}")
     private String roleAdmin;
 
+    @Value("${fr.insee.rem.role.user}")
+    private String roleUser;
+
     @Value("#{'${fr.insee.rem.security.whitelist-matchers}'.split(',')}")
     private String[] whiteList;
 

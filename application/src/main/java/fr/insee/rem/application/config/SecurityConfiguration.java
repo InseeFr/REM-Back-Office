@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,7 +29,8 @@ public class SecurityConfiguration {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, PropertiesConfiguration props) throws Exception {
-        http.csrf().disable().authorizeHttpRequests().requestMatchers(props.getWhiteList()).permitAll().anyRequest().hasAnyRole(props.getRoleAdmin()).and()
+        http.csrf().disable().authorizeHttpRequests().requestMatchers(props.getWhiteList()).permitAll().requestMatchers(HttpMethod.GET)
+            .hasAnyRole(props.getRoleUser(), props.getRoleAdmin()).anyRequest().hasAnyRole(props.getRoleAdmin()).and()
             .oauth2ResourceServer(oauth2 -> oauth2.jwt().jwtAuthenticationConverter(jwtAuthenticationConverter()));
         return http.build();
     }

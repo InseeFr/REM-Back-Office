@@ -19,7 +19,7 @@ import io.swagger.v3.oas.models.servers.Server;
 public class SpringDocConfiguration {
 
     @Bean
-    public OpenAPI customOpenAPI(PropertiesConfiguration props) {
+    OpenAPI customOpenAPI(PropertiesConfiguration props) {
         String authUrl = props.getKeycloakUrl() + "/realms/" + props.getKeycloakRealm() + "/protocol/openid-connect";
         if ("OIDC".equals(props.getAuthMode())) {
             return new OpenAPI().addServersItem(new Server().url(props.getHost()))
