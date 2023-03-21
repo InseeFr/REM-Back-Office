@@ -6,6 +6,7 @@ import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
+import fr.insee.rem.domain.records.SuIdMappingRecord;
 
 public interface SurveyUnitServicePort {
 
@@ -22,5 +23,7 @@ public interface SurveyUnitServicePort {
     List<SampleSurveyUnitDto> getSurveyUnitsBySampleId(Long sampleId) throws SampleNotFoundException;
 
     List<Long> getSurveyUnitIdsBySampleId(Long sampleId) throws SampleNotFoundException;
+
+    List<SuIdMappingRecord> getIdMappingTableBySampleId(Long sampleId) throws SampleNotFoundException;
 
 }

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.domain.ports.spi.SampleSurveyUnitPersistencePort;
+import fr.insee.rem.domain.records.SuIdMappingRecord;
 import fr.insee.rem.infrastructure.entity.Sample;
 import fr.insee.rem.infrastructure.entity.SampleSurveyUnit;
 import fr.insee.rem.infrastructure.entity.SurveyUnit;
@@ -68,6 +69,11 @@ public class SampleSurveyUnitJpaAdapter implements SampleSurveyUnitPersistencePo
     public List<SampleSurveyUnitDto> findSurveyUnitsBySampleId(Long sampleId) {
         List<SampleSurveyUnit> ssuList = sampleSurveyUnitRepository.findAllSurveyUnitsBySampleId(sampleId);
         return SampleSurveyUnitMapper.INSTANCE.listEntityToListDto(ssuList);
+    }
+
+    @Override
+    public List<SuIdMappingRecord> findSuIdMappingBySampleId(Long sampleId) {
+        return sampleSurveyUnitRepository.findSuIdMappingBySampleId(sampleId);
     }
 
 }

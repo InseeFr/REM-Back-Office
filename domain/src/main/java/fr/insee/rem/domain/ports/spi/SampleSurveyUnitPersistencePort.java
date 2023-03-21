@@ -4,6 +4,7 @@ import java.util.List;
 
 import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
+import fr.insee.rem.domain.records.SuIdMappingRecord;
 
 public interface SampleSurveyUnitPersistencePort {
 
@@ -16,5 +17,7 @@ public interface SampleSurveyUnitPersistencePort {
     void removeSurveyUnitFromSample(Long surveyUnitId, Long sampleId);
 
     List<SampleSurveyUnitDto> findSurveyUnitsBySampleId(Long sampleId);
+
+    List<SuIdMappingRecord> findSuIdMappingBySampleId(Long sampleId);
 
 }

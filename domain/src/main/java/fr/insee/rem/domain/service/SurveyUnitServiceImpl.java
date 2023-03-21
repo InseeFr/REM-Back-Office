@@ -11,6 +11,7 @@ import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
 import fr.insee.rem.domain.ports.spi.SamplePersistencePort;
 import fr.insee.rem.domain.ports.spi.SampleSurveyUnitPersistencePort;
 import fr.insee.rem.domain.ports.spi.SurveyUnitPersistencePort;
+import fr.insee.rem.domain.records.SuIdMappingRecord;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -99,6 +100,15 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
             throw new SampleNotFoundException(sampleId);
         }
         return sampleSurveyUnitPersistencePort.findAllIdsBySampleId(sampleId);
+    }
+
+    @Override
+    public List<SuIdMappingRecord> getIdMappingTableBySampleId(Long sampleId) throws SampleNotFoundException {
+        log.debug("domain: getIdMappingTableBySampleId({})", sampleId);
+        if ( !samplePersistencePort.existsById(sampleId)) {
+            throw new SampleNotFoundException(sampleId);
+        }
+        return sampleSurveyUnitPersistencePort.findSuIdMappingBySampleId(sampleId);
     }
 
 }

@@ -1,9 +1,12 @@
 package fr.insee.rem.controller.rest;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +24,15 @@ import fr.insee.rem.controller.adapter.HouseholdCsvAdapter;
 import fr.insee.rem.controller.exception.CsvFileException;
 import fr.insee.rem.controller.response.Response;
 import fr.insee.rem.controller.sources.HouseholdCsvSource;
+import fr.insee.rem.controller.targets.SuIdMappingCsvTarget;
+import fr.insee.rem.controller.utils.BeanToCsvUtils;
 import fr.insee.rem.controller.utils.CsvToBeanUtils;
 import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
 import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
+import fr.insee.rem.domain.records.SuIdMappingRecord;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -136,6 +142,23 @@ public class SurveyUnitController {
     public ResponseEntity<List<Long>> getListOfIds(@PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException {
         log.info("Get list of Survey Units Ids for sample {}", sampleId);
         return new ResponseEntity<>(surveyUnitService.getSurveyUnitIdsBySampleId(sampleId), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Export identifiers mapping table", responses = {
+        @ApiResponse(responseCode = "200", description = "Identifiers mapping table successfully recovered"),
+        @ApiResponse(responseCode = "404", description = "Sample Not Found")
+    })
+    @GetMapping(path = "/samples/{sampleId}/id-mapping-table", produces = "text/csv")
+    public ResponseEntity<Object> getIdentifiersMappingTable(@PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException, CsvFileException {
+        log.info("Get identifiers mapping table for sample {}", sampleId);
+        List<SuIdMappingRecord> records = surveyUnitService.getIdMappingTableBySampleId(sampleId);
+        List<SuIdMappingCsvTarget> targets =
+            records.stream().map(r -> SuIdMappingCsvTarget.builder().idRem(String.valueOf(r.repositoryId())).idSource(r.externalId()).build()).toList();
+        ByteArrayInputStream csvStream = BeanToCsvUtils.write(targets);
+        String fileName = "ids-mapping-table-sample-" + sampleId + ".csv";
+
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+            .contentType(MediaType.parseMediaType("text/csv")).body(new InputStreamResource(csvStream));
     }
 
 }
