@@ -3,6 +3,8 @@ package fr.insee.rem.controller.utils;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -27,14 +29,21 @@ public final class CsvToBeanUtils {
                 new CsvToBeanBuilder<T>(reader).withType(targetType).withSeparator(';').withIgnoreLeadingWhiteSpace(true).withEscapeChar('\0')
                     .withThrowExceptions(false).build();
 
-            List<T> t = csvToBean.parse();
+            Iterator<T> it = csvToBean.iterator();
+
+            List<T> listT = new ArrayList<>();
+
+            while (it.hasNext()) {
+                T t = it.next();
+                listT.add(t);
+            }
 
             if ( !csvToBean.getCapturedExceptions().isEmpty()) {
                 csvToBean.getCapturedExceptions().stream().forEach(e -> log.error(e.getMessage(), e));
                 throw new CsvFileException("File read error");
             }
 
-            return t;
+            return listT;
         }
         catch (Exception e) {
             throw new CsvFileException("File read error", e);

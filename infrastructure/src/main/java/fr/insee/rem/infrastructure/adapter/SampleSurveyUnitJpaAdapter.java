@@ -1,5 +1,6 @@
 package fr.insee.rem.infrastructure.adapter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,12 +35,26 @@ public class SampleSurveyUnitJpaAdapter implements SampleSurveyUnitPersistencePo
     @PersistenceContext
     private EntityManager entityManager;
 
+    private static final int BATCH_SIZE = 100;
+
     @Override
     public List<SampleSurveyUnitDto> saveAll(Long sampleId, List<SurveyUnitDto> ssuListDto) {
-        Optional<Sample> sample = sampleRepository.findById(sampleId);
+        Optional<Sample> optionalSample = sampleRepository.findById(sampleId);
         List<SurveyUnit> suList = SurveyUnitMapper.INSTANCE.listDtoToListEntity(ssuListDto);
-        List<SampleSurveyUnit> ssuList = suList.stream().map(su -> new SampleSurveyUnit(sample.get(), su)).toList();
-        ssuList.stream().forEach(ssu -> entityManager.persist(ssu));
+        Sample sample = optionalSample.orElseThrow();
+        List<SampleSurveyUnit> ssuList = new ArrayList<>();
+        for (int i = 0; i < suList.size(); i ++ ) {
+            if (i > 0 && i % BATCH_SIZE == 0) {
+                entityManager.flush();
+                entityManager.clear();
+                sample = entityManager.merge(sample); // re-attach entity to the persistence context
+            }
+            SurveyUnit su = suList.get(i);
+            entityManager.persist(su);
+            SampleSurveyUnit ssu = new SampleSurveyUnit(sample, su);
+            entityManager.persist(ssu);
+            ssuList.add(ssu);
+        }
         return SampleSurveyUnitMapper.INSTANCE.listEntityToListDto(ssuList);
     }
 

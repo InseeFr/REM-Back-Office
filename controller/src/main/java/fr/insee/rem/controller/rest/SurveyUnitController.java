@@ -1,7 +1,6 @@
 package fr.insee.rem.controller.rest;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +34,12 @@ import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
 import fr.insee.rem.domain.records.SuIdMappingRecord;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
+@Tag(name = "SurveyUnits endpoints")
 @RequestMapping(path = "/survey-units")
 public class SurveyUnitController {
 
@@ -60,8 +61,7 @@ public class SurveyUnitController {
         @RequestPart("sample") MultipartFile sampleFile) throws SampleNotFoundException, CsvFileException {
         log.info("POST add sample {} from csv file {}", sampleId, sampleFile.getOriginalFilename());
         List<HouseholdCsvSource> householdCsvList = CsvToBeanUtils.parse(sampleFile, HouseholdCsvSource.class);
-        List<SurveyUnitDto> surveyUnitDtos = new ArrayList<>();
-        householdCsvList.forEach(h -> surveyUnitDtos.add(householdCsvAdapter.convert(h)));
+        List<SurveyUnitDto> surveyUnitDtos = householdCsvList.stream().map(h -> householdCsvAdapter.convert(h)).toList();
         List<SampleSurveyUnitDto> ssuDtos = surveyUnitService.importSurveyUnitsToSample(sampleId, surveyUnitDtos);
         Response response = new Response(String.format("%s surveyUnits created", ssuDtos.size()), HttpStatus.OK);
         log.info("POST /survey-units/samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
@@ -148,7 +148,7 @@ public class SurveyUnitController {
         @ApiResponse(responseCode = "200", description = "Identifiers mapping table successfully recovered"),
         @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
-    @GetMapping(path = "/samples/{sampleId}/id-mapping-table", produces = "text/csv")
+    @GetMapping(path = "/samples/{sampleId}/ids-mapping-table", produces = "text/csv")
     public ResponseEntity<Object> getIdentifiersMappingTable(@PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException, CsvFileException {
         log.info("Get identifiers mapping table for sample {}", sampleId);
         List<SuIdMappingRecord> records = surveyUnitService.getIdMappingTableBySampleId(sampleId);

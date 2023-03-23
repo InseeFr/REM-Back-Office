@@ -21,33 +21,23 @@ import fr.insee.rem.domain.exception.SampleNotFoundException;
 import fr.insee.rem.domain.ports.api.SampleServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
+@Tag(name = "Samples endpoints")
 @RequestMapping(path = "/samples")
 public class SampleController {
 
     @Autowired
     SampleServicePort sampleService;
 
-    @Operation(summary = "Delete sample", responses = {
-        @ApiResponse(responseCode = "200", description = "Sample successfully deleted"), @ApiResponse(responseCode = "404", description = "Sample Not Found")
-    })
-    @DeleteMapping(path = "/{sampleId}")
-    public ResponseEntity<Object> deleteSample(@PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException {
-        log.info("DELETE sample {}", sampleId);
-        sampleService.deleteSampleById(sampleId);
-        Response response = new Response(String.format("sample %s deleted", sampleId), HttpStatus.OK);
-        log.info("DELETE /samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
-    }
-
     @Operation(summary = "Create sample", responses = {
         @ApiResponse(responseCode = "200", description = "Sample successfully created"),
         @ApiResponse(responseCode = "409", description = "Sample Already Exists")
     })
-    @PostMapping(path = "/samples", consumes = {
+    @PostMapping(path = "/", consumes = {
         MediaType.TEXT_PLAIN_VALUE
     })
     public ResponseEntity<SampleDto> createSample(@RequestBody String label) throws SampleAlreadyExistsException {
@@ -71,5 +61,17 @@ public class SampleController {
     public ResponseEntity<List<SampleDto>> getAllSamples() {
         log.info("Get all samples");
         return new ResponseEntity<>(sampleService.getAllSamples(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Delete sample", responses = {
+        @ApiResponse(responseCode = "200", description = "Sample successfully deleted"), @ApiResponse(responseCode = "404", description = "Sample Not Found")
+    })
+    @DeleteMapping(path = "/{sampleId}")
+    public ResponseEntity<Object> deleteSample(@PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException {
+        log.info("DELETE sample {}", sampleId);
+        sampleService.deleteSampleById(sampleId);
+        Response response = new Response(String.format("sample %s deleted", sampleId), HttpStatus.OK);
+        log.info("DELETE /samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 }
