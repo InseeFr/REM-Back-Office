@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -92,8 +91,8 @@ public class HouseholdCsvAdapter {
             PhoneNumberDto number = PhoneNumberDto.builder().favorite(false).source(Source.INITIAL).number(personMap.get("tel2_" + index)).build();
             phones.add(number);
         }
-        return PersonDto.builder().index(index).externalId(identInd).gender(personMap.get("sexe_" + index)).firstName(personMap.get("nom_nais_" + index))
-            .lastName(personMap.get("nom_usage_" + index)).birthName(personMap.get("prenom_" + index))
+        return PersonDto.builder().index(index).externalId(identInd).gender(personMap.get("sexe_" + index)).firstName(personMap.get("prenom_" + index))
+            .lastName(personMap.get("nom_usage_" + index)).birthName(personMap.get("nom_nais_" + index))
             .dateOfBirth(buildDateOfBirth(personMap.get("anais_" + index), personMap.get("mnais_" + index), personMap.get("jnais_" + index))).surveyed(surveyed)
             .main(main).emails(emails.isEmpty() ? null : emails).phoneNumbers(phones.isEmpty() ? null : phones).build();
     }
@@ -107,18 +106,14 @@ public class HouseholdCsvAdapter {
         return LocationHelpDto.builder().cityCode(h.getCityCode()).building(h.getBuilding()).floor(h.getFloor()).staircase(h.getStaircase()).door(h.getDoor())
             .iris(h.getIris()).sector(StringUtils.isNotBlank(h.getSectorUp()) ? h.getSectorUp() : h.getSectorZae())
             .gpsCoordinates(CoordinateConversionUtils.convertCoordinates(h.getX(), h.getY(), h.getCityCode())).elevator(buildBoolean(h.getElevator()))
-            .cityPriorityDistrict(StringUtils.isNotBlank(h.getCityPriorityDistrict())).build();
+            .cityPriorityDistrict(buildBoolean(h.getCityPriorityDistrict())).build();
     }
 
     private Boolean buildBoolean(String test) {
-        Pattern pattern = Pattern.compile("1|O|oui|vrai|true|yes", Pattern.CASE_INSENSITIVE);
         if (StringUtils.isBlank(test)) {
             return null;// NOSONAR
         }
-        else if (pattern.matcher(test).find()) {
-            return true;
-        }
-        return false;
+        return "1".equals(test);
     }
 
     private String buildDateOfBirth(String year, String month, String day) {
