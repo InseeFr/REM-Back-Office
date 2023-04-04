@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +31,7 @@ import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
+import fr.insee.rem.domain.exception.SurveyUnitsNotFoundException;
 import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
 import fr.insee.rem.domain.records.SuIdMappingRecord;
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,6 +83,27 @@ public class SurveyUnitController {
         Response response =
             new Response(String.format("SurveyUnit %s add to sample %s", ssuDto.getSurveyUnit().getRepositoryId(), ssuDto.getSample().getId()), HttpStatus.OK);
         log.info("PUT /survey-units/{surveyUnitId}/samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+
+        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+    }
+
+    @Operation(summary = "Add SurveyUnits List to Sample", responses = {
+        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
+        @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
+    })
+    @PutMapping(path = "/samples/{sampleId}")
+    public ResponseEntity<Object> addSurveyUnitsToSample(
+        @RequestBody List<Long> surveyUnitIds,
+        @PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException, SurveyUnitsNotFoundException {
+        log.info("PUT Add SurveyUnits List to Sample {}", sampleId);
+        if (surveyUnitIds == null || surveyUnitIds.isEmpty()) {
+            Response response = new Response("SurveyUnits List empty", HttpStatus.BAD_REQUEST);
+            log.info("PUT /survey-units/samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+            return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+        }
+        int count = surveyUnitService.addSurveyUnitsToSample(surveyUnitIds, sampleId);
+        Response response = new Response(String.format("%s SurveyUnits add to sample %s", count, sampleId), HttpStatus.OK);
+        log.info("PUT /survey-units/samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
 
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }

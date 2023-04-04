@@ -7,6 +7,7 @@ import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
+import fr.insee.rem.domain.exception.SurveyUnitsNotFoundException;
 import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
 import fr.insee.rem.domain.ports.spi.SamplePersistencePort;
 import fr.insee.rem.domain.ports.spi.SampleSurveyUnitPersistencePort;
@@ -109,6 +110,20 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
             throw new SampleNotFoundException(sampleId);
         }
         return sampleSurveyUnitPersistencePort.findSuIdMappingBySampleId(sampleId);
+    }
+
+    @Override
+    public int addSurveyUnitsToSample(List<Long> surveyUnitIds, Long sampleId) throws SampleNotFoundException, SurveyUnitsNotFoundException {
+        log.debug("domain: addSurveyUnitsToSample({})", sampleId);
+        if ( !samplePersistencePort.existsById(sampleId)) {
+            throw new SampleNotFoundException(sampleId);
+        }
+        List<Long> idsNotOk = surveyUnitIds.stream().filter(id -> !surveyUnitPersistencePort.existsById(id)).toList();
+        if (idsNotOk != null && !idsNotOk.isEmpty()) {
+            throw new SurveyUnitsNotFoundException(idsNotOk);
+        }
+        surveyUnitIds.stream().forEach(id -> sampleSurveyUnitPersistencePort.addSurveyUnitToSample(id, sampleId));
+        return surveyUnitIds.size();
     }
 
 }
