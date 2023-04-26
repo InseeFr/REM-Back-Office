@@ -14,10 +14,6 @@ RUN mvn -B -e -C org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offli
 # if you have modules that depends each other, you may use -DexcludeArtifactIds as follows
 # RUN mvn -B -e -C org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offline -DexcludeArtifactIds=module1
 
-# Copy the dependencies from the DEPS stage with the advantage
-# of using docker layer caches. If something goes wrong from this
-# line on, all dependencies from DEPS were already downloaded and
-# stored in docker's layers.
 FROM maven:3.6-alpine as BUILDER
 WORKDIR /opt/app
 COPY --from=deps /root/.m2 /root/.m2
