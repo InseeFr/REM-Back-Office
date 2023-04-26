@@ -1,6 +1,9 @@
 # cache as most as possible in this multistage dockerfile.
 FROM maven:3.6-alpine as DEPS
 
+ARG MAVEN_SETTINGS
+COPY $MAVEN_SETTINGS /usr/share/maven/ref/settings.xml
+
 WORKDIR /opt/app
 COPY application/pom.xml application/pom.xml
 COPY controller/pom.xml controller/pom.xml
@@ -15,9 +18,10 @@ RUN mvn -B -e -C org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offli
 # RUN mvn -B -e -C org.apache.maven.plugins:maven-dependency-plugin:3.1.2:go-offline -DexcludeArtifactIds=module1
 
 FROM maven:3.6-alpine as BUILDER
+ENV MAVEN_CONFIG /root/.m2
 WORKDIR /opt/app
-COPY --from=deps /root/.m2 /root/.m2
-COPY --from=deps /opt/app/ /opt/app
+COPY --from=DEPS /root/.m2 /root/.m2
+COPY --from=DEPS /opt/app/ /opt/app
 COPY application/src /opt/app/application/src
 COPY controller/src /opt/app/controller/src
 COPY domain/src /opt/app/domain/src
@@ -33,3 +37,8 @@ WORKDIR /opt/app
 COPY --from=builder /opt/app/target/rembo-1.0.0.jar .
 EXPOSE 8080
 CMD [ "java", "-jar", "/opt/app/rembo-0.0.1-SNAPSHOT.jar" ]
+
+
+
+
+
