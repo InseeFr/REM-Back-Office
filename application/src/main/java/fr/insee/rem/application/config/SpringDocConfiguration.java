@@ -20,18 +20,20 @@ public class SpringDocConfiguration {
 
     @Bean
     OpenAPI customOpenAPI(PropertiesConfiguration props) {
-        String authUrl = props.getKeycloakUrl() + "/realms/" + props.getKeycloakRealm() + "/protocol/openid-connect";
-        if ("OIDC".equals(props.getAuthMode())) {
-            return new OpenAPI().addServersItem(new Server().url(props.getHost()))
-                .components(new Components().addSecuritySchemes("oauth2", new SecurityScheme().type(SecurityScheme.Type.OAUTH2).flows(getFlows(authUrl))))
-                .info(new Info().title(props.getSpringDocTitle()).description(props.getSpringDocDescription()).version(props.getVersion()))
-                .addSecurityItem(new SecurityRequirement().addList("oauth2", Arrays.asList("read", "write")));
-        }
-        else {
+        if (!"OIDC".equals(props.getAuthMode())) {
             // noauth
-            return new OpenAPI().info(new Info().title(props.getSpringDocTitle()).description(props.getSpringDocDescription()).version(props.getVersion()));
+            return new OpenAPI().info(new Info().title(props.getSpringDocTitle())
+                .description(props.getSpringDocDescription()).version(props.getVersion()));
         }
 
+        String authUrl = props.getKeycloakUrl() + "/realms/" + props.getKeycloakRealm() + "/protocol/openid-connect";
+
+        return new OpenAPI().addServersItem(new Server().url(props.getHost()))
+            .components(new Components().addSecuritySchemes("oauth2", new SecurityScheme()
+                .type(SecurityScheme.Type.OAUTH2).flows(getFlows(authUrl))))
+            .info(new Info().title(props.getSpringDocTitle()).description(props.getSpringDocDescription())
+                .version(props.getVersion()))
+            .addSecurityItem(new SecurityRequirement().addList("oauth2", Arrays.asList("read", "write")));
     }
 
     private OAuthFlows getFlows(String authUrl) {

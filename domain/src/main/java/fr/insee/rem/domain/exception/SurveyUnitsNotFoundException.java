@@ -2,7 +2,7 @@ package fr.insee.rem.domain.exception;
 
 import java.util.List;
 
-public class SurveyUnitsNotFoundException extends Exception {
+public class SurveyUnitsNotFoundException extends RuntimeException {
 
     /**
      * 

@@ -24,8 +24,7 @@ public interface SampleSurveyUnitRepository extends JpaRepository<SampleSurveyUn
     List<SampleSurveyUnit> findAllSurveyUnitsBySampleId(Long sampleId);
 
     @Query(
-        value = "select new fr.insee.rem.domain.records.SuIdMappingRecord(su.repositoryId, su.externalId) "
-            + "from SampleSurveyUnit ssu, SurveyUnit su where ssu.surveyUnit.repositoryId = su.repositoryId and ssu.sample.id = ?1")
+            value = "select new fr.insee.rem.domain.records.SuIdMappingRecord(su.repositoryId, su.externalId) " + "from SampleSurveyUnit ssu, SurveyUnit su where ssu.surveyUnit.repositoryId = su.repositoryId and ssu.sample.id = ?1")
     List<SuIdMappingRecord> findSuIdMappingBySampleId(Long sampleId);
 
 }

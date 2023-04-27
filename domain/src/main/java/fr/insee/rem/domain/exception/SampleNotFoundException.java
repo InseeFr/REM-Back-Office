@@ -1,6 +1,6 @@
 package fr.insee.rem.domain.exception;
 
-public class SampleNotFoundException extends Exception {
+public class SampleNotFoundException extends RuntimeException {
 
     /**
      * 

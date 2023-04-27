@@ -1,6 +1,6 @@
 package fr.insee.rem.controller.exception;
 
-public class CsvFileException extends Exception {
+public class CsvFileException extends RuntimeException {
 
     /**
      * 

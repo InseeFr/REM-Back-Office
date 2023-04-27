@@ -18,27 +18,27 @@ import fr.insee.rem.infrastructure.adapter.SurveyUnitJpaAdapter;
 public class PortConfig {
 
     @Bean
-    public SamplePersistencePort samplePersistance() {
+    SamplePersistencePort samplePersistance() {
         return new SampleJpaAdapter();
     }
 
     @Bean
-    public SampleSurveyUnitPersistencePort sampleSurveyUnitPersistance() {
+    SampleSurveyUnitPersistencePort sampleSurveyUnitPersistance() {
         return new SampleSurveyUnitJpaAdapter();
     }
 
     @Bean
-    public SurveyUnitPersistencePort surveyUnitPersistance() {
+    SurveyUnitPersistencePort surveyUnitPersistance() {
         return new SurveyUnitJpaAdapter();
     }
 
     @Bean
-    public SampleServicePort sampleService() {
+    SampleServicePort sampleService() {
         return new SampleServiceImpl(samplePersistance());
     }
 
     @Bean
-    public SurveyUnitServicePort surveyUnitService() {
+    SurveyUnitServicePort surveyUnitService() {
         return new SurveyUnitServiceImpl(surveyUnitPersistance(), sampleSurveyUnitPersistance(), samplePersistance());
     }
 

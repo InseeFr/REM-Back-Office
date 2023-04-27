@@ -25,9 +25,9 @@ public final class CsvToBeanUtils {
     public static <T> List<T> parse(MultipartFile csvFile, Class<T> targetType) throws CsvFileException {
         try (Reader reader = new BufferedReader(new InputStreamReader(csvFile.getInputStream()))) {
 
-            CsvToBean<T> csvToBean =
-                new CsvToBeanBuilder<T>(reader).withType(targetType).withSeparator(';').withIgnoreLeadingWhiteSpace(true).withEscapeChar('\0')
-                    .withThrowExceptions(false).build();
+            CsvToBean<T> csvToBean = new CsvToBeanBuilder<T>(reader).withType(targetType).withSeparator(';')
+                .withIgnoreLeadingWhiteSpace(true).withEscapeChar('\0')
+                .withThrowExceptions(false).build();
 
             Iterator<T> it = csvToBean.iterator();
 
@@ -38,14 +38,13 @@ public final class CsvToBeanUtils {
                 listT.add(t);
             }
 
-            if ( !csvToBean.getCapturedExceptions().isEmpty()) {
+            if (!csvToBean.getCapturedExceptions().isEmpty()) {
                 csvToBean.getCapturedExceptions().stream().forEach(e -> log.error(e.getMessage(), e));
                 throw new CsvFileException("File read error");
             }
 
             return listT;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new CsvFileException("File read error", e);
         }
 

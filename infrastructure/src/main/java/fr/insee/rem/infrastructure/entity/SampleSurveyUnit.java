@@ -41,7 +41,8 @@ public class SampleSurveyUnit implements Serializable {
     private Date registeredDate;
 
     @SuppressWarnings("unused")
-    private SampleSurveyUnit() {}
+    private SampleSurveyUnit() {
+    }
 
     public SampleSurveyUnit(Sample sample, SurveyUnit surveyUnit) {
         this.sample = sample;

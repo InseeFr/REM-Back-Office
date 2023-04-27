@@ -22,15 +22,14 @@ public final class BeanToCsvUtils {
 
     public static <T> ByteArrayInputStream write(List<T> sources) throws CsvFileException {
         try (
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            OutputStreamWriter streamWriter = new OutputStreamWriter(stream);
-            CSVWriter writer =
-                new CSVWriter(streamWriter, ';', ICSVWriter.NO_QUOTE_CHARACTER, ICSVWriter.DEFAULT_ESCAPE_CHARACTER, ICSVWriter.DEFAULT_LINE_END)) {
+             ByteArrayOutputStream stream = new ByteArrayOutputStream();
+             OutputStreamWriter streamWriter = new OutputStreamWriter(stream);
+             CSVWriter writer = new CSVWriter(streamWriter, ';', ICSVWriter.NO_QUOTE_CHARACTER, ICSVWriter.DEFAULT_ESCAPE_CHARACTER, ICSVWriter.DEFAULT_LINE_END)) {
 
             StatefulBeanToCsv<T> beanToCsv = new StatefulBeanToCsvBuilder<T>(writer).build();
             beanToCsv.write(sources);
 
-            if ( !beanToCsv.getCapturedExceptions().isEmpty()) {
+            if (!beanToCsv.getCapturedExceptions().isEmpty()) {
                 beanToCsv.getCapturedExceptions().stream().forEach(e -> log.error(e.getMessage(), e));
                 throw new CsvFileException("File write error");
             }
@@ -39,8 +38,7 @@ public final class BeanToCsvUtils {
 
             return new ByteArrayInputStream(stream.toByteArray());
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new CsvFileException("File write error", e);
         }
 

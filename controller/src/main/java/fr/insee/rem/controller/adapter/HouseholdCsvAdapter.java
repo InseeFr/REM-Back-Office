@@ -54,20 +54,18 @@ public class HouseholdCsvAdapter {
         Map<String, String> addInfoMap = new HashMap<>();
         h.getAdditionalInfomations().asMap().forEach((k, v) -> addInfoMap.put(k, v.iterator().next()));
         for (int i = 1; i <= 50; i++) {
-            PersonDto personDto = convertPerson(i, personMap, addInfoMap.get("type_unite"), addInfoMap
-                .get("ident_ind_dec"), addInfoMap.get("ident_ind_co"), h.getExternalId());
-            if (StringUtils.isNotBlank(personDto.getExternalId())) {
+            String identInd = personMap.get("ident_ind_" + i);
+            if (StringUtils.isNotBlank(identInd)) {
+                PersonDto personDto = convertPerson(i, identInd, personMap, addInfoMap.get("type_unite"), addInfoMap
+                    .get("ident_ind_dec"), addInfoMap.get("ident_ind_co"), h.getExternalId());
                 persons.add(personDto);
-            } else {
-                break;
             }
         }
 
         return persons;
     }
 
-    private PersonDto convertPerson(int index, Map<String, String> personMap, String typeUnite, String identDec, String identCo, String externalId) {
-        String identInd = personMap.get("ident_ind_" + index);
+    private PersonDto convertPerson(int index, String identInd, Map<String, String> personMap, String typeUnite, String identDec, String identCo, String externalId) {
         Boolean surveyed = false;
         Boolean main = false;
         if (identInd != null) {
@@ -129,16 +127,17 @@ public class HouseholdCsvAdapter {
     private String buildDateOfBirth(String year, String month, String day) {
         if (StringUtils.isBlank(year)) {
             return null;
-        } else if (StringUtils.isBlank(month)) {
-            return year;
-        } else if (StringUtils.isBlank(day)) {
-            month = month.length() == 1 ? "0" + month : month;
-            return year + month;
-        } else {
-            month = month.length() == 1 ? "0" + month : month;
-            day = day.length() == 1 ? "0" + day : day;
-            return year + month + day;
         }
+        if (StringUtils.isBlank(month)) {
+            return year;
+        }
+        if (StringUtils.isBlank(day)) {
+            month = String.format("%02d", month);
+            return year + month;
+        }
+        month = String.format("%02d", month);
+        day = String.format("%02d", day);
+        return year + month + day;
     }
 
 }

@@ -35,9 +35,8 @@ public class SurveyUnitJpaAdapter implements SurveyUnitPersistencePort {
         if (su.isPresent()) {
             return Optional.of(SurveyUnitMapper.INSTANCE.entityToDto(su.get()));
         }
-        else {
-            return Optional.empty();
-        }
+        return Optional.empty();
+
     }
 
     @Override

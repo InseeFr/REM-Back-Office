@@ -29,7 +29,8 @@ public class SecurityConfiguration {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, PropertiesConfiguration props) throws Exception {
-        http.csrf().disable().authorizeHttpRequests().requestMatchers(props.getWhiteList()).permitAll().requestMatchers(HttpMethod.GET)
+        http.csrf().disable().authorizeHttpRequests().requestMatchers(props.getWhiteList()).permitAll()
+            .requestMatchers(HttpMethod.GET)
             .hasAnyRole(props.getRoleUser(), props.getRoleAdmin()).anyRequest().hasAnyRole(props.getRoleAdmin()).and()
             .oauth2ResourceServer(oauth2 -> oauth2.jwt().jwtAuthenticationConverter(jwtAuthenticationConverter()));
         return http.build();
@@ -52,7 +53,8 @@ public class SecurityConfiguration {
                 Map<String, Object> realmAccess = (Map<String, Object>) claims.get("realm_access");
                 List<String> roles = (List<String>) realmAccess.get("roles");
 
-                return roles.stream().map(r -> new SimpleGrantedAuthority(ROLE_PREFIX + r)).collect(Collectors.toCollection(ArrayList::new));
+                return roles.stream().map(r -> new SimpleGrantedAuthority(ROLE_PREFIX + r)).collect(Collectors
+                    .toCollection(ArrayList::new));
             }
         };
     }
