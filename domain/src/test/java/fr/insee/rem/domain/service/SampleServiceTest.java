@@ -63,8 +63,8 @@ class SampleServiceTest {
 
     @Test
     void createSample_throw() {
-        when(samplePersistencePort.existsByLabel(Mockito.anyString())).thenReturn(true);
-        Assertions.assertThrows(SampleAlreadyExistsException.class, () -> sampleService.createSample(Mockito.anyString()));
+        when(samplePersistencePort.existsByLabel("test")).thenReturn(true);
+        Assertions.assertThrows(SampleAlreadyExistsException.class, () -> sampleService.createSample("test"));
     }
 
     @Test
@@ -86,8 +86,8 @@ class SampleServiceTest {
 
     @Test
     void getSampleById_throw() {
-        when(samplePersistencePort.findById(Mockito.anyLong())).thenReturn(Optional.empty());
-        Assertions.assertThrows(SampleNotFoundException.class, () -> sampleService.getSampleById(Mockito.anyLong()));
+        when(samplePersistencePort.findById(1l)).thenReturn(Optional.empty());
+        Assertions.assertThrows(SampleNotFoundException.class, () -> sampleService.getSampleById(1l));
     }
 
     @Test
