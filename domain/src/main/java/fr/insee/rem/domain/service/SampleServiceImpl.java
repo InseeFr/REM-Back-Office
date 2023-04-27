@@ -20,16 +20,16 @@ public class SampleServiceImpl implements SampleServicePort {
     }
 
     @Override
-    public void deleteSampleById(Long sampleId) throws SampleNotFoundException {
+    public void deleteSampleById(Long sampleId) {
         log.debug("domain: deleteSampleById({})", sampleId);
-        if ( !samplePersistencePort.existsById(sampleId)) {
+        if (!samplePersistencePort.existsById(sampleId)) {
             throw new SampleNotFoundException(sampleId);
         }
         samplePersistencePort.deleteById(sampleId);
     }
 
     @Override
-    public SampleDto createSample(String label) throws SampleAlreadyExistsException {
+    public SampleDto createSample(String label) {
         log.debug("domain: createSample({})", label);
         if (samplePersistencePort.existsByLabel(label)) {
             throw new SampleAlreadyExistsException(label);
@@ -38,10 +38,10 @@ public class SampleServiceImpl implements SampleServicePort {
     }
 
     @Override
-    public SampleDto getSampleById(Long sampleId) throws SampleNotFoundException {
+    public SampleDto getSampleById(Long sampleId) {
         log.debug("domain: getSampleById({})", sampleId);
         Optional<SampleDto> findSampleDto = samplePersistencePort.findById(sampleId);
-        if ( !findSampleDto.isPresent()) {
+        if (!findSampleDto.isPresent()) {
             throw new SampleNotFoundException(sampleId);
         }
         return findSampleDto.get();

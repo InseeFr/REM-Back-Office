@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import fr.insee.rem.domain.exception.SampleAlreadyExistsException;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
+import fr.insee.rem.domain.exception.SettingsException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +24,7 @@ public class GlobalExceptionsHandlers {
 
     @ExceptionHandler(SurveyUnitNotFoundException.class)
     public ResponseEntity<SurveyUnitNotFoundException> exceptionSurveyUnitNotFoundHandler(
-        final HttpServletRequest req,
-        final SurveyUnitNotFoundException exception) {
+                                                                                          final HttpServletRequest req, final SurveyUnitNotFoundException exception) {
         log.error("exceptionSurveyUnitNotFoundHandler  : " + exception.getMessage());
         return new ResponseEntity<>(exception, HttpStatus.NOT_FOUND);
     }
@@ -37,10 +37,15 @@ public class GlobalExceptionsHandlers {
 
     @ExceptionHandler(SampleAlreadyExistsException.class)
     public ResponseEntity<SampleAlreadyExistsException> exceptionSampleAlreadyExistsHandler(
-        final HttpServletRequest req,
-        final SampleAlreadyExistsException exception) {
+                                                                                            final HttpServletRequest req, final SampleAlreadyExistsException exception) {
         log.error("exceptionSampleAlreadyExistsHandler  : " + exception.getMessage());
         return new ResponseEntity<>(exception, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(SettingsException.class)
+    public ResponseEntity<SettingsException> exceptionSettingsHandler(final SettingsException exception) {
+        log.error("exceptionSettingsHandler  : " + exception.getMessage());
+        return new ResponseEntity<>(exception, HttpStatus.BAD_REQUEST);
     }
 
 }
