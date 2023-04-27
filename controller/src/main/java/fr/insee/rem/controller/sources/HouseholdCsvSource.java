@@ -16,8 +16,7 @@ import lombok.NoArgsConstructor;
 public class HouseholdCsvSource {
 
     @CsvIgnore
-    private static final String REGEX_PERSON_COLUMN =
-        "ident_ind_\\d+|nom_usage_\\d+|nom_nais_\\d+|prenom_\\d+|(a|m|j)nais_\\d+|sexe_\\d+|mel_\\d+|tel(_port|2)_\\d+";
+    private static final String REGEX_PERSON_COLUMN = "ident_ind_\\d+|nom_usage_\\d+|nom_nais_\\d+|prenom_\\d+|(a|m|j)nais_\\d+|sexe_\\d+|mel_\\d+|tel(_port|2)_\\d+";
 
     @CsvBindByName(column = "ident_unite")
     private String externalId;
@@ -75,6 +74,12 @@ public class HouseholdCsvSource {
     private String noGrap;
     @CsvBindByName
     private String noLog;
+    @CsvBindByName
+    private String noi;
+    @CsvBindByName
+    private String nole;
+    @CsvBindByName
+    private String autre;
     @CsvBindAndJoinByName(column = REGEX_PERSON_COLUMN, elementType = String.class)
     private MultiValuedMap<String, String> persons;
     @CsvBindAndJoinByName(column = ".+", elementType = String.class)

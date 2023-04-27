@@ -25,7 +25,8 @@ import fr.insee.rem.domain.dtos.TypeUnit;
 public class HouseholdCsvAdapter {
 
     public SurveyUnitDto convert(HouseholdCsvSource h) {
-        return SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId(h.getExternalId()).address(convertAddress(h)).persons(convertPersonList(h))
+        return SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId(h.getExternalId())
+            .address(convertAddress(h)).persons(convertPersonList(h))
             .otherIdentifier(convertOtherIdentifier(h)).additionalInformations(convertAdditionalInformation(h)).build();
     }
 
@@ -41,8 +42,9 @@ public class HouseholdCsvAdapter {
     }
 
     private OtherIdentifierDto convertOtherIdentifier(HouseholdCsvSource h) {
-        return OtherIdentifierDto.builder().rges(h.getRges()).ssech(h.getSsech()).numfa(h.getNumfa()).cle(h.getCle()).le(h.getLe()).ec(h.getEc()).bs(h.getBs())
-            .nograp(h.getNoGrap()).nolog(h.getNoLog()).build();
+        return OtherIdentifierDto.builder().rges(h.getRges()).ssech(h.getSsech()).numfa(h.getNumfa()).cle(h.getCle())
+            .le(h.getLe()).ec(h.getEc()).bs(h.getBs())
+            .nograp(h.getNoGrap()).nolog(h.getNoLog()).noi(h.getNoi()).nole(h.getNole()).autre(h.getAutre()).build();
     }
 
     private List<PersonDto> convertPersonList(HouseholdCsvSource h) {
@@ -51,13 +53,12 @@ public class HouseholdCsvAdapter {
         h.getPersons().asMap().forEach((k, v) -> personMap.put(k, v.iterator().next()));
         Map<String, String> addInfoMap = new HashMap<>();
         h.getAdditionalInfomations().asMap().forEach((k, v) -> addInfoMap.put(k, v.iterator().next()));
-        for (int i = 1; i <= 50; i ++ ) {
-            PersonDto personDto =
-                convertPerson(i, personMap, addInfoMap.get("type_unite"), addInfoMap.get("ident_ind_dec"), addInfoMap.get("ident_ind_co"), h.getExternalId());
+        for (int i = 1; i <= 50; i++) {
+            PersonDto personDto = convertPerson(i, personMap, addInfoMap.get("type_unite"), addInfoMap
+                .get("ident_ind_dec"), addInfoMap.get("ident_ind_co"), h.getExternalId());
             if (StringUtils.isNotBlank(personDto.getExternalId())) {
                 persons.add(personDto);
-            }
-            else {
+            } else {
                 break;
             }
         }
@@ -79,33 +80,42 @@ public class HouseholdCsvAdapter {
         }
         List<EmailDto> emails = new ArrayList<>();
         if (StringUtils.isNotBlank(personMap.get("mel_" + index))) {
-            EmailDto email = EmailDto.builder().favorite(false).source(Source.INITIAL).mailAddress(personMap.get("mel_" + index)).build();
+            EmailDto email = EmailDto.builder().favorite(false).source(Source.INITIAL).mailAddress(personMap
+                .get("mel_" + index)).build();
             emails.add(email);
         }
         List<PhoneNumberDto> phones = new ArrayList<>();
         if (StringUtils.isNotBlank(personMap.get("tel_port_" + index))) {
-            PhoneNumberDto number = PhoneNumberDto.builder().favorite(false).source(Source.INITIAL).number(personMap.get("tel_port_" + index)).build();
+            PhoneNumberDto number = PhoneNumberDto.builder().favorite(false).source(Source.INITIAL).number(personMap
+                .get("tel_port_" + index)).build();
             phones.add(number);
         }
         if (StringUtils.isNotBlank(personMap.get("tel2_" + index))) {
-            PhoneNumberDto number = PhoneNumberDto.builder().favorite(false).source(Source.INITIAL).number(personMap.get("tel2_" + index)).build();
+            PhoneNumberDto number = PhoneNumberDto.builder().favorite(false).source(Source.INITIAL).number(personMap
+                .get("tel2_" + index)).build();
             phones.add(number);
         }
-        return PersonDto.builder().index(index).externalId(identInd).gender(personMap.get("sexe_" + index)).firstName(personMap.get("prenom_" + index))
+        return PersonDto.builder().index(index).externalId(identInd).gender(personMap.get("sexe_" + index))
+            .firstName(personMap.get("prenom_" + index))
             .lastName(personMap.get("nom_usage_" + index)).birthName(personMap.get("nom_nais_" + index))
-            .dateOfBirth(buildDateOfBirth(personMap.get("anais_" + index), personMap.get("mnais_" + index), personMap.get("jnais_" + index))).surveyed(surveyed)
+            .dateOfBirth(buildDateOfBirth(personMap.get("anais_" + index), personMap.get("mnais_" + index), personMap
+                .get("jnais_" + index))).surveyed(surveyed)
             .main(main).emails(emails.isEmpty() ? null : emails).phoneNumbers(phones.isEmpty() ? null : phones).build();
     }
 
     private AddressDto convertAddress(HouseholdCsvSource h) {
-        return AddressDto.builder().streetNumber(h.getStreetNumber()).repetitionIndex(h.getRepetitionIndex()).streetName(h.getStreetName())
-            .addressSupplement(h.getAddressSupplement()).cityName(h.getCityName()).zipCode(h.getZipCode()).locationHelp(convertLocationHelp(h)).build();
+        return AddressDto.builder().streetNumber(h.getStreetNumber()).repetitionIndex(h.getRepetitionIndex())
+            .streetName(h.getStreetName())
+            .addressSupplement(h.getAddressSupplement()).cityName(h.getCityName()).zipCode(h.getZipCode())
+            .locationHelp(convertLocationHelp(h)).build();
     }
 
     private LocationHelpDto convertLocationHelp(HouseholdCsvSource h) {
-        return LocationHelpDto.builder().cityCode(h.getCityCode()).building(h.getBuilding()).floor(h.getFloor()).staircase(h.getStaircase()).door(h.getDoor())
+        return LocationHelpDto.builder().cityCode(h.getCityCode()).building(h.getBuilding()).floor(h.getFloor())
+            .staircase(h.getStaircase()).door(h.getDoor())
             .iris(h.getIris()).sector(StringUtils.isNotBlank(h.getSectorUp()) ? h.getSectorUp() : h.getSectorZae())
-            .gpsCoordinates(CoordinateConversionUtils.convertCoordinates(h.getX(), h.getY(), h.getCityCode())).elevator(buildBoolean(h.getElevator()))
+            .gpsCoordinates(CoordinateConversionUtils.convertCoordinates(h.getX(), h.getY(), h.getCityCode()))
+            .elevator(buildBoolean(h.getElevator()))
             .cityPriorityDistrict(buildBoolean(h.getCityPriorityDistrict())).build();
     }
 
@@ -119,15 +129,12 @@ public class HouseholdCsvAdapter {
     private String buildDateOfBirth(String year, String month, String day) {
         if (StringUtils.isBlank(year)) {
             return null;
-        }
-        else if (StringUtils.isBlank(month)) {
+        } else if (StringUtils.isBlank(month)) {
             return year;
-        }
-        else if (StringUtils.isBlank(day)) {
+        } else if (StringUtils.isBlank(day)) {
             month = month.length() == 1 ? "0" + month : month;
             return year + month;
-        }
-        else {
+        } else {
             month = month.length() == 1 ? "0" + month : month;
             day = day.length() == 1 ? "0" + day : day;
             return year + month + day;
