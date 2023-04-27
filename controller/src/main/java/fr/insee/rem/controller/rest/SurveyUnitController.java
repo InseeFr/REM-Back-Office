@@ -1,6 +1,8 @@
 package fr.insee.rem.controller.rest;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,7 +180,8 @@ public class SurveyUnitController {
     public ResponseEntity<List<SurveyUnitDto>> getSurveyUnitsBySample(@PathVariable("sampleId") final Long sampleId) {
         log.info("Get SurveyUnits by Sample {}", sampleId);
         List<SurveyUnitDto> suList = surveyUnitService.getSurveyUnitsBySampleId(sampleId).stream()
-            .map(SampleSurveyUnitDto::getSurveyUnit).toList();
+            .map(SampleSurveyUnitDto::getSurveyUnit).sorted(Comparator.comparing(SurveyUnitDto::getRepositoryId))
+            .toList();
         return new ResponseEntity<>(suList, HttpStatus.OK);
     }
 
@@ -189,7 +192,9 @@ public class SurveyUnitController {
     @GetMapping(path = "/samples/{sampleId}/ids")
     public ResponseEntity<List<Long>> getListOfIds(@PathVariable("sampleId") final Long sampleId) {
         log.info("Get list of Survey Units Ids for sample {}", sampleId);
-        return new ResponseEntity<>(surveyUnitService.getSurveyUnitIdsBySampleId(sampleId), HttpStatus.OK);
+        List<Long> ids = surveyUnitService.getSurveyUnitIdsBySampleId(sampleId);
+        Collections.sort(ids);
+        return new ResponseEntity<>(ids, HttpStatus.OK);
     }
 
     @Operation(summary = "Export identifiers mapping table", responses = {
@@ -201,7 +206,8 @@ public class SurveyUnitController {
         log.info("Get identifiers mapping table for sample {}", sampleId);
         List<SuIdMappingRecord> records = surveyUnitService.getIdMappingTableBySampleId(sampleId);
         List<SuIdMappingCsvTarget> targets = records.stream().map(r -> SuIdMappingCsvTarget.builder().idRem(String
-            .valueOf(r.repositoryId())).idSource(r.externalId()).build()).toList();
+            .valueOf(r.repositoryId())).idSource(r.externalId()).build()).sorted(Comparator
+                .comparing(SuIdMappingCsvTarget::getIdRem)).toList();
         ByteArrayInputStream csvStream = BeanToCsvUtils.write(targets);
         String fileName = "ids-mapping-table-sample-" + sampleId + ".csv";
 
