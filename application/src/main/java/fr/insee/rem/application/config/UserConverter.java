@@ -14,12 +14,14 @@ public class UserConverter extends ClassicConverter {
     @Override
     public String convert(ILoggingEvent event) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            if (auth.getPrincipal() != null && ANONYMOUS_USER.equals(auth.getPrincipal())) {
-                return "NOAUTH";
-            }
-            return ((Jwt) auth.getCredentials()).getClaims().get("preferred_username").toString().toUpperCase();
+        if (auth == null) {
+            return "";
         }
-        return "";
+
+        if (auth.getPrincipal() != null && ANONYMOUS_USER.equals(auth.getPrincipal())) {
+            return "NOAUTH";
+        }
+
+        return ((Jwt) auth.getCredentials()).getClaims().get("preferred_username").toString().toUpperCase();
     }
 }

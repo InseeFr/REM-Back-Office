@@ -29,4 +29,6 @@ public interface SurveyUnitServicePort {
 
     int addSurveyUnitsToSample(List<Long> surveyUnitIds, Long sampleId) throws SampleNotFoundException, SurveyUnitsNotFoundException;
 
+    boolean checkRepositoryId(List<SurveyUnitDto> surveyUnitDtos);
+
 }

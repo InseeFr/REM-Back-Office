@@ -1,6 +1,8 @@
 package fr.insee.rem.controller.rest;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +32,7 @@ import fr.insee.rem.controller.utils.CsvToBeanUtils;
 import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
-import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
-import fr.insee.rem.domain.exception.SurveyUnitsNotFoundException;
+import fr.insee.rem.domain.exception.SettingsException;
 import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
 import fr.insee.rem.domain.records.SuIdMappingRecord;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,131 +53,161 @@ public class SurveyUnitController {
     HouseholdCsvAdapter householdCsvAdapter;
 
     @Operation(summary = "Add Household SurveyUnits to Sample from CSV file", responses = {
-        @ApiResponse(responseCode = "200", description = "SurveysUnits successfully added"), @ApiResponse(responseCode = "400", description = "CSV File Error"),
-        @ApiResponse(responseCode = "404", description = "Sample Not Found")
+            @ApiResponse(responseCode = "200", description = "SurveysUnits successfully added"),
+            @ApiResponse(responseCode = "400", description = "CSV File Error"),
+            @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @PostMapping(path = "/households/samples/{sampleId}/csv-upload", consumes = {
-        MediaType.MULTIPART_FORM_DATA_VALUE
+            MediaType.MULTIPART_FORM_DATA_VALUE
     })
     public ResponseEntity<Object> addHouseholdSuFromCSVFile(
-        @PathVariable("sampleId") final Long sampleId,
-        @RequestPart("sample") MultipartFile sampleFile) throws SampleNotFoundException, CsvFileException {
+                                                            @PathVariable("sampleId") final Long sampleId, @RequestPart("sample") MultipartFile sampleFile) throws SampleNotFoundException, CsvFileException {
         log.info("POST add sample {} from csv file {}", sampleId, sampleFile.getOriginalFilename());
         List<HouseholdCsvSource> householdCsvList = CsvToBeanUtils.parse(sampleFile, HouseholdCsvSource.class);
-        List<SurveyUnitDto> surveyUnitDtos = householdCsvList.stream().map(h -> householdCsvAdapter.convert(h)).toList();
+        List<SurveyUnitDto> surveyUnitDtos = householdCsvList.stream().map(h -> householdCsvAdapter.convert(h))
+            .toList();
         List<SampleSurveyUnitDto> ssuDtos = surveyUnitService.importSurveyUnitsToSample(sampleId, surveyUnitDtos);
         Response response = new Response(String.format("%s surveyUnits created", ssuDtos.size()), HttpStatus.OK);
-        log.info("POST /survey-units/samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+        log.info("POST /survey-units/samples/{sampleId} resulting in {} with response [{}]", response
+            .getHttpStatus(), response.getMessage());
+        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+    }
+
+    @Operation(summary = "Add Household SurveyUnits to Sample from json (REM Model)", responses = {
+            @ApiResponse(responseCode = "200", description = "SurveysUnits successfully added"),
+            @ApiResponse(responseCode = "404", description = "Sample Not Found")
+    })
+    @PostMapping(path = "/households/samples/{sampleId}/json-upload")
+    public ResponseEntity<Object> addHouseholdSuFromJson(
+                                                         @PathVariable("sampleId") final Long sampleId, @RequestBody List<SurveyUnitDto> surveyUnitDtos) {
+        log.info("POST add sample {} from json {}", sampleId);
+        boolean hasRepositoryId = surveyUnitService.checkRepositoryId(surveyUnitDtos);
+        if (hasRepositoryId) {
+            throw new SettingsException("Survey units already contain a repository identifier");
+        }
+        List<SampleSurveyUnitDto> ssuDtos = surveyUnitService.importSurveyUnitsToSample(sampleId, surveyUnitDtos);
+        Response response = new Response(String.format("%s surveyUnits created", ssuDtos.size()), HttpStatus.OK);
+        log.info("POST /survey-units/samples/{sampleId} resulting in {} with response [{}]", response
+            .getHttpStatus(), response.getMessage());
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
     @Operation(summary = "Add SurveyUnit to Sample", responses = {
-        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
-        @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
+            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
+            @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
     @PutMapping(path = "/{surveyUnitId}/samples/{sampleId}")
     public ResponseEntity<Object> addSurveyUnitToSample(
-        @PathVariable("surveyUnitId") final Long surveyUnitId,
-        @PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException {
+                                                        @PathVariable("surveyUnitId") final Long surveyUnitId, @PathVariable("sampleId") final Long sampleId) {
         log.info("PUT Add SurveyUnit {} to Sample {}", surveyUnitId, sampleId);
         SampleSurveyUnitDto ssuDto = surveyUnitService.addSurveyUnitToSample(surveyUnitId, sampleId);
-        Response response =
-            new Response(String.format("SurveyUnit %s add to sample %s", ssuDto.getSurveyUnit().getRepositoryId(), ssuDto.getSample().getId()), HttpStatus.OK);
-        log.info("PUT /survey-units/{surveyUnitId}/samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+        Response response = new Response(String.format("SurveyUnit %s add to sample %s", ssuDto.getSurveyUnit()
+            .getRepositoryId(), ssuDto.getSample().getId()), HttpStatus.OK);
+        log.info("PUT /survey-units/{surveyUnitId}/samples/{sampleId} resulting in {} with response [{}]", response
+            .getHttpStatus(), response.getMessage());
 
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
     @Operation(summary = "Add SurveyUnits List to Sample", responses = {
-        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
-        @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
+            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
+            @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
     @PutMapping(path = "/samples/{sampleId}")
     public ResponseEntity<Object> addSurveyUnitsToSample(
-        @RequestBody List<Long> surveyUnitIds,
-        @PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException, SurveyUnitsNotFoundException {
+                                                         @RequestBody List<Long> surveyUnitIds, @PathVariable("sampleId") final Long sampleId) {
         log.info("PUT Add SurveyUnits List to Sample {}", sampleId);
         if (surveyUnitIds == null || surveyUnitIds.isEmpty()) {
             Response response = new Response("SurveyUnits List empty", HttpStatus.BAD_REQUEST);
-            log.info("PUT /survey-units/samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+            log.info("PUT /survey-units/samples/{sampleId} resulting in {} with response [{}]", response
+                .getHttpStatus(), response.getMessage());
             return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
         }
         int count = surveyUnitService.addSurveyUnitsToSample(surveyUnitIds, sampleId);
-        Response response = new Response(String.format("%s SurveyUnits add to sample %s", count, sampleId), HttpStatus.OK);
-        log.info("PUT /survey-units/samples/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+        Response response = new Response(String
+            .format("%s SurveyUnits add to sample %s", count, sampleId), HttpStatus.OK);
+        log.info("PUT /survey-units/samples/{sampleId} resulting in {} with response [{}]", response
+            .getHttpStatus(), response.getMessage());
 
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
     @Operation(summary = "Get SurveyUnit by Id", responses = {
-        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully found"),
-        @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
+            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully found"),
+            @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
     })
     @GetMapping(path = "/{surveyUnitId}")
-    public ResponseEntity<SurveyUnitDto> getSurveyUnit(@PathVariable("surveyUnitId") final Long surveyUnitId) throws SurveyUnitNotFoundException {
+    public ResponseEntity<SurveyUnitDto> getSurveyUnit(@PathVariable("surveyUnitId") final Long surveyUnitId) {
         log.info("GET SurveyUnit {}", surveyUnitId);
         return new ResponseEntity<>(surveyUnitService.getSurveyUnitById(surveyUnitId), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete SurveyUnit", responses = {
-        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully deleted"),
-        @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
+            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
     })
     @DeleteMapping(path = "/{surveyUnitId}")
-    public ResponseEntity<Object> deleteSurveyUnitToSample(@PathVariable("surveyUnitId") final Long surveyUnitId) throws SurveyUnitNotFoundException {
+    public ResponseEntity<Object> deleteSurveyUnitToSample(@PathVariable("surveyUnitId") final Long surveyUnitId) {
         log.info("DELETE SurveyUnit {} ", surveyUnitId);
         surveyUnitService.deleteSurveyUnitById(surveyUnitId);
         Response response = new Response(String.format("SurveyUnit %s deleted", surveyUnitId), HttpStatus.OK);
-        log.info("DELETE /survey-units/{surveyUnitId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+        log.info("DELETE /survey-units/{surveyUnitId} resulting in {} with response [{}]", response
+            .getHttpStatus(), response.getMessage());
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
     @Operation(summary = "Remove SurveyUnit from Sample", responses = {
-        @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
-        @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
+            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
+            @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
     @DeleteMapping(path = "/{surveyUnitId}/samples/{sampleId}")
     public ResponseEntity<Object> removeSurveyUnitFromSample(
-        @PathVariable("surveyUnitId") final Long surveyUnitId,
-        @PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException {
+                                                             @PathVariable("surveyUnitId") final Long surveyUnitId, @PathVariable("sampleId") final Long sampleId) {
         log.info("DELTE Remove SurveyUnit {} from Sample {}", surveyUnitId, sampleId);
         surveyUnitService.removeSurveyUnitFromSample(surveyUnitId, sampleId);
-        Response response = new Response(String.format("SurveyUnit %s removed from sample %s", surveyUnitId, sampleId), HttpStatus.OK);
-        log.info("DELETE /survey-units/{surveyUnitId}/sample/{sampleId} resulting in {} with response [{}]", response.getHttpStatus(), response.getMessage());
+        Response response = new Response(String
+            .format("SurveyUnit %s removed from sample %s", surveyUnitId, sampleId), HttpStatus.OK);
+        log.info("DELETE /survey-units/{surveyUnitId}/sample/{sampleId} resulting in {} with response [{}]", response
+            .getHttpStatus(), response.getMessage());
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
     @Operation(summary = "Get SurveyUnits by Sample", responses = {
-        @ApiResponse(responseCode = "200", description = "SurveysUnits successfully recovered"),
-        @ApiResponse(responseCode = "404", description = "Sample Not Found")
+            @ApiResponse(responseCode = "200", description = "SurveysUnits successfully recovered"),
+            @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @GetMapping(path = "/samples/{sampleId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SurveyUnitDto>> getSurveyUnitsBySample(@PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException {
+    public ResponseEntity<List<SurveyUnitDto>> getSurveyUnitsBySample(@PathVariable("sampleId") final Long sampleId) {
         log.info("Get SurveyUnits by Sample {}", sampleId);
-        List<SurveyUnitDto> suList = surveyUnitService.getSurveyUnitsBySampleId(sampleId).stream().map(SampleSurveyUnitDto::getSurveyUnit).toList();
+        List<SurveyUnitDto> suList = surveyUnitService.getSurveyUnitsBySampleId(sampleId).stream()
+            .map(SampleSurveyUnitDto::getSurveyUnit).sorted(Comparator.comparing(SurveyUnitDto::getRepositoryId))
+            .toList();
         return new ResponseEntity<>(suList, HttpStatus.OK);
     }
 
     @Operation(summary = "Get list of Survey Units Ids", responses = {
-        @ApiResponse(responseCode = "200", description = "List of Survey Units Ids successfully recovered"),
-        @ApiResponse(responseCode = "404", description = "Sample Not Found")
+            @ApiResponse(responseCode = "200", description = "List of Survey Units Ids successfully recovered"),
+            @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @GetMapping(path = "/samples/{sampleId}/ids")
-    public ResponseEntity<List<Long>> getListOfIds(@PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException {
+    public ResponseEntity<List<Long>> getListOfIds(@PathVariable("sampleId") final Long sampleId) {
         log.info("Get list of Survey Units Ids for sample {}", sampleId);
-        return new ResponseEntity<>(surveyUnitService.getSurveyUnitIdsBySampleId(sampleId), HttpStatus.OK);
+        List<Long> ids = surveyUnitService.getSurveyUnitIdsBySampleId(sampleId);
+        Collections.sort(ids);
+        return new ResponseEntity<>(ids, HttpStatus.OK);
     }
 
     @Operation(summary = "Export identifiers mapping table", responses = {
-        @ApiResponse(responseCode = "200", description = "Identifiers mapping table successfully recovered"),
-        @ApiResponse(responseCode = "404", description = "Sample Not Found")
+            @ApiResponse(responseCode = "200", description = "Identifiers mapping table successfully recovered"),
+            @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @GetMapping(path = "/samples/{sampleId}/ids-mapping-table", produces = "text/csv")
-    public ResponseEntity<Object> getIdentifiersMappingTable(@PathVariable("sampleId") final Long sampleId) throws SampleNotFoundException, CsvFileException {
+    public ResponseEntity<Object> getIdentifiersMappingTable(@PathVariable("sampleId") final Long sampleId) {
         log.info("Get identifiers mapping table for sample {}", sampleId);
         List<SuIdMappingRecord> records = surveyUnitService.getIdMappingTableBySampleId(sampleId);
-        List<SuIdMappingCsvTarget> targets =
-            records.stream().map(r -> SuIdMappingCsvTarget.builder().idRem(String.valueOf(r.repositoryId())).idSource(r.externalId()).build()).toList();
+        List<SuIdMappingCsvTarget> targets = records.stream().map(r -> SuIdMappingCsvTarget.builder().idRem(String
+            .valueOf(r.repositoryId())).idSource(r.externalId()).build()).sorted(Comparator
+                .comparing(SuIdMappingCsvTarget::getIdRem)).toList();
         ByteArrayInputStream csvStream = BeanToCsvUtils.write(targets);
         String fileName = "ids-mapping-table-sample-" + sampleId + ".csv";
 

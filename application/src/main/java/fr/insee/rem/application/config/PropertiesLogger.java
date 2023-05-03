@@ -24,12 +24,14 @@ public class PropertiesLogger implements ApplicationListener<ApplicationEnvironm
 
         log.info("===============================================================================================");
         log.info("                                     Properties                                                ");
-        log.info("===============================================================================================");
 
-        ((AbstractEnvironment) environment).getPropertySources().stream().filter(EnumerablePropertySource.class::isInstance)
-            .map(ps -> ((EnumerablePropertySource<?>) ps).getPropertyNames()).flatMap(Arrays::stream).distinct().filter(Objects::nonNull)
-            .filter(ps -> ps.startsWith("fr.insee") || ps.startsWith("spring")).forEach(key -> log.info(key + " = " + hideProperties(key, environment)));
-        log.info("============================================================================");
+        ((AbstractEnvironment) environment).getPropertySources().stream()
+            .filter(EnumerablePropertySource.class::isInstance)
+            .map(ps -> ((EnumerablePropertySource<?>) ps).getPropertyNames()).flatMap(Arrays::stream).distinct()
+            .filter(Objects::nonNull)
+            .filter(ps -> ps.startsWith("fr.insee") || ps.startsWith("spring")).forEach(key -> log
+                .info(key + " = " + hideProperties(key, environment)));
+        log.info("===============================================================================================");
 
     }
 

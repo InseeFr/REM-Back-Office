@@ -1,6 +1,6 @@
 package fr.insee.rem.domain.exception;
 
-public class SurveyUnitNotFoundException extends Exception {
+public class SurveyUnitNotFoundException extends RuntimeException {
 
     /**
      * 

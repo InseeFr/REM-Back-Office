@@ -38,12 +38,12 @@ public class SampleSurveyUnitJpaAdapter implements SampleSurveyUnitPersistencePo
     private static final int BATCH_SIZE = 100;
 
     @Override
-    public List<SampleSurveyUnitDto> saveAll(Long sampleId, List<SurveyUnitDto> ssuListDto) {
+    public List<SampleSurveyUnitDto> saveAll(Long sampleId, List<SurveyUnitDto> suListDto) {
         Optional<Sample> optionalSample = sampleRepository.findById(sampleId);
-        List<SurveyUnit> suList = SurveyUnitMapper.INSTANCE.listDtoToListEntity(ssuListDto);
+        List<SurveyUnit> suList = SurveyUnitMapper.INSTANCE.listDtoToListEntity(suListDto);
         Sample sample = optionalSample.orElseThrow();
         List<SampleSurveyUnit> ssuList = new ArrayList<>();
-        for (int i = 0; i < suList.size(); i ++ ) {
+        for (int i = 0; i < suList.size(); i++) {
             if (i > 0 && i % BATCH_SIZE == 0) {
                 entityManager.flush();
                 entityManager.clear();

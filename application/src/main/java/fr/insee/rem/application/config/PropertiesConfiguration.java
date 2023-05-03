@@ -30,7 +30,7 @@ public class PropertiesConfiguration {
     @Value("${fr.insee.rem.role.user}")
     private String roleUser;
 
-    @Value("#{'${fr.insee.rem.security.whitelist-matchers}'.split(',')}")
+    @Value("${fr.insee.rem.security.whitelist-matchers}")
     private String[] whiteList;
 
     @Value("${fr.insee.rem.security.auth.mode}")

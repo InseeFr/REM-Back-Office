@@ -10,7 +10,10 @@ import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.infrastructure.entity.SurveyUnit;
 
 @Mapper(uses = {
-    AddressMapper.class, PersonMapper.class, OtherIdentifierMapper.class, AdditionalInformationMapper.class
+        AddressMapper.class,
+        PersonMapper.class,
+        OtherIdentifierMapper.class,
+        AdditionalInformationMapper.class
 })
 public interface SurveyUnitMapper {
 

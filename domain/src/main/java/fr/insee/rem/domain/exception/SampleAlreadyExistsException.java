@@ -1,6 +1,6 @@
 package fr.insee.rem.domain.exception;
 
-public class SampleAlreadyExistsException extends Exception {
+public class SampleAlreadyExistsException extends RuntimeException {
 
     /**
      * 

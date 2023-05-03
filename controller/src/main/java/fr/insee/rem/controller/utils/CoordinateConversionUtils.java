@@ -5,6 +5,7 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import fr.insee.rem.domain.dtos.GPSLocation;
@@ -21,12 +22,11 @@ public final class CoordinateConversionUtils {
 
     private static Coordinate transformCoordonneesToGPSSystem(double x, double y, TypeConversion type) throws Exception {
         try {
-            var coordinate = new Coordinate(x, y);
-            var transform = CRS.findMathTransform(CRS.decode(type.epsg), CRS.decode(GPS_SYSTEM), false);
+            Coordinate coordinate = new Coordinate(x, y);
+            MathTransform transform = CRS.findMathTransform(CRS.decode(type.epsg), CRS.decode(GPS_SYSTEM), false);
             return JTS.transform(coordinate, new Coordinate(), transform);
-        }
-        catch (FactoryException | TransformException e) {
-            var error = String.format("Cannot transform coordinates [%f,%f]", x, y);
+        } catch (FactoryException | TransformException e) {
+            String error = String.format("Cannot transform coordinates [%f,%f]", x, y);
             log.error(error, e);
             throw e;
         }
@@ -47,23 +47,15 @@ public final class CoordinateConversionUtils {
         if (x != null && y != null && StringUtils.isNotBlank(cityCode) && cityCode.length() >= 3) {
             try {
                 String dep = cityCode.substring(0, 3);
-                CoordinateConversionUtils.TypeConversion type;
-                if ("973".equals(dep)) {
-                    type = CoordinateConversionUtils.TypeConversion.GUYANE;
-                }
-                else if ("974".equals(dep)) {
-                    type = CoordinateConversionUtils.TypeConversion.REUNION;
-                }
-                else if ("971".equals(dep) || "972".equals(dep)) {
-                    type = CoordinateConversionUtils.TypeConversion.ANTILLES;
-                }
-                else {
-                    type = CoordinateConversionUtils.TypeConversion.LAMBERT;
-                }
+                TypeConversion type = switch (dep) {
+                    case "973" -> TypeConversion.GUYANE;
+                    case "974" -> TypeConversion.REUNION;
+                    case "971" -> TypeConversion.ANTILLES;
+                    default -> TypeConversion.LAMBERT;
+                };
                 Coordinate c = transformCoordonneesToGPSSystem(x, y, type);
                 return GPSLocation.builder().latitude(c.x).longitude(c.y).build();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return GPSLocation.builder().latitude(0d).longitude(0d).build();
             }
         }

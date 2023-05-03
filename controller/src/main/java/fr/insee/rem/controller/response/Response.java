@@ -12,6 +12,7 @@ public class Response {
 
     /**
      * Defaut constructor for a Status
+     * 
      * @param label
      */
     public Response(String message, HttpStatus httpStatus) {
@@ -21,6 +22,7 @@ public class Response {
 
     /**
      * Get the label for a Status
+     * 
      * @return label
      */
     public String getMessage() {

@@ -9,7 +9,9 @@ import fr.insee.rem.domain.dtos.PersonDto;
 import fr.insee.rem.infrastructure.entity.Person;
 
 @Mapper(uses = {
-    AddressMapper.class, PhoneNumberMapper.class, EmailMapper.class
+        AddressMapper.class,
+        PhoneNumberMapper.class,
+        EmailMapper.class
 })
 public interface PersonMapper {
 

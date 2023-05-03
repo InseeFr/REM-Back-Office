@@ -44,7 +44,7 @@ class SampleServiceTest {
             @Override
             public SampleDto answer(InvocationOnMock invocation) throws Throwable {
                 String label = (String) invocation.getArgument(0);
-                SampleDto sampleDto = SampleDto.builder().id(sequence ++ ).label(label).build();
+                SampleDto sampleDto = SampleDto.builder().id(sequence++).label(label).build();
                 return sampleDto;
             }
         });
@@ -55,8 +55,7 @@ class SampleServiceTest {
             verify(samplePersistencePort).createSample(Mockito.anyString());
             Assertions.assertNotNull(insertedSample.getId());
             Assertions.assertEquals(newSample, insertedSample.getLabel());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Assertions.fail("Unexpected exception was thrown");
         }
 
@@ -64,8 +63,8 @@ class SampleServiceTest {
 
     @Test
     void createSample_throw() {
-        when(samplePersistencePort.existsByLabel(Mockito.anyString())).thenReturn(true);
-        Assertions.assertThrows(SampleAlreadyExistsException.class, () -> sampleService.createSample(Mockito.anyString()));
+        when(samplePersistencePort.existsByLabel("test")).thenReturn(true);
+        Assertions.assertThrows(SampleAlreadyExistsException.class, () -> sampleService.createSample("test"));
     }
 
     @Test
@@ -79,8 +78,7 @@ class SampleServiceTest {
             SampleDto sample = sampleService.getSampleById(1l);
             verify(samplePersistencePort).findById(1l);
             Assertions.assertNotNull(sample.getLabel());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Assertions.fail("Unexpected exception was thrown");
         }
 
@@ -88,8 +86,8 @@ class SampleServiceTest {
 
     @Test
     void getSampleById_throw() {
-        when(samplePersistencePort.findById(Mockito.anyLong())).thenReturn(Optional.empty());
-        Assertions.assertThrows(SampleNotFoundException.class, () -> sampleService.getSampleById(Mockito.anyLong()));
+        when(samplePersistencePort.findById(1l)).thenReturn(Optional.empty());
+        Assertions.assertThrows(SampleNotFoundException.class, () -> sampleService.getSampleById(1l));
     }
 
     @Test
@@ -102,7 +100,7 @@ class SampleServiceTest {
         when(samplePersistencePort.findAll()).thenReturn(samples);
 
         List<SampleDto> returnList = sampleService.getAllSamples();
-        Assertions.assertTrue( !returnList.isEmpty());
+        Assertions.assertTrue(!returnList.isEmpty());
         Assertions.assertEquals(2, returnList.size());
         Assertions.assertEquals(sample1, returnList.get(0));
         Assertions.assertEquals(sample2, returnList.get(1));

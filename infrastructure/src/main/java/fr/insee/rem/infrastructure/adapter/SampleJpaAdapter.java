@@ -36,9 +36,8 @@ public class SampleJpaAdapter implements SamplePersistencePort {
         if (sample.isPresent()) {
             return Optional.of(SampleMapper.INSTANCE.entityToDto(sample.get()));
         }
-        else {
-            return Optional.empty();
-        }
+        return Optional.empty();
+
     }
 
     @Override

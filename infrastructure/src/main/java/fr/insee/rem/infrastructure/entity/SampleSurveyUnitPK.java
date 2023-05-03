@@ -21,7 +21,8 @@ public class SampleSurveyUnitPK implements Serializable {
     private Long surveyUnitId;
 
     @SuppressWarnings("unused")
-    private SampleSurveyUnitPK() {}
+    private SampleSurveyUnitPK() {
+    }
 
     public SampleSurveyUnitPK(Long sampleId, Long surveyUnitId) {
         this.sampleId = sampleId;
