@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>fr.insee.rem</groupId>
 		<artifactId>rembo</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${revision}</version>
 	</parent>
 	<artifactId>controller</artifactId>
 	<description>Survey unit repository - Rest Controler</description>
@@ -14,7 +14,6 @@
 		<dependency>
             <groupId>fr.insee.rem</groupId>
             <artifactId>domain</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         
 		<dependency>

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>fr.insee.rem</groupId>
 	<artifactId>rembo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -21,6 +21,7 @@
     </modules>
 
 	<properties>
+		<revision>1.0.0-RC</revision>
 		<java.version>17</java.version>
 		<lombok.version>1.18.26</lombok.version>
 		<slf4j.version>2.0.6</slf4j.version>
@@ -40,6 +41,26 @@
 	            <version>${slf4j.version}</version>
 	            <scope>provided</scope>
 	     	</dependency>
+	     	<dependency>
+	            <groupId>fr.insee.rem</groupId>
+	            <artifactId>application</artifactId>
+	            <version>${project.version}</version>
+	        </dependency>
+	     	<dependency>
+	            <groupId>fr.insee.rem</groupId>
+	            <artifactId>domain</artifactId>
+	            <version>${project.version}</version>
+	        </dependency>	        
+	        <dependency>
+	            <groupId>fr.insee.rem</groupId>
+	            <artifactId>infrastructure</artifactId>
+	            <version>${project.version}</version>
+	        </dependency>	        
+	        <dependency>
+	            <groupId>fr.insee.rem</groupId>
+	            <artifactId>controller</artifactId>
+	            <version>${project.version}</version>
+	        </dependency>
 		</dependencies>
 	</dependencyManagement>
 
