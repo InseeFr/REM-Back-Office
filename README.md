@@ -1,6 +1,6 @@
 # REM-Back-Office
 
-REM-Back-Office is a Java Spring Boot application that manages the survey units repositoryRe for multimode surveys.
+REM-Back-Office is a Java Spring Boot application that manages the survey units repository for multimode surveys.
 
 ## Requirements
 * JDK 17 +
