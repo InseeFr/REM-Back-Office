@@ -53,7 +53,7 @@ public class SurveyUnitController {
     HouseholdCsvAdapter householdCsvAdapter;
 
     @Operation(summary = "Add Household SurveyUnits to Sample from CSV file", responses = {
-            @ApiResponse(responseCode = "200", description = "SurveysUnits successfully added"),
+            @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added"),
             @ApiResponse(responseCode = "400", description = "CSV File Error"),
             @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
@@ -74,7 +74,7 @@ public class SurveyUnitController {
     }
 
     @Operation(summary = "Add Household SurveyUnits to Sample from json (REM Model)", responses = {
-            @ApiResponse(responseCode = "200", description = "SurveysUnits successfully added"),
+            @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added"),
             @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @PostMapping(path = "/households/samples/{sampleId}/json-upload")
@@ -93,7 +93,7 @@ public class SurveyUnitController {
     }
 
     @Operation(summary = "Add SurveyUnit to Sample", responses = {
-            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
+            @ApiResponse(responseCode = "200", description = "SurveyUnit successfully added"),
             @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
     @PutMapping(path = "/{surveyUnitId}/samples/{sampleId}")
@@ -110,7 +110,7 @@ public class SurveyUnitController {
     }
 
     @Operation(summary = "Add SurveyUnits List to Sample", responses = {
-            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
+            @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added"),
             @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
     @PutMapping(path = "/samples/{sampleId}")
@@ -133,7 +133,7 @@ public class SurveyUnitController {
     }
 
     @Operation(summary = "Get SurveyUnit by Id", responses = {
-            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully found"),
+            @ApiResponse(responseCode = "200", description = "SurveyUnit successfully recovered"),
             @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
     })
     @GetMapping(path = "/{surveyUnitId}")
@@ -143,7 +143,7 @@ public class SurveyUnitController {
     }
 
     @Operation(summary = "Delete SurveyUnit", responses = {
-            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully deleted"),
+            @ApiResponse(responseCode = "200", description = "SurveyUnit successfully deleted"),
             @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
     })
     @DeleteMapping(path = "/{surveyUnitId}")
@@ -157,7 +157,7 @@ public class SurveyUnitController {
     }
 
     @Operation(summary = "Remove SurveyUnit from Sample", responses = {
-            @ApiResponse(responseCode = "200", description = "SurveysUnit successfully added"),
+            @ApiResponse(responseCode = "200", description = "SurveyUnit successfully removed"),
             @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
     @DeleteMapping(path = "/{surveyUnitId}/samples/{sampleId}")
@@ -173,7 +173,7 @@ public class SurveyUnitController {
     }
 
     @Operation(summary = "Get SurveyUnits by Sample", responses = {
-            @ApiResponse(responseCode = "200", description = "SurveysUnits successfully recovered"),
+            @ApiResponse(responseCode = "200", description = "SurveyUnits successfully recovered"),
             @ApiResponse(responseCode = "404", description = "Sample Not Found")
     })
     @GetMapping(path = "/samples/{sampleId}", produces = MediaType.APPLICATION_JSON_VALUE)
