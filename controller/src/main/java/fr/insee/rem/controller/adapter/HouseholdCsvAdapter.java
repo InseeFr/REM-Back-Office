@@ -132,11 +132,11 @@ public class HouseholdCsvAdapter {
             return year;
         }
         if (StringUtils.isBlank(day)) {
-            month = String.format("%02s", month);
+            month = StringUtils.leftPad(month, 2, '0');
             return year + month;
         }
-        month = String.format("%02s", month);
-        day = String.format("%02s", day);
+        month = StringUtils.leftPad(month, 2, '0');
+        day = StringUtils.leftPad(day, 2, '0');
         return year + month + day;
     }
 
