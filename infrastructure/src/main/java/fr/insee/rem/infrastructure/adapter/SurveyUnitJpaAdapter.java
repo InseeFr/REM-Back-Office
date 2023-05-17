@@ -44,4 +44,11 @@ public class SurveyUnitJpaAdapter implements SurveyUnitPersistencePort {
         return surveyUnitRepository.existsById(surveyUnitId);
     }
 
+    @Override
+    public SurveyUnitDto update(SurveyUnitDto surveyUnitDto) {
+        SurveyUnit su = SurveyUnitMapper.INSTANCE.dtoToEntity(surveyUnitDto);
+        su = entityManager.merge(su);
+        return SurveyUnitMapper.INSTANCE.entityToDto(su);
+    }
+
 }

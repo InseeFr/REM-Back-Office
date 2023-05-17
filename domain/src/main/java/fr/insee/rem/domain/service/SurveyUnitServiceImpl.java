@@ -141,4 +141,22 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
         return surveyUnitDtos.stream().anyMatch(su -> su.getRepositoryId() != null);
     }
 
+    @Override
+    public SurveyUnitDto updateSurveyUnit(SurveyUnitDto surveyUnitDto) {
+        if (surveyUnitDto == null) {
+            log.error("domain: updateSurveyUnit(no data error)");
+            throw new SettingsException("SurveyUnit data empty");
+        }
+        if (surveyUnitDto.getRepositoryId() == null) {
+            log.error("domain: updateSurveyUnit(no id error)");
+            throw new SettingsException("Repository id empty");
+        }
+        Long repositoryId = surveyUnitDto.getRepositoryId();
+        log.debug("domain: updateSurveyUnit {}", repositoryId);
+        if (!surveyUnitPersistencePort.existsById(repositoryId)) {
+            throw new SurveyUnitNotFoundException(repositoryId);
+        }
+        return surveyUnitPersistencePort.update(surveyUnitDto);
+    }
+
 }

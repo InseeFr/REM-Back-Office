@@ -114,8 +114,7 @@ public class SurveyUnitController {
             @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
     @PutMapping(path = "/samples/{sampleId}")
-    public ResponseEntity<Object> addSurveyUnitsToSample(
-                                                         @RequestBody List<Long> surveyUnitIds, @PathVariable("sampleId") final Long sampleId) {
+    public ResponseEntity<Object> addSurveyUnitsToSample(@RequestBody List<Long> surveyUnitIds, @PathVariable("sampleId") final Long sampleId) {
         log.info("PUT Add SurveyUnits List to Sample {}", sampleId);
         if (surveyUnitIds == null || surveyUnitIds.isEmpty()) {
             Response response = new Response("SurveyUnits List empty", HttpStatus.BAD_REQUEST);
@@ -161,8 +160,7 @@ public class SurveyUnitController {
             @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
     })
     @DeleteMapping(path = "/{surveyUnitId}/samples/{sampleId}")
-    public ResponseEntity<Object> removeSurveyUnitFromSample(
-                                                             @PathVariable("surveyUnitId") final Long surveyUnitId, @PathVariable("sampleId") final Long sampleId) {
+    public ResponseEntity<Object> removeSurveyUnitFromSample(@PathVariable("surveyUnitId") final Long surveyUnitId, @PathVariable("sampleId") final Long sampleId) {
         log.info("DELTE Remove SurveyUnit {} from Sample {}", surveyUnitId, sampleId);
         surveyUnitService.removeSurveyUnitFromSample(surveyUnitId, sampleId);
         Response response = new Response(String
@@ -213,6 +211,23 @@ public class SurveyUnitController {
 
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
             .contentType(MediaType.parseMediaType("text/csv")).body(new InputStreamResource(csvStream));
+    }
+
+    @Operation(summary = "Replace SurveyUnit Data", responses = {
+            @ApiResponse(responseCode = "200", description = "SurveyUnit successfully updated"),
+            @ApiResponse(responseCode = "400", description = "Data error"),
+            @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
+    })
+    @PutMapping(path = "/update")
+    public ResponseEntity<Object> replaceSurveyUnitData(@RequestBody SurveyUnitDto surveyUnitDto) {
+        log.info("PUT Replace SurveyUnit data replaced");
+        SurveyUnitDto suDto = surveyUnitService.updateSurveyUnit(surveyUnitDto);
+        Response response = new Response(String.format("SurveyUnit %s data replaced", suDto
+            .getRepositoryId()), HttpStatus.OK);
+        log.info("PUT /survey-units/{surveyUnitId}/update resulting in {} with response [{}]", response
+            .getHttpStatus(), response.getMessage());
+
+        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
 }

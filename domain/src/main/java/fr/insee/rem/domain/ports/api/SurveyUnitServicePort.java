@@ -31,4 +31,6 @@ public interface SurveyUnitServicePort {
 
     boolean checkRepositoryId(List<SurveyUnitDto> surveyUnitDtos);
 
+    SurveyUnitDto updateSurveyUnit(SurveyUnitDto surveyUnitDto);
+
 }
