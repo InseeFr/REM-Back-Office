@@ -29,7 +29,10 @@ public class SecurityConfiguration {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, PropertiesConfiguration props) throws Exception {
-        http.csrf().disable().authorizeHttpRequests().requestMatchers(props.getWhiteList()).permitAll()
+        http.csrf().disable() //NOSONAR
+            .authorizeHttpRequests()
+            .requestMatchers(props.getWhiteList())
+            .permitAll()
             .requestMatchers(HttpMethod.GET)
             .hasAnyRole(props.getRoleUser(), props.getRoleAdmin()).anyRequest().hasAnyRole(props.getRoleAdmin()).and()
             .oauth2ResourceServer(oauth2 -> oauth2.jwt().jwtAuthenticationConverter(jwtAuthenticationConverter()));

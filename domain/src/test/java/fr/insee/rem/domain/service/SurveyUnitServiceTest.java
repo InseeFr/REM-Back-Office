@@ -483,4 +483,38 @@ class SurveyUnitServiceTest {
         Assertions.assertFalse(check);
     }
 
+    @Test
+    void updateSurveyUnit_empty_data() {
+        Assertions.assertThrows(SettingsException.class, () -> surveyUnitService
+            .updateSurveyUnit(null));
+    }
+
+    @Test
+    void updateSurveyUnit_empty_id() {
+        SurveyUnitDto suDto = SurveyUnitDto.builder().build();
+        Assertions.assertThrows(SettingsException.class, () -> surveyUnitService
+            .updateSurveyUnit(suDto));
+    }
+
+    @Test
+    void updateSurveyUnit_existsById_throw() {
+        SurveyUnitDto suDto = SurveyUnitDto.builder().repositoryId(1l).build();
+        when(surveyUnitPersistencePort.existsById(1l)).thenReturn(false);
+        Assertions.assertThrows(SurveyUnitNotFoundException.class, () -> surveyUnitService.updateSurveyUnit(suDto));
+    }
+
+    @Test
+    void updateSurveyUnit_does_not_throw() {
+        SurveyUnitDto suDto = SurveyUnitDto.builder().repositoryId(1l).build();
+        when(surveyUnitPersistencePort.existsById(1l)).thenReturn(true);
+        when(surveyUnitPersistencePort.update(suDto)).thenReturn(suDto);
+        try {
+            SurveyUnitDto su = surveyUnitService.updateSurveyUnit(suDto);
+            Assertions.assertNotNull(su);
+            Assertions.assertEquals(1l, su.getRepositoryId());
+        } catch (Exception e) {
+            Assertions.fail("Unexpected exception was thrown");
+        }
+    }
+
 }
