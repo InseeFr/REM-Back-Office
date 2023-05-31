@@ -11,7 +11,6 @@ import lombok.Data;
 
 @Data
 @JsonInclude(Include.NON_EMPTY)
-
 public class Person implements Serializable {
 
     /**
@@ -29,6 +28,7 @@ public class Person implements Serializable {
     private String dateOfBirth;
     private Boolean surveyed;
     private Boolean main;
+    private Boolean coDeclarant;
 
     private List<PhoneNumber> phoneNumbers = new ArrayList<>();
     private List<Email> emails = new ArrayList<>();
