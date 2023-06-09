@@ -1,8 +1,5 @@
 package fr.insee.rem.domain.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
@@ -16,6 +13,9 @@ import fr.insee.rem.domain.ports.spi.SurveyUnitPersistencePort;
 import fr.insee.rem.domain.records.SuIdMappingRecord;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+import java.util.Optional;
+
 @Slf4j
 public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
 
@@ -26,7 +26,9 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
     private SamplePersistencePort samplePersistencePort;
 
     public SurveyUnitServiceImpl(
-                                 SurveyUnitPersistencePort surveyUnitPersistencePort, SampleSurveyUnitPersistencePort sampleSurveyUnitPersistencePort, SamplePersistencePort samplePersistencePort) {
+            SurveyUnitPersistencePort surveyUnitPersistencePort,
+            SampleSurveyUnitPersistencePort sampleSurveyUnitPersistencePort,
+            SamplePersistencePort samplePersistencePort) {
         this.surveyUnitPersistencePort = surveyUnitPersistencePort;
         this.sampleSurveyUnitPersistencePort = sampleSurveyUnitPersistencePort;
         this.samplePersistencePort = samplePersistencePort;
@@ -35,8 +37,9 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
     @Override
     public List<SampleSurveyUnitDto> importSurveyUnitsToSample(Long sampleId, List<SurveyUnitDto> suList) {
         if (suList == null || suList.isEmpty()) {
-            log.error("domain: importSurveyUnitsToSample({}, no survey units)", sampleId);
-            throw new SettingsException("No Survey units: empty list or null");
+            log.error("domain: importSurveyUnitsToSample({}, List of survey units to import is empty or null)",
+                    sampleId);
+            throw new SettingsException("List of survey units to import is empty or null");
         }
         log.debug("domain: importSurveyUnitsToSample({}, {} survey units)", sampleId, suList.size());
         if (!samplePersistencePort.existsById(sampleId)) {
@@ -118,8 +121,8 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
     @Override
     public int addSurveyUnitsToSample(List<Long> surveyUnitIds, Long sampleId) {
         if (surveyUnitIds == null || surveyUnitIds.isEmpty()) {
-            log.error("domain: addSurveyUnitsToSample({}, no ids)", sampleId);
-            throw new SettingsException("No ids: empty list or null");
+            log.error("domain: addSurveyUnitsToSample({}, List of survey units to add is empty or null)", sampleId);
+            throw new SettingsException("List of survey units to add is empty or null");
         }
         log.debug("domain: addSurveyUnitsToSample({})", sampleId);
         if (!samplePersistencePort.existsById(sampleId)) {
