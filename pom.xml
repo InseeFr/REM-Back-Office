@@ -21,7 +21,7 @@
     </modules>
 
 	<properties>
-		<revision>1.0.0-RC</revision>
+		<revision>1.0.0</revision>
 		<java.version>17</java.version>
 		<lombok.version>1.18.26</lombok.version>
 		<slf4j.version>2.0.6</slf4j.version>
