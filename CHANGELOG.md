@@ -10,8 +10,8 @@
 - Import new survey units from a json and add them to the new partition
 
 #### Manage a partition of survey units
-- Add existing a survey unit to another partition
-- Add existing a list of survey units to another partition
+- Add a existing survey unit to another partition
+- Add a list of survey units to another partition
 - Remove a survey unit from a partition (survey unit is not deleted)
 
 #### Extract Data (Partitions and Survey Units)
@@ -25,3 +25,25 @@
 #### Clean Data
 - Delete a partition (links withs survey units are deleted but not the survey units)
 - Delete a survey unit (links withs partitions are deleted too)
+
+## 1.1.0
+
+### Features
+- Update Data of a survey unit
+
+### Changes
+- distinction between household members (main, surveyed, co-declarant)
+- security configuration changed with spring-security 6.1.0: use lambda expression
+
+### Refactoring
+- test: pattern "Given When Then" without Mockito
+
+### Dependencies updates
+- spring-boot: 3.0.0 -> 3.1.0
+- springdoc-openapi-stater-webmvc-ui: 2.0.0 -> 2.1.0
+- opencsv: 5.7.0 -> 5.7.1
+- pitest-maven: 1.11.0 -> 1.14.1
+- pitest-junit5-plugin: 1.1.2 -> 1.2.0
+- mapstruct-processor: 1.5.3.Final -> 1.5.5.Final
+- lombok: 1.18.26 -> 1.18.28
+- slf4j-api: 2.0.6 -> 2.0.7

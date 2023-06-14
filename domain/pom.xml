@@ -10,8 +10,8 @@
 	<artifactId>domain</artifactId>
 	<description>Survey unit repository - Business Logic</description>
 	<properties>
-		<pitest.version>1.11.0</pitest.version>
-		<pitest.junit.version>1.1.2</pitest.junit.version>		
+		<pitest.version>1.14.1</pitest.version>
+		<pitest.junit.version>1.2.0</pitest.junit.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.language>java</sonar.language>
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
@@ -33,16 +33,6 @@
      	<dependency>
 		    <groupId>org.junit.jupiter</groupId>
 		    <artifactId>junit-jupiter</artifactId>
-		    <scope>test</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-core</artifactId>
-		    <scope>test</scope>
-		</dependency>
-		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-junit-jupiter</artifactId>
 		    <scope>test</scope>
 		</dependency>
 	</dependencies>	

@@ -1,11 +1,5 @@
 package fr.insee.rem.application.config;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,23 +13,31 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Configuration
 @EnableWebSecurity
 @ConditionalOnProperty(name = "fr.insee.rem.security.auth.mode", havingValue = "OIDC")
 public class SecurityConfiguration {
 
-    // Par défaut, spring sécurity prefixe les rôles avec cette chaine
+    // By default, "spring security" prefixes roles with this string
     private static final String ROLE_PREFIX = "ROLE_";
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, PropertiesConfiguration props) throws Exception {
-        http.csrf().disable() //NOSONAR
-            .authorizeHttpRequests()
-            .requestMatchers(props.getWhiteList())
-            .permitAll()
-            .requestMatchers(HttpMethod.GET)
-            .hasAnyRole(props.getRoleUser(), props.getRoleAdmin()).anyRequest().hasAnyRole(props.getRoleAdmin()).and()
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt().jwtAuthenticationConverter(jwtAuthenticationConverter()));
+        http.csrf(csrf -> csrf.disable()) //NOSONAR
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(props.getWhiteList())
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET)
+                        .hasAnyRole(props.getRoleUser(), props.getRoleAdmin())
+                        .anyRequest()
+                        .hasAnyRole(props.getRoleAdmin()))
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();
     }
 
@@ -57,7 +59,7 @@ public class SecurityConfiguration {
                 List<String> roles = (List<String>) realmAccess.get("roles");
 
                 return roles.stream().map(r -> new SimpleGrantedAuthority(ROLE_PREFIX + r)).collect(Collectors
-                    .toCollection(ArrayList::new));
+                        .toCollection(ArrayList::new));
             }
         };
     }
