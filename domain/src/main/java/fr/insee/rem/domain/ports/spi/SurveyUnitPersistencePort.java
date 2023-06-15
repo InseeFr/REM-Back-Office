@@ -12,4 +12,6 @@ public interface SurveyUnitPersistencePort {
 
     boolean existsById(Long surveyUnitId);
 
+    SurveyUnitDto update(SurveyUnitDto surveyUnitDto);
+
 }

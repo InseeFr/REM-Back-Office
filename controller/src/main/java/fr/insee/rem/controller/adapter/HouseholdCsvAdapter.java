@@ -56,8 +56,7 @@ public class HouseholdCsvAdapter {
         for (int i = 1; i <= 50; i++) {
             String identInd = personMap.get("ident_ind_" + i);
             if (StringUtils.isNotBlank(identInd)) {
-                PersonDto personDto = convertPerson(i, identInd, personMap, addInfoMap.get("type_unite"), addInfoMap
-                    .get("ident_ind_dec"), addInfoMap.get("ident_ind_co"), h.getExternalId());
+                PersonDto personDto = convertPerson(i, identInd, personMap);
                 persons.add(personDto);
             }
         }
@@ -65,17 +64,7 @@ public class HouseholdCsvAdapter {
         return persons;
     }
 
-    private PersonDto convertPerson(int index, String identInd, Map<String, String> personMap, String typeUnite, String identDec, String identCo, String externalId) {
-        Boolean surveyed = false;
-        Boolean main = false;
-        if (identInd != null) {
-            if ("INDIVIDU".equals(typeUnite) && identInd.equals(externalId)) {
-                surveyed = true;
-            }
-            if (identInd.equals(identDec) || identInd.equals(identCo)) {
-                main = true;
-            }
-        }
+    private PersonDto convertPerson(int index, String identInd, Map<String, String> personMap) {
         List<EmailDto> emails = new ArrayList<>();
         if (StringUtils.isNotBlank(personMap.get("mel_" + index))) {
             EmailDto email = EmailDto.builder().favorite(false).source(Source.INITIAL).mailAddress(personMap
@@ -94,11 +83,11 @@ public class HouseholdCsvAdapter {
             phones.add(number);
         }
         return PersonDto.builder().index(index).externalId(identInd).gender(personMap.get("sexe_" + index))
-            .firstName(personMap.get("prenom_" + index))
-            .lastName(personMap.get("nom_usage_" + index)).birthName(personMap.get("nom_nais_" + index))
-            .dateOfBirth(buildDateOfBirth(personMap.get("anais_" + index), personMap.get("mnais_" + index), personMap
-                .get("jnais_" + index))).surveyed(surveyed)
-            .main(main).emails(emails.isEmpty() ? null : emails).phoneNumbers(phones.isEmpty() ? null : phones).build();
+            .firstName(personMap.get("prenom_" + index)).lastName(personMap.get("nom_usage_" + index))
+            .birthName(personMap.get("nom_nais_" + index)).dateOfBirth(buildDateOfBirth(personMap
+                .get("anais_" + index), personMap.get("mnais_" + index), personMap.get("jnais_" + index))).emails(emails
+                    .isEmpty() ? null : emails)
+            .phoneNumbers(phones.isEmpty() ? null : phones).build();
     }
 
     private AddressDto convertAddress(HouseholdCsvSource h) {

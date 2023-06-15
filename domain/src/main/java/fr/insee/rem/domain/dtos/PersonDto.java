@@ -19,6 +19,7 @@ public class PersonDto {
     private String dateOfBirth;
     private Boolean surveyed;
     private Boolean main;
+    private Boolean coDeclarant;
     private List<PhoneNumberDto> phoneNumbers;
     private List<EmailDto> emails;
     private AddressDto address;

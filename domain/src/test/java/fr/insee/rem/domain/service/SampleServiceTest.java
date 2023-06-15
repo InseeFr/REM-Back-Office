@@ -1,131 +1,112 @@
 package fr.insee.rem.domain.service;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
-
 import fr.insee.rem.domain.dtos.SampleDto;
 import fr.insee.rem.domain.exception.SampleAlreadyExistsException;
 import fr.insee.rem.domain.exception.SampleNotFoundException;
-import fr.insee.rem.domain.ports.spi.SamplePersistencePort;
+import fr.insee.rem.domain.ports.api.SampleServicePort;
+import fr.insee.rem.domain.service.mock.SamplePersistenceInMemory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-@ExtendWith(MockitoExtension.class)
+import java.util.List;
+
+
 class SampleServiceTest {
 
-    @InjectMocks
-    SampleServiceImpl sampleService;
-
-    @Mock
-    SamplePersistencePort samplePersistencePort;
+    SamplePersistenceInMemory samplePersistenceInMemory = new SamplePersistenceInMemory();
+    SampleServicePort sampleService = new SampleServiceImpl(samplePersistenceInMemory);
 
     @Test
-    void createSample_does_not_throw() {
+    void shouldCreateSampleFromLabel() {
+        // Given
+        String label = "new label";
 
-        String newSample = "sample1";
+        // When
+        SampleDto sampleDto = sampleService.createSample(label);
 
-        when(samplePersistencePort.existsByLabel(newSample)).thenReturn(false);
-
-        when(samplePersistencePort.createSample(Mockito.anyString())).then(new Answer<SampleDto>() {
-            long sequence = 1l;
-
-            @Override
-            public SampleDto answer(InvocationOnMock invocation) throws Throwable {
-                String label = (String) invocation.getArgument(0);
-                SampleDto sampleDto = SampleDto.builder().id(sequence++).label(label).build();
-                return sampleDto;
-            }
-        });
-
-        try {
-            SampleDto insertedSample = sampleService.createSample(newSample);
-            verify(samplePersistencePort).existsByLabel(newSample);
-            verify(samplePersistencePort).createSample(Mockito.anyString());
-            Assertions.assertNotNull(insertedSample.getId());
-            Assertions.assertEquals(newSample, insertedSample.getLabel());
-        } catch (Exception e) {
-            Assertions.fail("Unexpected exception was thrown");
-        }
-
+        // Then
+        Assertions.assertNotNull(sampleDto);
+        Assertions.assertEquals(label, sampleDto.getLabel());
+        Assertions.assertNotNull(sampleDto.getId());
     }
 
     @Test
-    void createSample_throw() {
-        when(samplePersistencePort.existsByLabel("test")).thenReturn(true);
-        Assertions.assertThrows(SampleAlreadyExistsException.class, () -> sampleService.createSample("test"));
+    void shouldReturnSampleAlreadyExistsExceptionWhenCreateLabelAlreadyExists() {
+        // Given
+        String label = "existing label";
+        sampleService.createSample(label);
+
+        // When + Then
+        SampleAlreadyExistsException exception = Assertions.assertThrows(SampleAlreadyExistsException.class,
+                () -> sampleService.createSample(label));
+        Assertions.assertEquals(String.format("Sample [%s] already exists", label), exception.getMessage());
     }
 
     @Test
-    void getSampleById_does_not_throw() {
+    void shouldDeleteSampleFromId() {
+        // Given
+        SampleDto sampleToDelete = sampleService.createSample("sampleToDelete");
+        Long sampleToDeleteId = sampleToDelete.getId();
 
-        SampleDto sampleDto = SampleDto.builder().id(1l).label("sample1").build();
+        // When
+        sampleService.deleteSampleById(sampleToDeleteId);
 
-        when(samplePersistencePort.findById(1l)).thenReturn(Optional.of(sampleDto));
-
-        try {
-            SampleDto sample = sampleService.getSampleById(1l);
-            verify(samplePersistencePort).findById(1l);
-            Assertions.assertNotNull(sample.getLabel());
-        } catch (Exception e) {
-            Assertions.fail("Unexpected exception was thrown");
-        }
-
+        // Then
+        Assertions.assertFalse(samplePersistenceInMemory.existsById(sampleToDeleteId));
     }
 
     @Test
-    void getSampleById_throw() {
-        when(samplePersistencePort.findById(1l)).thenReturn(Optional.empty());
-        Assertions.assertThrows(SampleNotFoundException.class, () -> sampleService.getSampleById(1l));
+    void shouldReturnSampleNotFoundExceptionWhenDeleteNotExistingSample() {
+        // Given
+        Long notExistingSampleId = 99L;
+
+        // When + Then
+        SampleNotFoundException exception = Assertions.assertThrows(SampleNotFoundException.class,
+                () -> sampleService.deleteSampleById(notExistingSampleId));
+        Assertions.assertEquals(String.format("Sample [%s] doesn't exist", notExistingSampleId),
+                exception.getMessage());
     }
 
     @Test
-    void getAllSamples() {
+    void shouldReturnSampleFromId() {
+        // Given
+        SampleDto sampleToReturn = sampleService.createSample("sampleToReturn");
+        Long sampleToReturnId = sampleToReturn.getId();
 
-        SampleDto sample1 = SampleDto.builder().id(1l).label("sample1").build();
-        SampleDto sample2 = SampleDto.builder().id(2l).label("sample2").build();
-        List<SampleDto> samples = List.of(sample1, sample2);
+        // When
+        SampleDto sampleReturned = sampleService.getSampleById(sampleToReturnId);
 
-        when(samplePersistencePort.findAll()).thenReturn(samples);
-
-        List<SampleDto> returnList = sampleService.getAllSamples();
-        Assertions.assertTrue(!returnList.isEmpty());
-        Assertions.assertEquals(2, returnList.size());
-        Assertions.assertEquals(sample1, returnList.get(0));
-        Assertions.assertEquals(sample2, returnList.get(1));
-
+        // Then
+        Assertions.assertNotNull(sampleReturned);
+        Assertions.assertEquals(sampleToReturn.getId(), sampleReturned.getId());
+        Assertions.assertEquals(sampleToReturn.getLabel(), sampleReturned.getLabel());
     }
 
     @Test
-    void deleteSampleById_does_not_throw() {
+    void shouldReturnSampleNotFoundExceptionWhenGetNotExistingSample() {
+        // Given
+        Long notExistingSampleId = 99L;
 
-        when(samplePersistencePort.existsById(1l)).thenReturn(true);
-        doNothing().when(samplePersistencePort).deleteById(1l);
-        try {
-            sampleService.deleteSampleById(1l);
-            verify(samplePersistencePort).existsById(1l);
-            verify(samplePersistencePort).deleteById(1l);
-        }
-        catch (Exception e) {
-            Assertions.fail("Unexpected exception was thrown");
-        }
-
+        // When + Then
+        SampleNotFoundException exception = Assertions.assertThrows(SampleNotFoundException.class,
+                () -> sampleService.getSampleById(notExistingSampleId));
+        Assertions.assertEquals(String.format("Sample [%s] doesn't exist", notExistingSampleId),
+                exception.getMessage());
     }
 
     @Test
-    void deleteSampleById_throw() {
-        when(samplePersistencePort.existsById(1l)).thenReturn(false);
-        Assertions.assertThrows(SampleNotFoundException.class, () -> sampleService.deleteSampleById(1l));
+    void shouldReturnListOfAllSamples() {
+        // Given
+        SampleDto sampleOne = sampleService.createSample("sampleOne");
+        SampleDto sampleTwo = sampleService.createSample("sampleTwo");
+
+        // When
+        List<SampleDto> allSamples = sampleService.getAllSamples();
+
+        // Then
+        Assertions.assertFalse(allSamples.isEmpty());
+        Assertions.assertEquals(2, allSamples.size());
+        Assertions.assertEquals(sampleOne, allSamples.get(0));
+        Assertions.assertEquals(sampleTwo, allSamples.get(1));
     }
 }
