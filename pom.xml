@@ -21,7 +21,7 @@
     </modules>
 
     <properties>
-        <revision>1.1.0-SNAPSHOT</revision>
+        <revision>1.1.0</revision>
         <java.version>17</java.version>
         <lombok.version>1.18.28</lombok.version>
         <slf4j.version>2.0.7</slf4j.version>
