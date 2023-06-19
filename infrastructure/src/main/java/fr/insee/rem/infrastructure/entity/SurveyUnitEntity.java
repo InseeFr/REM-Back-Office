@@ -1,7 +1,7 @@
 package fr.insee.rem.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import fr.insee.rem.domain.dtos.TypeUnit;
+import fr.insee.rem.domain.dtos.Context;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,7 +32,7 @@ public class SurveyUnitEntity implements Serializable {
 
     private String externalName;
 
-    private TypeUnit typeUnit;
+    private Context context;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", name = "data")

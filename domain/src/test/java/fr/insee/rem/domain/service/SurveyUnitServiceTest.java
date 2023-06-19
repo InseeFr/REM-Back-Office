@@ -1,9 +1,9 @@
 package fr.insee.rem.domain.service;
 
+import fr.insee.rem.domain.dtos.Context;
 import fr.insee.rem.domain.dtos.PartitionDto;
 import fr.insee.rem.domain.dtos.PartitionSurveyUnitLinkDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
-import fr.insee.rem.domain.dtos.TypeUnit;
 import fr.insee.rem.domain.exception.PartitionNotFoundException;
 import fr.insee.rem.domain.exception.SettingsException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
@@ -32,8 +32,8 @@ class SurveyUnitServiceTest {
     private List<PartitionSurveyUnitLinkDto> initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits(String label) {
         PartitionDto existingPartition = partitionService.createPartition(label);
         List<SurveyUnitDto> surveyUnitsToImport =
-                List.of(SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00001").build(),
-                        SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00002").build());
+                List.of(SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00001").build(),
+                        SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00002").build());
         return surveyUnitService.importSurveyUnitsIntoPartition(existingPartition.getPartitionId(),
                 surveyUnitsToImport);
     }
@@ -43,8 +43,8 @@ class SurveyUnitServiceTest {
         // Given
         PartitionDto existingPartition = partitionService.createPartition("existing partition");
         List<SurveyUnitDto> surveyUnitsToImport =
-                List.of(SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00001").build(),
-                        SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00002").build());
+                List.of(SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00001").build(),
+                        SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00002").build());
 
         // When
         List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
@@ -66,8 +66,8 @@ class SurveyUnitServiceTest {
     void shouldReturnPartitionNotFoundExceptionWhenImportSurveyUnitsIntoNotExistingPartition() {
         // Given
         List<SurveyUnitDto> surveyUnitsToImport =
-                List.of(SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00001").build(),
-                        SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00002").build());
+                List.of(SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00001").build(),
+                        SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00002").build());
         Long notExistingPartitionId = 99L;
 
         // When + Then
@@ -541,7 +541,7 @@ class SurveyUnitServiceTest {
                 initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
         SurveyUnitDto surveyUnitToUpdate = importedPartitionSurveyUnits.get(0).getSurveyUnit();
         surveyUnitToUpdate.setExternalId("00003");
-        surveyUnitToUpdate.setTypeUnit(TypeUnit.ENTERPRISE);
+        surveyUnitToUpdate.setContext(Context.BUSINESS);
 
         // When
         SurveyUnitDto updatedSurveyUnit = surveyUnitService.updateSurveyUnit(surveyUnitToUpdate);
@@ -550,7 +550,7 @@ class SurveyUnitServiceTest {
         Assertions.assertNotNull(updatedSurveyUnit);
         Assertions.assertEquals(surveyUnitToUpdate.getRepositoryId(), updatedSurveyUnit.getRepositoryId());
         Assertions.assertEquals(surveyUnitToUpdate.getExternalId(), updatedSurveyUnit.getExternalId());
-        Assertions.assertEquals(surveyUnitToUpdate.getTypeUnit(), updatedSurveyUnit.getTypeUnit());
+        Assertions.assertEquals(surveyUnitToUpdate.getContext(), updatedSurveyUnit.getContext());
     }
 
 }

@@ -54,3 +54,4 @@
 - Replaced the name "Sample" with "Partition" (many files changes)
 - Created ApiError class to manage errors feedback
 - Used Tags for groups of endpoints
+- Replace name of TypeUnit enum to Context

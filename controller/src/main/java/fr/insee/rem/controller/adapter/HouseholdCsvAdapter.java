@@ -15,7 +15,7 @@ import java.util.Map;
 public class HouseholdCsvAdapter {
 
     public SurveyUnitDto convert(HouseholdCsvSource h) {
-        return SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId(h.getExternalId())
+        return SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId(h.getExternalId())
                 .address(convertAddress(h)).persons(convertPersonList(h))
                 .otherIdentifier(convertOtherIdentifier(h)).additionalInformations(convertAdditionalInformation(h)).build();
     }
