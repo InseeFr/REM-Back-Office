@@ -3,7 +3,7 @@ package fr.insee.rem.domain.exception;
 public class SurveyUnitNotFoundException extends RuntimeException {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -6392109505374844497L;
 

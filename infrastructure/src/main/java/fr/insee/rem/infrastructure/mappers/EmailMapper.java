@@ -1,23 +1,22 @@
 package fr.insee.rem.infrastructure.mappers;
 
-import java.util.List;
-
+import fr.insee.rem.domain.dtos.EmailDto;
+import fr.insee.rem.infrastructure.entity.Email;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import fr.insee.rem.domain.dtos.EmailDto;
-import fr.insee.rem.infrastructure.entity.Email;
+import java.util.List;
 
 @Mapper
 public interface EmailMapper {
 
     EmailMapper INSTANCE = Mappers.getMapper(EmailMapper.class);
 
-    Email dtoToEntity(EmailDto emailDto);
+    Email dtoToEntity(EmailDto email);
 
     EmailDto entityToDto(Email email);
 
     List<EmailDto> listEntityToListDto(List<Email> emails);
 
-    List<Email> listDtoToListEntity(List<EmailDto> emailsDto);
+    List<Email> listDtoToListEntity(List<EmailDto> emails);
 }

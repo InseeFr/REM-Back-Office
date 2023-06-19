@@ -1,36 +1,33 @@
 package fr.insee.rem.domain.ports.api;
 
-import java.util.List;
-
-import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
+import fr.insee.rem.domain.dtos.PartitionSurveyUnitLinkDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
-import fr.insee.rem.domain.exception.SampleNotFoundException;
-import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
-import fr.insee.rem.domain.exception.SurveyUnitsNotFoundException;
 import fr.insee.rem.domain.records.SuIdMappingRecord;
+
+import java.util.List;
 
 public interface SurveyUnitServicePort {
 
-    List<SampleSurveyUnitDto> importSurveyUnitsToSample(Long sampleId, List<SurveyUnitDto> suList) throws SampleNotFoundException;
+    List<PartitionSurveyUnitLinkDto> importSurveyUnitsIntoPartition(Long partitionId, List<SurveyUnitDto> suList);
 
-    SampleSurveyUnitDto addSurveyUnitToSample(Long surveyUnitId, Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException;
+    PartitionSurveyUnitLinkDto addExistingSurveyUnitIntoPartition(Long surveyUnitId, Long partitionId);
 
-    void deleteSurveyUnitById(Long surveyUnitId) throws SurveyUnitNotFoundException;
+    void deleteSurveyUnitById(Long surveyUnitId);
 
-    void removeSurveyUnitFromSample(Long surveyUnitId, Long sampleId) throws SampleNotFoundException, SurveyUnitNotFoundException;
+    void removeSurveyUnitFromPartition(Long surveyUnitId, Long partitionId);
 
-    SurveyUnitDto getSurveyUnitById(Long surveyUnitId) throws SurveyUnitNotFoundException;
+    SurveyUnitDto getSurveyUnitById(Long surveyUnitId);
 
-    List<SampleSurveyUnitDto> getSurveyUnitsBySampleId(Long sampleId) throws SampleNotFoundException;
+    List<PartitionSurveyUnitLinkDto> getSurveyUnitsByPartitionId(Long partitionId);
 
-    List<Long> getSurveyUnitIdsBySampleId(Long sampleId) throws SampleNotFoundException;
+    List<Long> getSurveyUnitIdsByPartitionId(Long partitionId);
 
-    List<SuIdMappingRecord> getIdMappingTableBySampleId(Long sampleId) throws SampleNotFoundException;
+    List<SuIdMappingRecord> getSurveyUnitIdsMappingTableByPartitionId(Long partitionId);
 
-    int addSurveyUnitsToSample(List<Long> surveyUnitIds, Long sampleId) throws SampleNotFoundException, SurveyUnitsNotFoundException;
+    int addExistingSurveyUnitsToPartition(List<Long> surveyUnitIds, Long partitionId);
 
-    boolean checkRepositoryId(List<SurveyUnitDto> surveyUnitDtos);
+    boolean checkRepositoryId(List<SurveyUnitDto> surveyUnits);
 
-    SurveyUnitDto updateSurveyUnit(SurveyUnitDto surveyUnitDto);
+    SurveyUnitDto updateSurveyUnit(SurveyUnitDto surveyUnit);
 
 }

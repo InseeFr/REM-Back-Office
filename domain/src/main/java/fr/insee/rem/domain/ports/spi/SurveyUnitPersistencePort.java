@@ -1,8 +1,8 @@
 package fr.insee.rem.domain.ports.spi;
 
-import java.util.Optional;
-
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
+
+import java.util.Optional;
 
 public interface SurveyUnitPersistencePort {
 
@@ -12,6 +12,6 @@ public interface SurveyUnitPersistencePort {
 
     boolean existsById(Long surveyUnitId);
 
-    SurveyUnitDto update(SurveyUnitDto surveyUnitDto);
+    SurveyUnitDto update(SurveyUnitDto surveyUnit);
 
 }

@@ -5,9 +5,9 @@ import lombok.Data;
 
 @Builder
 @Data
-public class SampleDto {
+public class PartitionDto {
 
-    private Long id;
+    private Long partitionId;
 
     private String label;
 

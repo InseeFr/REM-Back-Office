@@ -1,23 +1,22 @@
 package fr.insee.rem.infrastructure.mappers;
 
-import java.util.List;
-
+import fr.insee.rem.domain.dtos.AdditionalInformationDto;
+import fr.insee.rem.infrastructure.entity.AdditionalInformation;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import fr.insee.rem.domain.dtos.AdditionalInformationDto;
-import fr.insee.rem.infrastructure.entity.AdditionalInformation;
+import java.util.List;
 
 @Mapper
 public interface AdditionalInformationMapper {
 
     AdditionalInformationMapper INSTANCE = Mappers.getMapper(AdditionalInformationMapper.class);
 
-    AdditionalInformationDto entityToDto(AdditionalInformation addInfo);
+    AdditionalInformationDto entityToDto(AdditionalInformation additionalInformation);
 
-    AdditionalInformation dtoToentity(AdditionalInformationDto addInfoDto);
+    AdditionalInformation dtoToEntity(AdditionalInformationDto additionalInformation);
 
-    List<AdditionalInformationDto> listEntityToListDto(List<AdditionalInformation> addInfos);
+    List<AdditionalInformationDto> listEntityToListDto(List<AdditionalInformation> additionalInformations);
 
-    List<AdditionalInformation> listDtoToListEntity(List<AdditionalInformationDto> addInfosDto);
+    List<AdditionalInformation> listDtoToListEntity(List<AdditionalInformationDto> additionalInformations);
 }

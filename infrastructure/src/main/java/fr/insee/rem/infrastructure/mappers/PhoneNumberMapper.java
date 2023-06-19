@@ -1,23 +1,22 @@
 package fr.insee.rem.infrastructure.mappers;
 
-import java.util.List;
-
+import fr.insee.rem.domain.dtos.PhoneNumberDto;
+import fr.insee.rem.infrastructure.entity.PhoneNumber;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import fr.insee.rem.domain.dtos.PhoneNumberDto;
-import fr.insee.rem.infrastructure.entity.PhoneNumber;
+import java.util.List;
 
 @Mapper
 public interface PhoneNumberMapper {
 
     PhoneNumberMapper INSTANCE = Mappers.getMapper(PhoneNumberMapper.class);
 
-    PhoneNumberDto entityToDto(PhoneNumber numbers);
+    PhoneNumberDto entityToDto(PhoneNumber number);
 
-    PhoneNumber dtoToEntity(PhoneNumberDto numbersDto);
+    PhoneNumber dtoToEntity(PhoneNumberDto number);
 
     List<PhoneNumberDto> listEntityToListDto(List<PhoneNumber> numbers);
 
-    List<PhoneNumber> listDtoToListEntity(List<PhoneNumberDto> numbersDto);
+    List<PhoneNumber> listDtoToListEntity(List<PhoneNumberDto> numbers);
 }

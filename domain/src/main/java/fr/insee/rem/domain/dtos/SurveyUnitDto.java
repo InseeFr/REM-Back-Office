@@ -1,13 +1,13 @@
 package fr.insee.rem.domain.dtos;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Builder
 @Data
@@ -33,7 +33,7 @@ public class SurveyUnitDto {
     /**
      * Defining everyone's role (surveyed, main, coDeclarant)
      * for HouseHold Unit
-     * 
+     *
      * @return the persons
      */
     public List<PersonDto> getPersons() {
@@ -54,15 +54,15 @@ public class SurveyUnitDto {
         for (PersonDto person : persons) {
             PersonDto definedPerson = person;
             if (definedPerson.getSurveyed() == null && isIndividualUnit && person
-                .getExternalId() != null && person.getExternalId().equalsIgnoreCase(externalId)) {
+                    .getExternalId() != null && person.getExternalId().equalsIgnoreCase(externalId)) {
                 definedPerson.setSurveyed(true);
             }
             if (definedPerson.getMain() == null && mainId != null && person
-                .getExternalId() != null && person.getExternalId().equalsIgnoreCase(mainId)) {
+                    .getExternalId() != null && person.getExternalId().equalsIgnoreCase(mainId)) {
                 definedPerson.setMain(true);
             }
             if (definedPerson.getCoDeclarant() == null && coDeclarantId != null && person
-                .getExternalId() != null && person.getExternalId().equalsIgnoreCase(coDeclarantId)) {
+                    .getExternalId() != null && person.getExternalId().equalsIgnoreCase(coDeclarantId)) {
                 definedPerson.setCoDeclarant(true);
             }
             definedPersons.add(definedPerson);

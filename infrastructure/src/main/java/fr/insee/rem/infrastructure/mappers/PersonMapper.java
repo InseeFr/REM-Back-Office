@@ -1,12 +1,11 @@
 package fr.insee.rem.infrastructure.mappers;
 
-import java.util.List;
-
+import fr.insee.rem.domain.dtos.PersonDto;
+import fr.insee.rem.infrastructure.entity.Person;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import fr.insee.rem.domain.dtos.PersonDto;
-import fr.insee.rem.infrastructure.entity.Person;
+import java.util.List;
 
 @Mapper(uses = {
         AddressMapper.class,
@@ -19,9 +18,9 @@ public interface PersonMapper {
 
     PersonDto entityToDto(Person person);
 
-    Person dtoToEntity(PersonDto personDto);
+    Person dtoToEntity(PersonDto person);
 
     List<PersonDto> listEntityToListDto(List<Person> persons);
 
-    List<Person> listDtoToListEntity(List<PersonDto> personsDto);
+    List<Person> listDtoToListEntity(List<PersonDto> persons);
 }
