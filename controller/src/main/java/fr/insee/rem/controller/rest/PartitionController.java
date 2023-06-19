@@ -6,6 +6,7 @@ import fr.insee.rem.domain.ports.api.PartitionServicePort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,10 @@ public class PartitionController {
     @Autowired
     PartitionServicePort partitionService;
 
-    @Tag(name = "Manage a partition")
+    @Tags(value = {
+            @Tag(name = "3. Manage a partition"),
+            @Tag(name = "1. Import data")
+    })
     @Operation(summary = "Create partition", responses = {
             @ApiResponse(responseCode = "200", description = "Partition successfully created"),
             @ApiResponse(responseCode = "409", description = "Partition Already Exists")
@@ -37,7 +41,7 @@ public class PartitionController {
         return new ResponseEntity<>(partitionService.createPartition(label), HttpStatus.OK);
     }
 
-    @Tag(name = "Export data")
+    @Tag(name = "2. Export data")
     @Operation(summary = "Get partition", responses = {
             @ApiResponse(responseCode = "200", description = "Partition successfully recovered"),
             @ApiResponse(responseCode = "404", description = "Partition Not Found")
@@ -48,7 +52,7 @@ public class PartitionController {
         return new ResponseEntity<>(partitionService.getPartitionById(partitionId), HttpStatus.OK);
     }
 
-    @Tag(name = "Export data")
+    @Tag(name = "2. Export data")
     @Operation(summary = "Get all partitions", responses = {
             @ApiResponse(responseCode = "200", description = "Partitions successfully recovered")
     })
@@ -58,7 +62,7 @@ public class PartitionController {
         return new ResponseEntity<>(partitionService.getAllPartitions(), HttpStatus.OK);
     }
 
-    @Tag(name = "Clean data")
+    @Tag(name = "5. Clean data")
     @Operation(summary = "Delete partition", responses = {
             @ApiResponse(responseCode = "200", description = "Partition successfully deleted"),
             @ApiResponse(responseCode = "404", description = "Partition Not Found")

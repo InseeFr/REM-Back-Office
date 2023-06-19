@@ -43,7 +43,7 @@ public class SurveyUnitController {
     @Autowired
     HouseholdCsvAdapter householdCsvAdapter;
 
-    @Tag(name = "Import new survey units")
+    @Tag(name = "1. Import data")
     @Operation(summary = "Add Household SurveyUnits into existing partition from CSV file", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added"),
             @ApiResponse(responseCode = "400", description = "CSV File Error"),
@@ -69,7 +69,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Tag(name = "Import new survey units")
+    @Tag(name = "1. Import data")
     @Operation(summary = "Add Household SurveyUnits into existing partition from json (REM Model)", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added"),
             @ApiResponse(responseCode = "404", description = "Partition Not Found")
@@ -92,7 +92,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Tag(name = "Manage a partition")
+    @Tag(name = "3. Manage a partition")
     @Operation(summary = "Add SurveyUnit to Partition", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully added"),
             @ApiResponse(responseCode = "404", description = "Partition or SurveyUnit Not Found")
@@ -115,7 +115,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Tag(name = "Manage a partition")
+    @Tag(name = "3. Manage a partition")
     @Operation(summary = "Add SurveyUnits List to Partition", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added"),
             @ApiResponse(responseCode = "404", description = "Partition or SurveyUnit Not Found")
@@ -139,7 +139,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Tag(name = "Export data")
+    @Tag(name = "2. Export data")
     @Operation(summary = "Get SurveyUnit by Id", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully recovered"),
             @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
@@ -150,7 +150,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(surveyUnitService.getSurveyUnitById(surveyUnitId), HttpStatus.OK);
     }
 
-    @Tag(name = "Clean data")
+    @Tag(name = "5. Clean data")
     @Operation(summary = "Delete SurveyUnit", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully deleted"),
             @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
@@ -165,7 +165,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Tag(name = "Manage a partition")
+    @Tag(name = "3. Manage a partition")
     @Operation(summary = "Remove SurveyUnit from Partition", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully removed"),
             @ApiResponse(responseCode = "404", description = "Partition or SurveyUnit Not Found")
@@ -182,7 +182,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Tag(name = "Export data")
+    @Tag(name = "2. Export data")
     @Operation(summary = "Get SurveyUnits by Partition", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully recovered"),
             @ApiResponse(responseCode = "404", description = "Partition Not Found")
@@ -196,7 +196,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(suList, HttpStatus.OK);
     }
 
-    @Tag(name = "Export data")
+    @Tag(name = "2. Export data")
     @Operation(summary = "Get list of Survey Units Ids", responses = {
             @ApiResponse(responseCode = "200", description = "List of Survey Units Ids successfully recovered"),
             @ApiResponse(responseCode = "404", description = "Partition Not Found")
@@ -209,7 +209,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(ids, HttpStatus.OK);
     }
 
-    @Tag(name = "Export data")
+    @Tag(name = "2. Export data")
     @Operation(summary = "Export identifiers mapping table", responses = {
             @ApiResponse(responseCode = "200", description = "Identifiers mapping table successfully recovered"),
             @ApiResponse(responseCode = "404", description = "Partition Not Found")
@@ -230,7 +230,7 @@ public class SurveyUnitController {
                 .contentType(MediaType.parseMediaType("text/csv")).body(new InputStreamResource(csvStream));
     }
 
-    @Tag(name = "Update data")
+    @Tag(name = "4. Update data")
     @Operation(summary = "Replace SurveyUnit Data", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully updated"),
             @ApiResponse(responseCode = "400", description = "Data error"),

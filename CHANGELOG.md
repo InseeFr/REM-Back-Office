@@ -51,5 +51,6 @@
 ## 1.2.0
 
 ### Refactoring
-- Replaced the name "Sample" with "Partition"
+- Replaced the name "Sample" with "Partition" (many files changes)
 - Created ApiError class to manage errors feedback
+- Used Tags for groups of endpoints
