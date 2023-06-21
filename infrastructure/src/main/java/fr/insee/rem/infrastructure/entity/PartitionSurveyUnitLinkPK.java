@@ -1,31 +1,31 @@
 package fr.insee.rem.infrastructure.entity;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 @Embeddable
-public class SampleSurveyUnitPK implements Serializable {
+public class PartitionSurveyUnitLinkPK implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -1449181380370389057L;
 
-    @Column(name = "sample_id")
-    private Long sampleId;
+    @Column(name = "partition_id")
+    private Long partitionId;
 
     @Column(name = "survey_unit_id")
     private Long surveyUnitId;
 
     @SuppressWarnings("unused")
-    private SampleSurveyUnitPK() {
+    private PartitionSurveyUnitLinkPK() {
     }
 
-    public SampleSurveyUnitPK(Long sampleId, Long surveyUnitId) {
-        this.sampleId = sampleId;
+    public PartitionSurveyUnitLinkPK(Long partitionId, Long surveyUnitId) {
+        this.partitionId = partitionId;
         this.surveyUnitId = surveyUnitId;
     }
 
@@ -35,12 +35,12 @@ public class SampleSurveyUnitPK implements Serializable {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        SampleSurveyUnitPK that = (SampleSurveyUnitPK) o;
-        return Objects.equals(sampleId, that.sampleId) && Objects.equals(surveyUnitId, that.surveyUnitId);
+        PartitionSurveyUnitLinkPK that = (PartitionSurveyUnitLinkPK) o;
+        return Objects.equals(partitionId, that.partitionId) && Objects.equals(surveyUnitId, that.surveyUnitId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sampleId, surveyUnitId);
+        return Objects.hash(partitionId, surveyUnitId);
     }
 }

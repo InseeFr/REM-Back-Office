@@ -1,14 +1,14 @@
 package fr.insee.rem.domain.service;
 
-import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
+import fr.insee.rem.domain.dtos.PartitionSurveyUnitLinkDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
-import fr.insee.rem.domain.exception.SampleNotFoundException;
+import fr.insee.rem.domain.exception.PartitionNotFoundException;
 import fr.insee.rem.domain.exception.SettingsException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
 import fr.insee.rem.domain.exception.SurveyUnitsNotFoundException;
 import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
-import fr.insee.rem.domain.ports.spi.SamplePersistencePort;
-import fr.insee.rem.domain.ports.spi.SampleSurveyUnitPersistencePort;
+import fr.insee.rem.domain.ports.spi.PartitionPersistencePort;
+import fr.insee.rem.domain.ports.spi.PartitionSurveyUnitLinkPersistencePort;
 import fr.insee.rem.domain.ports.spi.SurveyUnitPersistencePort;
 import fr.insee.rem.domain.records.SuIdMappingRecord;
 import lombok.extern.slf4j.Slf4j;
@@ -21,43 +21,44 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
 
     private SurveyUnitPersistencePort surveyUnitPersistencePort;
 
-    private SampleSurveyUnitPersistencePort sampleSurveyUnitPersistencePort;
+    private PartitionSurveyUnitLinkPersistencePort partitionSurveyUnitLinkPersistencePort;
 
-    private SamplePersistencePort samplePersistencePort;
+    private PartitionPersistencePort partitionPersistencePort;
 
     public SurveyUnitServiceImpl(
             SurveyUnitPersistencePort surveyUnitPersistencePort,
-            SampleSurveyUnitPersistencePort sampleSurveyUnitPersistencePort,
-            SamplePersistencePort samplePersistencePort) {
+            PartitionSurveyUnitLinkPersistencePort partitionSurveyUnitLinkPersistencePort,
+            PartitionPersistencePort partitionPersistencePort) {
         this.surveyUnitPersistencePort = surveyUnitPersistencePort;
-        this.sampleSurveyUnitPersistencePort = sampleSurveyUnitPersistencePort;
-        this.samplePersistencePort = samplePersistencePort;
+        this.partitionSurveyUnitLinkPersistencePort = partitionSurveyUnitLinkPersistencePort;
+        this.partitionPersistencePort = partitionPersistencePort;
     }
 
     @Override
-    public List<SampleSurveyUnitDto> importSurveyUnitsToSample(Long sampleId, List<SurveyUnitDto> suList) {
+    public List<PartitionSurveyUnitLinkDto> importSurveyUnitsIntoPartition(Long partitionId,
+                                                                           List<SurveyUnitDto> suList) {
         if (suList == null || suList.isEmpty()) {
-            log.error("domain: importSurveyUnitsToSample({}, List of survey units to import is empty or null)",
-                    sampleId);
+            log.error("domain: importSurveyUnitsIntoPartition({}, List of survey units to import is empty or null)",
+                    partitionId);
             throw new SettingsException("List of survey units to import is empty or null");
         }
-        log.debug("domain: importSurveyUnitsToSample({}, {} survey units)", sampleId, suList.size());
-        if (!samplePersistencePort.existsById(sampleId)) {
-            throw new SampleNotFoundException(sampleId);
+        log.debug("domain: importSurveyUnitsIntoPartition({}, {} survey units)", partitionId, suList.size());
+        if (!partitionPersistencePort.existsById(partitionId)) {
+            throw new PartitionNotFoundException(partitionId);
         }
-        return sampleSurveyUnitPersistencePort.saveAll(sampleId, suList);
+        return partitionSurveyUnitLinkPersistencePort.saveAll(partitionId, suList);
     }
 
     @Override
-    public SampleSurveyUnitDto addSurveyUnitToSample(Long surveyUnitId, Long sampleId) {
-        log.debug("domain: addSurveyUnitToSample({}, {})", surveyUnitId, sampleId);
-        if (!samplePersistencePort.existsById(sampleId)) {
-            throw new SampleNotFoundException(sampleId);
+    public PartitionSurveyUnitLinkDto addExistingSurveyUnitIntoPartition(Long surveyUnitId, Long partitionId) {
+        log.debug("domain: addExistingSurveyUnitIntoPartition({}, {})", surveyUnitId, partitionId);
+        if (!partitionPersistencePort.existsById(partitionId)) {
+            throw new PartitionNotFoundException(partitionId);
         }
         if (!surveyUnitPersistencePort.existsById(surveyUnitId)) {
             throw new SurveyUnitNotFoundException(surveyUnitId);
         }
-        return sampleSurveyUnitPersistencePort.addSurveyUnitToSample(surveyUnitId, sampleId);
+        return partitionSurveyUnitLinkPersistencePort.addExistingSurveyUnitIntoPartition(surveyUnitId, partitionId);
     }
 
     @Override
@@ -70,96 +71,98 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
     }
 
     @Override
-    public void removeSurveyUnitFromSample(Long surveyUnitId, Long sampleId) {
-        log.debug("domain: removeSurveyUnitFromSample({},{})", surveyUnitId, sampleId);
-        if (!samplePersistencePort.existsById(sampleId)) {
-            throw new SampleNotFoundException(sampleId);
+    public void removeSurveyUnitFromPartition(Long surveyUnitId, Long partitionId) {
+        log.debug("domain: removeSurveyUnitFromPartition({},{})", surveyUnitId, partitionId);
+        if (!partitionPersistencePort.existsById(partitionId)) {
+            throw new PartitionNotFoundException(partitionId);
         }
         if (!surveyUnitPersistencePort.existsById(surveyUnitId)) {
             throw new SurveyUnitNotFoundException(surveyUnitId);
         }
-        sampleSurveyUnitPersistencePort.removeSurveyUnitFromSample(surveyUnitId, sampleId);
+        partitionSurveyUnitLinkPersistencePort.removeSurveyUnitFromPartition(surveyUnitId, partitionId);
     }
 
     @Override
     public SurveyUnitDto getSurveyUnitById(Long surveyUnitId) {
         log.debug("domain: getSurveyUnitById({})", surveyUnitId);
-        Optional<SurveyUnitDto> findSurveyUnitDto = surveyUnitPersistencePort.findById(surveyUnitId);
-        if (!findSurveyUnitDto.isPresent()) {
+        Optional<SurveyUnitDto> findSurveyUnit = surveyUnitPersistencePort.findById(surveyUnitId);
+        if (!findSurveyUnit.isPresent()) {
             throw new SurveyUnitNotFoundException(surveyUnitId);
         }
-        return findSurveyUnitDto.get();
+        return findSurveyUnit.get();
     }
 
     @Override
-    public List<SampleSurveyUnitDto> getSurveyUnitsBySampleId(Long sampleId) {
-        log.debug("domain: getSurveyUnitsBySampleId({})", sampleId);
-        if (!samplePersistencePort.existsById(sampleId)) {
-            throw new SampleNotFoundException(sampleId);
+    public List<PartitionSurveyUnitLinkDto> getSurveyUnitsByPartitionId(Long partitionId) {
+        log.debug("domain: getSurveyUnitsByPartitionId({})", partitionId);
+        if (!partitionPersistencePort.existsById(partitionId)) {
+            throw new PartitionNotFoundException(partitionId);
         }
-        return sampleSurveyUnitPersistencePort.findSurveyUnitsBySampleId(sampleId);
+        return partitionSurveyUnitLinkPersistencePort.findSurveyUnitsByPartitionId(partitionId);
     }
 
     @Override
-    public List<Long> getSurveyUnitIdsBySampleId(Long sampleId) {
-        log.debug("domain: getSurveyUnitIdsBySampleId({})", sampleId);
-        if (!samplePersistencePort.existsById(sampleId)) {
-            throw new SampleNotFoundException(sampleId);
+    public List<Long> getSurveyUnitIdsByPartitionId(Long partitionId) {
+        log.debug("domain: getSurveyUnitIdsByPartitionId({})", partitionId);
+        if (!partitionPersistencePort.existsById(partitionId)) {
+            throw new PartitionNotFoundException(partitionId);
         }
-        return sampleSurveyUnitPersistencePort.findAllIdsBySampleId(sampleId);
+        return partitionSurveyUnitLinkPersistencePort.findAllIdsByPartitionId(partitionId);
     }
 
     @Override
-    public List<SuIdMappingRecord> getIdMappingTableBySampleId(Long sampleId) {
-        log.debug("domain: getIdMappingTableBySampleId({})", sampleId);
-        if (!samplePersistencePort.existsById(sampleId)) {
-            throw new SampleNotFoundException(sampleId);
+    public List<SuIdMappingRecord> getSurveyUnitIdsMappingTableByPartitionId(Long partitionId) {
+        log.debug("domain: getSurveyUnitIdsMappingTableByPartitionId({})", partitionId);
+        if (!partitionPersistencePort.existsById(partitionId)) {
+            throw new PartitionNotFoundException(partitionId);
         }
-        return sampleSurveyUnitPersistencePort.findSuIdMappingBySampleId(sampleId);
+        return partitionSurveyUnitLinkPersistencePort.findSurveyUnitIdsMappingTableByPartitionId(partitionId);
     }
 
     @Override
-    public int addSurveyUnitsToSample(List<Long> surveyUnitIds, Long sampleId) {
+    public int addExistingSurveyUnitsToPartition(List<Long> surveyUnitIds, Long partitionId) {
         if (surveyUnitIds == null || surveyUnitIds.isEmpty()) {
-            log.error("domain: addSurveyUnitsToSample({}, List of survey units to add is empty or null)", sampleId);
+            log.error("domain: addExistingSurveyUnitsToPartition({}, List of survey units to add is empty or null)",
+                    partitionId);
             throw new SettingsException("List of survey units to add is empty or null");
         }
-        log.debug("domain: addSurveyUnitsToSample({})", sampleId);
-        if (!samplePersistencePort.existsById(sampleId)) {
-            throw new SampleNotFoundException(sampleId);
+        log.debug("domain: addExistingSurveyUnitsToPartition({})", partitionId);
+        if (!partitionPersistencePort.existsById(partitionId)) {
+            throw new PartitionNotFoundException(partitionId);
         }
         List<Long> idsNotOk = surveyUnitIds.stream().filter(id -> !surveyUnitPersistencePort.existsById(id)).toList();
         if (!idsNotOk.isEmpty()) {
             throw new SurveyUnitsNotFoundException(idsNotOk);
         }
-        surveyUnitIds.stream().forEach(id -> sampleSurveyUnitPersistencePort.addSurveyUnitToSample(id, sampleId));
+        surveyUnitIds.stream().forEach(id -> partitionSurveyUnitLinkPersistencePort.addExistingSurveyUnitIntoPartition(id,
+                partitionId));
         return surveyUnitIds.size();
     }
 
     @Override
-    public boolean checkRepositoryId(List<SurveyUnitDto> surveyUnitDtos) {
-        if (surveyUnitDtos == null) {
+    public boolean checkRepositoryId(List<SurveyUnitDto> surveyUnits) {
+        if (surveyUnits == null) {
             return false;
         }
-        return surveyUnitDtos.stream().anyMatch(su -> su.getRepositoryId() != null);
+        return surveyUnits.stream().anyMatch(su -> su.getRepositoryId() != null);
     }
 
     @Override
-    public SurveyUnitDto updateSurveyUnit(SurveyUnitDto surveyUnitDto) {
-        if (surveyUnitDto == null) {
+    public SurveyUnitDto updateSurveyUnit(SurveyUnitDto surveyUnit) {
+        if (surveyUnit == null) {
             log.error("domain: updateSurveyUnit(no data error)");
             throw new SettingsException("SurveyUnit data empty");
         }
-        if (surveyUnitDto.getRepositoryId() == null) {
+        if (surveyUnit.getRepositoryId() == null) {
             log.error("domain: updateSurveyUnit(no id error)");
             throw new SettingsException("Repository id empty");
         }
-        Long repositoryId = surveyUnitDto.getRepositoryId();
+        Long repositoryId = surveyUnit.getRepositoryId();
         log.debug("domain: updateSurveyUnit {}", repositoryId);
         if (!surveyUnitPersistencePort.existsById(repositoryId)) {
             throw new SurveyUnitNotFoundException(repositoryId);
         }
-        return surveyUnitPersistencePort.update(surveyUnitDto);
+        return surveyUnitPersistencePort.update(surveyUnit);
     }
 
 }

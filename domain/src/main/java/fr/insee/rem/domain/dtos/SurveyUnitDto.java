@@ -1,13 +1,13 @@
 package fr.insee.rem.domain.dtos;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Builder
 @Data
@@ -19,7 +19,7 @@ public class SurveyUnitDto {
 
     private String externalName;
 
-    private TypeUnit typeUnit;
+    private Context context;
 
     private AddressDto address;
 
@@ -33,36 +33,37 @@ public class SurveyUnitDto {
     /**
      * Defining everyone's role (surveyed, main, coDeclarant)
      * for HouseHold Unit
-     * 
+     *
      * @return the persons
      */
     public List<PersonDto> getPersons() {
-        if (persons == null || persons.isEmpty()) {
-            return Collections.emptyList();
+        if (persons == null) {
+            return List.of();
         }
-        if (typeUnit == TypeUnit.ENTERPRISE) {
+        if (context == Context.BUSINESS) {
             return persons;
         }
         if (additionalInformations == null || additionalInformations.isEmpty()) {
             return persons;
         }
-        boolean isIndividualUnit = "INDIVIDU".equalsIgnoreCase(getValueByKey("type_unite"));
-        String mainId = getValueByKey("ident_ind_dec");
-        String coDeclarantId = getValueByKey("ident_ind_co");
+        Optional<String> typeUnite = getValueByKey("type_unite");
+        boolean isIndividualUnit = typeUnite.isPresent() && "INDIVIDU".equalsIgnoreCase(typeUnite.get());
+        Optional<String> mainId = getValueByKey("ident_ind_dec");
+        Optional<String> coDeclarantId = getValueByKey("ident_ind_co");
 
         List<PersonDto> definedPersons = new ArrayList<>();
         for (PersonDto person : persons) {
             PersonDto definedPerson = person;
-            if (definedPerson.getSurveyed() == null && isIndividualUnit && person
-                .getExternalId() != null && person.getExternalId().equalsIgnoreCase(externalId)) {
+            if (isIndividualUnit && definedPerson.getSurveyed() == null && person
+                    .getExternalId() != null && person.getExternalId().equalsIgnoreCase(externalId)) {
                 definedPerson.setSurveyed(true);
             }
-            if (definedPerson.getMain() == null && mainId != null && person
-                .getExternalId() != null && person.getExternalId().equalsIgnoreCase(mainId)) {
+            if (mainId.isPresent() && definedPerson.getMain() == null && person
+                    .getExternalId() != null && person.getExternalId().equalsIgnoreCase(mainId.get())) {
                 definedPerson.setMain(true);
             }
-            if (definedPerson.getCoDeclarant() == null && coDeclarantId != null && person
-                .getExternalId() != null && person.getExternalId().equalsIgnoreCase(coDeclarantId)) {
+            if (coDeclarantId.isPresent() && definedPerson.getCoDeclarant() == null && person
+                    .getExternalId() != null && person.getExternalId().equalsIgnoreCase(coDeclarantId.get())) {
                 definedPerson.setCoDeclarant(true);
             }
             definedPersons.add(definedPerson);
@@ -71,19 +72,16 @@ public class SurveyUnitDto {
         return definedPersons;
     }
 
-    private String getValueByKey(String key) {
+    private Optional<String> getValueByKey(String key) {
         if (key == null) {
-            return null;
+            return Optional.empty();
         }
         for (AdditionalInformationDto addInfo : additionalInformations) {
-            if (addInfo.getKey() == null) {
-                return null;
-            }
-            if (key.equalsIgnoreCase(addInfo.getKey())) {
-                return addInfo.getValue();
+            if (addInfo.getKey() != null && key.equalsIgnoreCase(addInfo.getKey())) {
+                return Optional.of(addInfo.getValue());
             }
         }
-        return null;
+        return Optional.empty();
     }
 
 

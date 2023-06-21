@@ -1,18 +1,18 @@
 package fr.insee.rem.domain.service;
 
-import fr.insee.rem.domain.dtos.SampleDto;
-import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
+import fr.insee.rem.domain.dtos.Context;
+import fr.insee.rem.domain.dtos.PartitionDto;
+import fr.insee.rem.domain.dtos.PartitionSurveyUnitLinkDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
-import fr.insee.rem.domain.dtos.TypeUnit;
-import fr.insee.rem.domain.exception.SampleNotFoundException;
+import fr.insee.rem.domain.exception.PartitionNotFoundException;
 import fr.insee.rem.domain.exception.SettingsException;
 import fr.insee.rem.domain.exception.SurveyUnitNotFoundException;
 import fr.insee.rem.domain.exception.SurveyUnitsNotFoundException;
-import fr.insee.rem.domain.ports.api.SampleServicePort;
+import fr.insee.rem.domain.ports.api.PartitionServicePort;
 import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
 import fr.insee.rem.domain.records.SuIdMappingRecord;
-import fr.insee.rem.domain.service.mock.SamplePersistenceInMemory;
-import fr.insee.rem.domain.service.mock.SampleSurveyUnitPersistenceInMemory;
+import fr.insee.rem.domain.service.mock.PartitionPersistenceInMemory;
+import fr.insee.rem.domain.service.mock.PartitionSurveyUnitLinkPersistenceInMemory;
 import fr.insee.rem.domain.service.mock.SurveyUnitPersistenceInMemory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,130 +20,136 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 class SurveyUnitServiceTest {
-    SamplePersistenceInMemory samplePersistenceInMemory = new SamplePersistenceInMemory();
+    PartitionPersistenceInMemory partitionPersistenceInMemory = new PartitionPersistenceInMemory();
     SurveyUnitPersistenceInMemory surveyUnitPersistenceInMemory = new SurveyUnitPersistenceInMemory();
-    SampleSurveyUnitPersistenceInMemory sampleSurveyUnitPersistenceInMemory =
-            new SampleSurveyUnitPersistenceInMemory(samplePersistenceInMemory, surveyUnitPersistenceInMemory);
+    PartitionSurveyUnitLinkPersistenceInMemory partitionSurveyUnitLinkPersistenceInMemory =
+            new PartitionSurveyUnitLinkPersistenceInMemory(partitionPersistenceInMemory, surveyUnitPersistenceInMemory);
 
     SurveyUnitServicePort surveyUnitService = new SurveyUnitServiceImpl(surveyUnitPersistenceInMemory,
-            sampleSurveyUnitPersistenceInMemory, samplePersistenceInMemory);
-    SampleServicePort sampleService = new SampleServiceImpl(samplePersistenceInMemory);
+            partitionSurveyUnitLinkPersistenceInMemory, partitionPersistenceInMemory);
+    PartitionServicePort partitionService = new PartitionServiceImpl(partitionPersistenceInMemory);
 
-    private List<SampleSurveyUnitDto> initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits(String label) {
-        SampleDto existingSample = sampleService.createSample(label);
+    private List<PartitionSurveyUnitLinkDto> initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits(String label) {
+        PartitionDto existingPartition = partitionService.createPartition(label);
         List<SurveyUnitDto> surveyUnitsToImport =
-                List.of(SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00001").build(),
-                        SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00002").build());
-        return surveyUnitService.importSurveyUnitsToSample(existingSample.getId(), surveyUnitsToImport);
+                List.of(SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00001").build(),
+                        SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00002").build());
+        return surveyUnitService.importSurveyUnitsIntoPartition(existingPartition.getPartitionId(),
+                surveyUnitsToImport);
     }
 
     @Test
-    void shouldImportListOfSurveyUnitsAndLinkThemToExistingSample() {
+    void shouldImportListOfSurveyUnitsAndLinkThemToExistingPartition() {
         // Given
-        SampleDto existingSample = sampleService.createSample("existing sample");
+        PartitionDto existingPartition = partitionService.createPartition("existing partition");
         List<SurveyUnitDto> surveyUnitsToImport =
-                List.of(SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00001").build(),
-                        SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00002").build());
+                List.of(SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00001").build(),
+                        SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00002").build());
 
         // When
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                surveyUnitService.importSurveyUnitsToSample(existingSample.getId(), surveyUnitsToImport);
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                surveyUnitService.importSurveyUnitsIntoPartition(existingPartition.getPartitionId(),
+                        surveyUnitsToImport);
 
         // Then
-        Assertions.assertNotNull(importedSampleSurveyUnits);
-        Assertions.assertEquals(2, importedSampleSurveyUnits.size());
-        Assertions.assertEquals(1L, importedSampleSurveyUnits.get(0).getSurveyUnit().getRepositoryId());
-        Assertions.assertEquals(2L, importedSampleSurveyUnits.get(1).getSurveyUnit().getRepositoryId());
-        Assertions.assertEquals("00001", importedSampleSurveyUnits.get(0).getSurveyUnit().getExternalId());
-        Assertions.assertEquals("00002", importedSampleSurveyUnits.get(1).getSurveyUnit().getExternalId());
-        Assertions.assertEquals(1L, importedSampleSurveyUnits.get(0).getSample().getId());
-        Assertions.assertEquals(1L, importedSampleSurveyUnits.get(1).getSample().getId());
+        Assertions.assertNotNull(importedPartitionSurveyUnits);
+        Assertions.assertEquals(2, importedPartitionSurveyUnits.size());
+        Assertions.assertEquals(1L, importedPartitionSurveyUnits.get(0).getSurveyUnit().getRepositoryId());
+        Assertions.assertEquals(2L, importedPartitionSurveyUnits.get(1).getSurveyUnit().getRepositoryId());
+        Assertions.assertEquals("00001", importedPartitionSurveyUnits.get(0).getSurveyUnit().getExternalId());
+        Assertions.assertEquals("00002", importedPartitionSurveyUnits.get(1).getSurveyUnit().getExternalId());
+        Assertions.assertEquals(1L, importedPartitionSurveyUnits.get(0).getPartition().getPartitionId());
+        Assertions.assertEquals(1L, importedPartitionSurveyUnits.get(1).getPartition().getPartitionId());
     }
 
     @Test
-    void shouldReturnSampleNotFoundExceptionWhenImportSurveyUnitsIntoNotExistingSample() {
+    void shouldReturnPartitionNotFoundExceptionWhenImportSurveyUnitsIntoNotExistingPartition() {
         // Given
         List<SurveyUnitDto> surveyUnitsToImport =
-                List.of(SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00001").build(),
-                        SurveyUnitDto.builder().typeUnit(TypeUnit.HOUSEHOLD).externalId("00002").build());
-        Long notExistingSampleId = 99L;
+                List.of(SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00001").build(),
+                        SurveyUnitDto.builder().context(Context.HOUSEHOLD).externalId("00002").build());
+        Long notExistingPartitionId = 99L;
 
         // When + Then
-        SampleNotFoundException exception =
-                Assertions.assertThrows(SampleNotFoundException.class,
-                        () -> surveyUnitService.importSurveyUnitsToSample(notExistingSampleId, surveyUnitsToImport));
-        Assertions.assertEquals(String.format("Sample [%s] doesn't exist", notExistingSampleId),
+        PartitionNotFoundException exception =
+                Assertions.assertThrows(PartitionNotFoundException.class,
+                        () -> surveyUnitService.importSurveyUnitsIntoPartition(notExistingPartitionId,
+                                surveyUnitsToImport));
+        Assertions.assertEquals(String.format("Partition [%s] doesn't exist", notExistingPartitionId),
                 exception.getMessage());
 
     }
 
     @Test
-    void shouldReturnSettingsExceptionWhenImportNullListToExistingSample() {
+    void shouldReturnSettingsExceptionWhenImportNullListToExistingPartition() {
         // Given
-        Long existingSampleId = 1L;
+        Long existingPartitionId = 1L;
 
         // When + Then
         SettingsException exception = Assertions.assertThrows(SettingsException.class,
-                () -> surveyUnitService.importSurveyUnitsToSample(existingSampleId, null));
+                () -> surveyUnitService.importSurveyUnitsIntoPartition(existingPartitionId, null));
         Assertions.assertEquals("List of survey units to import is empty or null", exception.getMessage());
     }
 
     @Test
-    void shouldReturnSettingsExceptionWhenImportEmptyListToExistingSample() {
+    void shouldReturnSettingsExceptionWhenImportEmptyListToExistingPartition() {
         // Given
         List<SurveyUnitDto> emptyList = List.of();
-        Long existingSampleId = 1L;
+        Long existingPartitionId = 1L;
 
         // When + Then
         SettingsException exception = Assertions.assertThrows(SettingsException.class,
-                () -> surveyUnitService.importSurveyUnitsToSample(existingSampleId, emptyList));
+                () -> surveyUnitService.importSurveyUnitsIntoPartition(existingPartitionId, emptyList));
         Assertions.assertEquals("List of survey units to import is empty or null", exception.getMessage());
     }
 
     @Test
-    void shouldAddAnExistingSurveyUnitIntoAnotherSample() {
+    void shouldAddAnExistingSurveyUnitIntoAnotherPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        Long existingSurveyUnitId = importedSampleSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
-        SampleDto anotherSample = sampleService.createSample("new sample");
-        Long anotherSampleId = anotherSample.getId();
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long existingSurveyUnitId = importedPartitionSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
+        PartitionDto anotherPartition = partitionService.createPartition("new partition");
+        Long anotherPartitionId = anotherPartition.getPartitionId();
 
         // When
-        SampleSurveyUnitDto addedSampleSurveyUnit = surveyUnitService.addSurveyUnitToSample(existingSurveyUnitId,
-                anotherSampleId);
+        PartitionSurveyUnitLinkDto addedPartitionSurveyUnit =
+                surveyUnitService.addExistingSurveyUnitIntoPartition(existingSurveyUnitId,
+                        anotherPartitionId);
 
         // Then
-        Assertions.assertNotNull(addedSampleSurveyUnit);
-        Assertions.assertEquals(existingSurveyUnitId, addedSampleSurveyUnit.getSurveyUnit().getRepositoryId());
-        Assertions.assertEquals(anotherSampleId, addedSampleSurveyUnit.getSample().getId());
+        Assertions.assertNotNull(addedPartitionSurveyUnit);
+        Assertions.assertEquals(existingSurveyUnitId, addedPartitionSurveyUnit.getSurveyUnit().getRepositoryId());
+        Assertions.assertEquals(anotherPartitionId, addedPartitionSurveyUnit.getPartition().getPartitionId());
     }
 
     @Test
-    void shouldReturnSampleNotFoundExceptionWhenAddExistingSurveyUnitIntoNonExistentSample() {
+    void shouldReturnPartitionNotFoundExceptionWhenAddExistingSurveyUnitIntoNonExistentPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        Long existingSurveyUnitId = importedSampleSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
-        Long notExistingSampleId = 99L;
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long existingSurveyUnitId = importedPartitionSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
+        Long notExistingPartitionId = 99L;
 
         // When + Then
-        SampleNotFoundException exception = Assertions.assertThrows(SampleNotFoundException.class,
-                () -> surveyUnitService.addSurveyUnitToSample(existingSurveyUnitId, notExistingSampleId));
-        Assertions.assertEquals(String.format("Sample [%s] doesn't exist", notExistingSampleId),
+        PartitionNotFoundException exception = Assertions.assertThrows(PartitionNotFoundException.class,
+                () -> surveyUnitService.addExistingSurveyUnitIntoPartition(existingSurveyUnitId,
+                        notExistingPartitionId));
+        Assertions.assertEquals(String.format("Partition [%s] doesn't exist", notExistingPartitionId),
                 exception.getMessage());
     }
 
     @Test
-    void shouldReturnSurveyUnitNotFoundExceptionWhenAddNotExistingSurveyUnitIntoExistingSample() {
+    void shouldReturnSurveyUnitNotFoundExceptionWhenAddNotExistingSurveyUnitIntoExistingPartition() {
         // Given
-        SampleDto existingSample = sampleService.createSample("existing sample");
-        Long existingSampleId = existingSample.getId();
+        PartitionDto existingPartition = partitionService.createPartition("existing partition");
+        Long existingPartitionId = existingPartition.getPartitionId();
         Long notExistingSurveyUnitId = 99L;
 
         // When + Then
         SurveyUnitNotFoundException exception = Assertions.assertThrows(SurveyUnitNotFoundException.class,
-                () -> surveyUnitService.addSurveyUnitToSample(notExistingSurveyUnitId, existingSampleId));
+                () -> surveyUnitService.addExistingSurveyUnitIntoPartition(notExistingSurveyUnitId,
+                        existingPartitionId));
         Assertions.assertEquals(String.format("SurveyUnit [%s] doesn't exist", notExistingSurveyUnitId),
                 exception.getMessage());
     }
@@ -151,9 +157,9 @@ class SurveyUnitServiceTest {
     @Test
     void shouldDeleteSurveyUnit() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        Long surveyUnitIdToDelete = importedSampleSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long surveyUnitIdToDelete = importedPartitionSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
 
         // When
         surveyUnitService.deleteSurveyUnitById(surveyUnitIdToDelete);
@@ -176,47 +182,47 @@ class SurveyUnitServiceTest {
     }
 
     @Test
-    void shouldRemoveSurveyUnitFromSample() {
+    void shouldRemoveSurveyUnitFromPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        Long surveyUnitIdToRemove = importedSampleSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
-        Long existingSampleId = importedSampleSurveyUnits.get(0).getSample().getId();
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long surveyUnitIdToRemove = importedPartitionSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
+        Long existingPartitionId = importedPartitionSurveyUnits.get(0).getPartition().getPartitionId();
 
         // When
-        surveyUnitService.removeSurveyUnitFromSample(surveyUnitIdToRemove, existingSampleId);
+        surveyUnitService.removeSurveyUnitFromPartition(surveyUnitIdToRemove, existingPartitionId);
 
         // Then
         Assertions.assertEquals(1,
-                sampleSurveyUnitPersistenceInMemory.findSurveyUnitsBySampleId(existingSampleId).size());
+                partitionSurveyUnitLinkPersistenceInMemory.findSurveyUnitsByPartitionId(existingPartitionId).size());
     }
 
     @Test
-    void shouldReturnSampleNotFoundExceptionWhenRemoveExistingSurveyUnitFromNotExistingSample() {
+    void shouldReturnPartitionNotFoundExceptionWhenRemoveExistingSurveyUnitFromNotExistingPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        Long existingSurveyUnitId = importedSampleSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
-        Long notExistingSampleId = 99L;
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long existingSurveyUnitId = importedPartitionSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
+        Long notExistingPartitionId = 99L;
 
         // When + Then
-        SampleNotFoundException exception = Assertions.assertThrows(SampleNotFoundException.class,
-                () -> surveyUnitService.removeSurveyUnitFromSample(existingSurveyUnitId, notExistingSampleId));
-        Assertions.assertEquals(String.format("Sample [%s] doesn't exist", notExistingSampleId),
+        PartitionNotFoundException exception = Assertions.assertThrows(PartitionNotFoundException.class,
+                () -> surveyUnitService.removeSurveyUnitFromPartition(existingSurveyUnitId, notExistingPartitionId));
+        Assertions.assertEquals(String.format("Partition [%s] doesn't exist", notExistingPartitionId),
                 exception.getMessage());
     }
 
     @Test
-    void shouldReturnSurveyUnitNotFoundExceptionWhenRemoveNotExistingSurveyUnitFromExistingSample() {
+    void shouldReturnSurveyUnitNotFoundExceptionWhenRemoveNotExistingSurveyUnitFromExistingPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        Long existingSampleId = importedSampleSurveyUnits.get(0).getSample().getId();
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long existingPartitionId = importedPartitionSurveyUnits.get(0).getPartition().getPartitionId();
         Long notExistingSurveyUnitId = 99L;
 
         // When + Then
         SurveyUnitNotFoundException exception = Assertions.assertThrows(SurveyUnitNotFoundException.class,
-                () -> surveyUnitService.removeSurveyUnitFromSample(notExistingSurveyUnitId, existingSampleId));
+                () -> surveyUnitService.removeSurveyUnitFromPartition(notExistingSurveyUnitId, existingPartitionId));
         Assertions.assertEquals(String.format("SurveyUnit [%s] doesn't exist", notExistingSurveyUnitId),
                 exception.getMessage());
     }
@@ -224,9 +230,9 @@ class SurveyUnitServiceTest {
     @Test
     void shouldReturnSurveyUnitFromId() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        Long existingSurveyUnitId = importedSampleSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long existingSurveyUnitId = importedPartitionSurveyUnits.get(0).getSurveyUnit().getRepositoryId();
 
         // When
         SurveyUnitDto existingSurveyUnit = surveyUnitService.getSurveyUnitById(existingSurveyUnitId);
@@ -250,120 +256,122 @@ class SurveyUnitServiceTest {
     }
 
     @Test
-    void shouldReturnSampleNotFoundExceptionWhenGetListOfSurveyUnitsFromNotExistingSample() {
+    void shouldReturnPartitionNotFoundExceptionWhenGetListOfSurveyUnitsFromNotExistingPartition() {
         // Given
-        Long notExistingSampleId = 99L;
+        Long notExistingPartitionId = 99L;
 
         // When + Then
-        SampleNotFoundException exception = Assertions.assertThrows(SampleNotFoundException.class,
-                () -> surveyUnitService.getSurveyUnitsBySampleId(notExistingSampleId));
-        Assertions.assertEquals(String.format("Sample [%s] doesn't exist", notExistingSampleId),
+        PartitionNotFoundException exception = Assertions.assertThrows(PartitionNotFoundException.class,
+                () -> surveyUnitService.getSurveyUnitsByPartitionId(notExistingPartitionId));
+        Assertions.assertEquals(String.format("Partition [%s] doesn't exist", notExistingPartitionId),
                 exception.getMessage());
     }
 
 
     @Test
-    void shouldReturnListOfSurveyUnitsLinkToExistingSample() {
+    void shouldReturnListOfSurveyUnitsLinkToExistingPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        List<SampleSurveyUnitDto> otherImportedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("other sample");
-        List<Long> idsNotInRetournedList = otherImportedSampleSurveyUnits.stream()
-                .map(SampleSurveyUnitDto::getSurveyUnit)
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        List<PartitionSurveyUnitLinkDto> otherImportedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("other partition");
+        List<Long> idsNotInRetournedList = otherImportedPartitionSurveyUnits.stream()
+                .map(PartitionSurveyUnitLinkDto::getSurveyUnit)
                 .map(SurveyUnitDto::getRepositoryId)
                 .toList();
-        Long importSampleId = importedSampleSurveyUnits.get(0).getSample().getId();
+        Long importPartitionId = importedPartitionSurveyUnits.get(0).getPartition().getPartitionId();
 
         // When
-        List<SampleSurveyUnitDto> returnedList = surveyUnitService.getSurveyUnitsBySampleId(importSampleId);
+        List<PartitionSurveyUnitLinkDto> returnedList =
+                surveyUnitService.getSurveyUnitsByPartitionId(importPartitionId);
 
         // Then
         Assertions.assertNotNull(returnedList);
-        Assertions.assertEquals(importedSampleSurveyUnits.size(), returnedList.size());
+        Assertions.assertEquals(importedPartitionSurveyUnits.size(), returnedList.size());
         for (int i = 0; i < returnedList.size(); i++) {
-            Assertions.assertEquals(importedSampleSurveyUnits.get(i).getSurveyUnit().getRepositoryId(),
+            Assertions.assertEquals(importedPartitionSurveyUnits.get(i).getSurveyUnit().getRepositoryId(),
                     returnedList.get(i).getSurveyUnit().getRepositoryId());
-            Assertions.assertEquals(importedSampleSurveyUnits.get(i).getSample().getId(),
-                    returnedList.get(i).getSample().getId());
+            Assertions.assertEquals(importedPartitionSurveyUnits.get(i).getPartition().getPartitionId(),
+                    returnedList.get(i).getPartition().getPartitionId());
             Assertions.assertFalse(idsNotInRetournedList.contains(returnedList.get(i).getSurveyUnit().getRepositoryId()));
         }
     }
 
     @Test
-    void shouldReturnSampleNotFoundExceptionWhenGetListOfSurveyUnitIdsFromNotExistingSample() {
+    void shouldReturnPartitionNotFoundExceptionWhenGetListOfSurveyUnitIdsFromNotExistingPartition() {
         // Given
-        Long notExistingSampleId = 99L;
+        Long notExistingPartitionId = 99L;
 
         // When + Then
-        SampleNotFoundException exception = Assertions.assertThrows(SampleNotFoundException.class,
-                () -> surveyUnitService.getSurveyUnitIdsBySampleId(notExistingSampleId));
-        Assertions.assertEquals(String.format("Sample [%s] doesn't exist", notExistingSampleId),
+        PartitionNotFoundException exception = Assertions.assertThrows(PartitionNotFoundException.class,
+                () -> surveyUnitService.getSurveyUnitIdsByPartitionId(notExistingPartitionId));
+        Assertions.assertEquals(String.format("Partition [%s] doesn't exist", notExistingPartitionId),
                 exception.getMessage());
     }
 
 
     @Test
-    void shouldReturnListOfSurveyUnitIdsLinkToExistingSample() {
+    void shouldReturnListOfSurveyUnitIdsLinkToExistingPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        List<SampleSurveyUnitDto> otherImportedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("other sample");
-        List<Long> idsNotInRetournedList = otherImportedSampleSurveyUnits.stream()
-                .map(SampleSurveyUnitDto::getSurveyUnit)
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        List<PartitionSurveyUnitLinkDto> otherImportedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("other partition");
+        List<Long> idsNotInRetournedList = otherImportedPartitionSurveyUnits.stream()
+                .map(PartitionSurveyUnitLinkDto::getSurveyUnit)
                 .map(SurveyUnitDto::getRepositoryId)
                 .toList();
-        Long importSampleId = importedSampleSurveyUnits.get(0).getSample().getId();
+        Long importPartitionId = importedPartitionSurveyUnits.get(0).getPartition().getPartitionId();
 
         // When
-        List<Long> returnedIds = surveyUnitService.getSurveyUnitIdsBySampleId(importSampleId);
+        List<Long> returnedIds = surveyUnitService.getSurveyUnitIdsByPartitionId(importPartitionId);
 
         // Then
         Assertions.assertNotNull(returnedIds);
-        Assertions.assertEquals(importedSampleSurveyUnits.size(), returnedIds.size());
+        Assertions.assertEquals(importedPartitionSurveyUnits.size(), returnedIds.size());
         for (int i = 0; i < returnedIds.size(); i++) {
-            Assertions.assertEquals(importedSampleSurveyUnits.get(i).getSurveyUnit().getRepositoryId(),
+            Assertions.assertEquals(importedPartitionSurveyUnits.get(i).getSurveyUnit().getRepositoryId(),
                     returnedIds.get(i));
             Assertions.assertFalse(idsNotInRetournedList.contains(returnedIds.get(i)));
         }
     }
 
     @Test
-    void shouldReturnSampleNotFoundExceptionWhenGetListOfSurveyUnitIdsMappingTableFromNotExistingSample() {
+    void shouldReturnPartitionNotFoundExceptionWhenGetListOfSurveyUnitIdsMappingTableFromNotExistingPartition() {
         // Given
-        Long notExistingSampleId = 99L;
+        Long notExistingPartitionId = 99L;
 
         // When + Then
-        SampleNotFoundException exception = Assertions.assertThrows(SampleNotFoundException.class,
-                () -> surveyUnitService.getIdMappingTableBySampleId(notExistingSampleId));
-        Assertions.assertEquals(String.format("Sample [%s] doesn't exist", notExistingSampleId),
+        PartitionNotFoundException exception = Assertions.assertThrows(PartitionNotFoundException.class,
+                () -> surveyUnitService.getSurveyUnitIdsMappingTableByPartitionId(notExistingPartitionId));
+        Assertions.assertEquals(String.format("Partition [%s] doesn't exist", notExistingPartitionId),
                 exception.getMessage());
     }
 
     @Test
-    void shouldReturnSurveyUnitIdsMappingTableLinkToExistingSample() {
+    void shouldReturnSurveyUnitIdsMappingTableLinkToExistingPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        List<SampleSurveyUnitDto> otherImportedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("other sample");
-        List<Long> idsNotInRetournedList = otherImportedSampleSurveyUnits.stream()
-                .map(SampleSurveyUnitDto::getSurveyUnit)
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        List<PartitionSurveyUnitLinkDto> otherImportedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("other partition");
+        List<Long> idsNotInRetournedList = otherImportedPartitionSurveyUnits.stream()
+                .map(PartitionSurveyUnitLinkDto::getSurveyUnit)
                 .map(SurveyUnitDto::getRepositoryId)
                 .toList();
-        Long importSampleId = importedSampleSurveyUnits.get(0).getSample().getId();
+        Long importPartitionId = importedPartitionSurveyUnits.get(0).getPartition().getPartitionId();
 
         // When
-        List<SuIdMappingRecord> suIdsMapping = surveyUnitService.getIdMappingTableBySampleId(importSampleId);
+        List<SuIdMappingRecord> suIdsMapping =
+                surveyUnitService.getSurveyUnitIdsMappingTableByPartitionId(importPartitionId);
 
         // Then
         Assertions.assertNotNull(suIdsMapping);
-        Assertions.assertEquals(importedSampleSurveyUnits.size(), suIdsMapping.size());
+        Assertions.assertEquals(importedPartitionSurveyUnits.size(), suIdsMapping.size());
         for (int i = 0; i < suIdsMapping.size(); i++) {
-            Assertions.assertEquals(importedSampleSurveyUnits.get(i).getSurveyUnit().getRepositoryId(),
+            Assertions.assertEquals(importedPartitionSurveyUnits.get(i).getSurveyUnit().getRepositoryId(),
                     suIdsMapping.get(i).repositoryId());
-            Assertions.assertEquals(importedSampleSurveyUnits.get(i).getSurveyUnit().getExternalId(),
+            Assertions.assertEquals(importedPartitionSurveyUnits.get(i).getSurveyUnit().getExternalId(),
                     suIdsMapping.get(i).externalId());
             Assertions.assertFalse(idsNotInRetournedList.contains(suIdsMapping.get(i).repositoryId()));
         }
@@ -372,85 +380,86 @@ class SurveyUnitServiceTest {
     }
 
     @Test
-    void shouldReturnSampleNotFoundExceptionWhenAddListOfSurveyUnitsIntoNotExistingSample() {
+    void shouldReturnPartitionNotFoundExceptionWhenAddListOfSurveyUnitsIntoNotExistingPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        List<Long> existingSurveyUnits = importedSampleSurveyUnits.stream()
-                .map(SampleSurveyUnitDto::getSurveyUnit)
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        List<Long> existingSurveyUnits = importedPartitionSurveyUnits.stream()
+                .map(PartitionSurveyUnitLinkDto::getSurveyUnit)
                 .map(SurveyUnitDto::getRepositoryId)
                 .toList();
-        Long notExistingSampleId = 99L;
+        Long notExistingPartitionId = 99L;
 
         // When + Then
-        SampleNotFoundException exception = Assertions.assertThrows(SampleNotFoundException.class,
-                () -> surveyUnitService.addSurveyUnitsToSample(existingSurveyUnits, notExistingSampleId));
-        Assertions.assertEquals(String.format("Sample [%s] doesn't exist", notExistingSampleId),
+        PartitionNotFoundException exception = Assertions.assertThrows(PartitionNotFoundException.class,
+                () -> surveyUnitService.addExistingSurveyUnitsToPartition(existingSurveyUnits, notExistingPartitionId));
+        Assertions.assertEquals(String.format("Partition [%s] doesn't exist", notExistingPartitionId),
                 exception.getMessage());
     }
 
     @Test
-    void shouldReturnSettingsExceptionWhenAddEmptyListIntoExistingSample() {
+    void shouldReturnSettingsExceptionWhenAddEmptyListIntoExistingPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        Long existingSampleId = importedSampleSurveyUnits.get(0).getSample().getId();
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long existingPartitionId = importedPartitionSurveyUnits.get(0).getPartition().getPartitionId();
         List<Long> emptyList = List.of();
 
         // When + Then
         SettingsException exception = Assertions.assertThrows(SettingsException.class, () -> surveyUnitService
-                .addSurveyUnitsToSample(emptyList, existingSampleId));
+                .addExistingSurveyUnitsToPartition(emptyList, existingPartitionId));
         Assertions.assertEquals("List of survey units to add is empty or null", exception.getMessage());
     }
 
     @Test
-    void shouldReturnSettingsExceptionWhenAddNullListIntoSample() {
+    void shouldReturnSettingsExceptionWhenAddNullListIntoPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        Long existingSampleId = importedSampleSurveyUnits.get(0).getSample().getId();
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long existingPartitionId = importedPartitionSurveyUnits.get(0).getPartition().getPartitionId();
 
         // When + Then
         SettingsException exception = Assertions.assertThrows(SettingsException.class, () -> surveyUnitService
-                .addSurveyUnitsToSample(null, existingSampleId));
+                .addExistingSurveyUnitsToPartition(null, existingPartitionId));
         Assertions.assertEquals("List of survey units to add is empty or null", exception.getMessage());
     }
 
     @Test
-    void shouldAddAListOfExistingSurveyUnitsIntoNewSampleAndReturnCountOfAdd() {
+    void shouldAddAListOfExistingSurveyUnitsIntoNewPartitionAndReturnCountOfAdd() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        List<Long> existingSurveyUnits = importedSampleSurveyUnits.stream()
-                .map(SampleSurveyUnitDto::getSurveyUnit)
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        List<Long> existingSurveyUnits = importedPartitionSurveyUnits.stream()
+                .map(PartitionSurveyUnitLinkDto::getSurveyUnit)
                 .map(SurveyUnitDto::getRepositoryId)
                 .toList();
-        SampleDto newSample = sampleService.createSample("new sample");
-        Long newSampleId = newSample.getId();
+        PartitionDto newPartition = partitionService.createPartition("new partition");
+        Long newPartitionId = newPartition.getPartitionId();
 
         // When
-        int count = surveyUnitService.addSurveyUnitsToSample(existingSurveyUnits, newSampleId);
+        int count = surveyUnitService.addExistingSurveyUnitsToPartition(existingSurveyUnits, newPartitionId);
 
         // Then
         Assertions.assertEquals(2, count);
-        List<SampleSurveyUnitDto> sampleSurveyUnitDtoListAfterAdd =
-                surveyUnitService.getSurveyUnitsBySampleId(newSampleId);
-        Assertions.assertEquals(1L, sampleSurveyUnitDtoListAfterAdd.get(0).getSurveyUnit().getRepositoryId());
-        Assertions.assertEquals(2L, sampleSurveyUnitDtoListAfterAdd.get(1).getSurveyUnit().getRepositoryId());
+        List<PartitionSurveyUnitLinkDto> partitionSurveyUnitLinkListAfterAdd =
+                surveyUnitService.getSurveyUnitsByPartitionId(newPartitionId);
+        Assertions.assertEquals(1L, partitionSurveyUnitLinkListAfterAdd.get(0).getSurveyUnit().getRepositoryId());
+        Assertions.assertEquals(2L, partitionSurveyUnitLinkListAfterAdd.get(1).getSurveyUnit().getRepositoryId());
     }
 
     @Test
-    void shouldReturnSurveyUnitsNotFoundExceptionWhenAddListWithNotExistingSurveyUnitIntoSample() {
+    void shouldReturnSurveyUnitsNotFoundExceptionWhenAddListWithNotExistingSurveyUnitIntoPartition() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
         List<Long> listWithNotExistingSurveyUnit =
-                List.of(importedSampleSurveyUnits.get(0).getSurveyUnit().getRepositoryId(), 99L);
-        Long existingSampleId = importedSampleSurveyUnits.get(0).getSample().getId();
+                List.of(importedPartitionSurveyUnits.get(0).getSurveyUnit().getRepositoryId(), 99L);
+        Long existingPartitionId = importedPartitionSurveyUnits.get(0).getPartition().getPartitionId();
 
         // When + Then
         SurveyUnitsNotFoundException exception = Assertions.assertThrows(SurveyUnitsNotFoundException.class, () ->
-                surveyUnitService.addSurveyUnitsToSample(listWithNotExistingSurveyUnit, existingSampleId));
+                surveyUnitService.addExistingSurveyUnitsToPartition(listWithNotExistingSurveyUnit,
+                        existingPartitionId));
         Assertions.assertEquals(String.format("SurveyUnits [%s] don't exist", List.of(99L)), exception.getMessage());
 
     }
@@ -503,11 +512,11 @@ class SurveyUnitServiceTest {
     @Test
     void shouldReturnSettingsExceptionWhenUpdateSurveyUnitWithoutId() {
         // Given
-        SurveyUnitDto suDto = SurveyUnitDto.builder().build();
+        SurveyUnitDto surveyUnitWithoutId = SurveyUnitDto.builder().build();
 
         // When + Then
         SettingsException settingsException = Assertions.assertThrows(SettingsException.class, () -> surveyUnitService
-                .updateSurveyUnit(suDto));
+                .updateSurveyUnit(surveyUnitWithoutId));
         Assertions.assertEquals("Repository id empty", settingsException.getMessage());
     }
 
@@ -528,11 +537,11 @@ class SurveyUnitServiceTest {
     @Test
     void shouldUpdateExistingSurveyUnit() {
         // Given
-        List<SampleSurveyUnitDto> importedSampleSurveyUnits =
-                initDataPersistenceInMemoryWithOneSampleAndTwoSurveyUnits("init sample");
-        SurveyUnitDto surveyUnitToUpdate = importedSampleSurveyUnits.get(0).getSurveyUnit();
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        SurveyUnitDto surveyUnitToUpdate = importedPartitionSurveyUnits.get(0).getSurveyUnit();
         surveyUnitToUpdate.setExternalId("00003");
-        surveyUnitToUpdate.setTypeUnit(TypeUnit.ENTERPRISE);
+        surveyUnitToUpdate.setContext(Context.BUSINESS);
 
         // When
         SurveyUnitDto updatedSurveyUnit = surveyUnitService.updateSurveyUnit(surveyUnitToUpdate);
@@ -541,7 +550,7 @@ class SurveyUnitServiceTest {
         Assertions.assertNotNull(updatedSurveyUnit);
         Assertions.assertEquals(surveyUnitToUpdate.getRepositoryId(), updatedSurveyUnit.getRepositoryId());
         Assertions.assertEquals(surveyUnitToUpdate.getExternalId(), updatedSurveyUnit.getExternalId());
-        Assertions.assertEquals(surveyUnitToUpdate.getTypeUnit(), updatedSurveyUnit.getTypeUnit());
+        Assertions.assertEquals(surveyUnitToUpdate.getContext(), updatedSurveyUnit.getContext());
     }
 
 }

@@ -7,9 +7,9 @@ import fr.insee.rem.controller.sources.HouseholdCsvSource;
 import fr.insee.rem.controller.targets.SuIdMappingCsvTarget;
 import fr.insee.rem.controller.utils.BeanToCsvUtils;
 import fr.insee.rem.controller.utils.CsvToBeanUtils;
-import fr.insee.rem.domain.dtos.SampleSurveyUnitDto;
+import fr.insee.rem.domain.dtos.PartitionSurveyUnitLinkDto;
 import fr.insee.rem.domain.dtos.SurveyUnitDto;
-import fr.insee.rem.domain.exception.SampleNotFoundException;
+import fr.insee.rem.domain.exception.PartitionNotFoundException;
 import fr.insee.rem.domain.exception.SettingsException;
 import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
 import fr.insee.rem.domain.records.SuIdMappingRecord;
@@ -34,7 +34,6 @@ import java.util.List;
 
 @Controller
 @Slf4j
-@Tag(name = "SurveyUnits endpoints")
 @RequestMapping(path = "/survey-units")
 public class SurveyUnitController {
 
@@ -44,86 +43,103 @@ public class SurveyUnitController {
     @Autowired
     HouseholdCsvAdapter householdCsvAdapter;
 
-    @Operation(summary = "Add Household SurveyUnits to Sample from CSV file", responses = {
+    @Tag(name = "1. Import data")
+    @Operation(summary = "Add Household SurveyUnits into existing partition from CSV file", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added"),
             @ApiResponse(responseCode = "400", description = "CSV File Error"),
-            @ApiResponse(responseCode = "404", description = "Sample Not Found")
+            @ApiResponse(responseCode = "404", description = "Partition Not Found")
     })
-    @PostMapping(path = "/households/samples/{sampleId}/csv-upload", consumes = {
+    @PostMapping(path = "/households/partitions/{partitionId}/csv-upload", consumes = {
             MediaType.MULTIPART_FORM_DATA_VALUE
     })
-    public ResponseEntity<Object> addHouseholdSuFromCSVFile(
-            @PathVariable("sampleId") final Long sampleId, @RequestPart("sample") MultipartFile sampleFile) throws SampleNotFoundException, CsvFileException {
-        log.info("POST add sample {} from csv file {}", sampleId, sampleFile.getOriginalFilename());
-        List<HouseholdCsvSource> householdCsvList = CsvToBeanUtils.parse(sampleFile, HouseholdCsvSource.class);
-        List<SurveyUnitDto> surveyUnitDtos = householdCsvList.stream().map(h -> householdCsvAdapter.convert(h))
+    public ResponseEntity<Object> addHouseholdSurveyUnitsFromCSVFile(
+            @PathVariable("partitionId") final Long partitionId,
+            @RequestPart("partition") MultipartFile partitionFile) throws PartitionNotFoundException, CsvFileException {
+        log.info("POST add partition {} from csv file {}", partitionId, partitionFile.getOriginalFilename());
+        List<HouseholdCsvSource> householdCsvList = CsvToBeanUtils.parse(partitionFile, HouseholdCsvSource.class);
+        List<SurveyUnitDto> surveyUnits = householdCsvList.stream().map(h -> householdCsvAdapter.convert(h))
                 .toList();
-        List<SampleSurveyUnitDto> ssuDtos = surveyUnitService.importSurveyUnitsToSample(sampleId, surveyUnitDtos);
-        Response response = new Response(String.format("%s surveyUnits created", ssuDtos.size()), HttpStatus.OK);
-        log.info("POST /survey-units/samples/{sampleId} resulting in {} with response [{}]", response
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnitLinks =
+                surveyUnitService.importSurveyUnitsIntoPartition(partitionId,
+                        surveyUnits);
+        Response response = new Response(String.format("%s surveyUnits created",
+                importedPartitionSurveyUnitLinks.size()), HttpStatus.OK);
+        log.info("POST /survey-units/partitions/{partitionId} resulting in {} with response [{}]", response
                 .getHttpStatus(), response.getMessage());
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Operation(summary = "Add Household SurveyUnits to Sample from json (REM Model)", responses = {
+    @Tag(name = "1. Import data")
+    @Operation(summary = "Add Household SurveyUnits into existing partition from json (REM Model)", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added"),
-            @ApiResponse(responseCode = "404", description = "Sample Not Found")
+            @ApiResponse(responseCode = "404", description = "Partition Not Found")
     })
-    @PostMapping(path = "/households/samples/{sampleId}/json-upload")
-    public ResponseEntity<Object> addHouseholdSuFromJson(
-            @PathVariable("sampleId") final Long sampleId, @RequestBody List<SurveyUnitDto> surveyUnitDtos) {
-        log.info("POST add sample {} from json {}", sampleId);
-        boolean hasRepositoryId = surveyUnitService.checkRepositoryId(surveyUnitDtos);
+    @PostMapping(path = "/households/partitions/{partitionId}/json-upload")
+    public ResponseEntity<Object> addHouseholdSurveyUnitsFromJson(
+            @PathVariable("partitionId") final Long partitionId, @RequestBody List<SurveyUnitDto> surveyUnits) {
+        log.info("POST add partition {} from json {}", partitionId);
+        boolean hasRepositoryId = surveyUnitService.checkRepositoryId(surveyUnits);
         if (hasRepositoryId) {
             throw new SettingsException("Survey units already contain a repository identifier");
         }
-        List<SampleSurveyUnitDto> ssuDtos = surveyUnitService.importSurveyUnitsToSample(sampleId, surveyUnitDtos);
-        Response response = new Response(String.format("%s surveyUnits created", ssuDtos.size()), HttpStatus.OK);
-        log.info("POST /survey-units/samples/{sampleId} resulting in {} with response [{}]", response
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnitLinks =
+                surveyUnitService.importSurveyUnitsIntoPartition(partitionId,
+                        surveyUnits);
+        Response response = new Response(String.format("%s surveyUnits created",
+                importedPartitionSurveyUnitLinks.size()), HttpStatus.OK);
+        log.info("POST /survey-units/partitions/{partitionId} resulting in {} with response [{}]", response
                 .getHttpStatus(), response.getMessage());
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Operation(summary = "Add SurveyUnit to Sample", responses = {
+    @Tag(name = "3. Manage a partition")
+    @Operation(summary = "Add SurveyUnit to Partition", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully added"),
-            @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
+            @ApiResponse(responseCode = "404", description = "Partition or SurveyUnit Not Found")
     })
-    @PutMapping(path = "/{surveyUnitId}/samples/{sampleId}")
-    public ResponseEntity<Object> addSurveyUnitToSample(
-            @PathVariable("surveyUnitId") final Long surveyUnitId, @PathVariable("sampleId") final Long sampleId) {
-        log.info("PUT Add SurveyUnit {} to Sample {}", surveyUnitId, sampleId);
-        SampleSurveyUnitDto ssuDto = surveyUnitService.addSurveyUnitToSample(surveyUnitId, sampleId);
-        Response response = new Response(String.format("SurveyUnit %s add to sample %s", ssuDto.getSurveyUnit()
-                .getRepositoryId(), ssuDto.getSample().getId()), HttpStatus.OK);
-        log.info("PUT /survey-units/{surveyUnitId}/samples/{sampleId} resulting in {} with response [{}]", response
-                .getHttpStatus(), response.getMessage());
+    @PutMapping(path = "/{surveyUnitId}/partitions/{partitionId}")
+    public ResponseEntity<Object> addSurveyUnitToPartition(
+            @PathVariable("surveyUnitId") final Long surveyUnitId,
+            @PathVariable("partitionId") final Long partitionId) {
+        log.info("PUT Add SurveyUnit {} to Partition {}", surveyUnitId, partitionId);
+        PartitionSurveyUnitLinkDto newPartitionSurveyUnitLink =
+                surveyUnitService.addExistingSurveyUnitIntoPartition(surveyUnitId,
+                        partitionId);
+        Response response = new Response(String.format("SurveyUnit %s add to partition %s",
+                newPartitionSurveyUnitLink.getSurveyUnit()
+                        .getRepositoryId(), newPartitionSurveyUnitLink.getPartition().getPartitionId()), HttpStatus.OK);
+        log.info("PUT /survey-units/{surveyUnitId}/partitions/{partitionId} resulting in {} with response [{}]",
+                response
+                        .getHttpStatus(), response.getMessage());
 
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Operation(summary = "Add SurveyUnits List to Sample", responses = {
+    @Tag(name = "3. Manage a partition")
+    @Operation(summary = "Add SurveyUnits List to Partition", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added"),
-            @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
+            @ApiResponse(responseCode = "404", description = "Partition or SurveyUnit Not Found")
     })
-    @PutMapping(path = "/samples/{sampleId}")
-    public ResponseEntity<Object> addSurveyUnitsToSample(@RequestBody List<Long> surveyUnitIds, @PathVariable(
-            "sampleId") final Long sampleId) {
-        log.info("PUT Add SurveyUnits List to Sample {}", sampleId);
+    @PutMapping(path = "/partitions/{partitionId}")
+    public ResponseEntity<Object> addSurveyUnitsToPartition(@RequestBody List<Long> surveyUnitIds, @PathVariable(
+            "partitionId") final Long partitionId) {
+        log.info("PUT Add SurveyUnits List to Partition {}", partitionId);
         if (surveyUnitIds == null || surveyUnitIds.isEmpty()) {
             Response response = new Response("SurveyUnits List empty", HttpStatus.BAD_REQUEST);
-            log.info("PUT /survey-units/samples/{sampleId} resulting in {} with response [{}]", response
+            log.info("PUT /survey-units/partitions/{partitionId} resulting in {} with response [{}]", response
                     .getHttpStatus(), response.getMessage());
             return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
         }
-        int count = surveyUnitService.addSurveyUnitsToSample(surveyUnitIds, sampleId);
+        int count = surveyUnitService.addExistingSurveyUnitsToPartition(surveyUnitIds, partitionId);
         Response response = new Response(String
-                .format("%s SurveyUnits add to sample %s", count, sampleId), HttpStatus.OK);
-        log.info("PUT /survey-units/samples/{sampleId} resulting in {} with response [{}]", response
+                .format("%s SurveyUnits add to partition %s", count, partitionId), HttpStatus.OK);
+        log.info("PUT /survey-units/partitions/{partitionId} resulting in {} with response [{}]", response
                 .getHttpStatus(), response.getMessage());
 
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
+    @Tag(name = "2. Export data")
     @Operation(summary = "Get SurveyUnit by Id", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully recovered"),
             @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
@@ -134,6 +150,7 @@ public class SurveyUnitController {
         return new ResponseEntity<>(surveyUnitService.getSurveyUnitById(surveyUnitId), HttpStatus.OK);
     }
 
+    @Tag(name = "5. Clean data")
     @Operation(summary = "Delete SurveyUnit", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully deleted"),
             @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
@@ -148,75 +165,82 @@ public class SurveyUnitController {
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Operation(summary = "Remove SurveyUnit from Sample", responses = {
+    @Tag(name = "3. Manage a partition")
+    @Operation(summary = "Remove SurveyUnit from Partition", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully removed"),
-            @ApiResponse(responseCode = "404", description = "Sample or SurveyUnit Not Found")
+            @ApiResponse(responseCode = "404", description = "Partition or SurveyUnit Not Found")
     })
-    @DeleteMapping(path = "/{surveyUnitId}/samples/{sampleId}")
-    public ResponseEntity<Object> removeSurveyUnitFromSample(@PathVariable("surveyUnitId") final Long surveyUnitId,
-                                                             @PathVariable("sampleId") final Long sampleId) {
-        log.info("DELTE Remove SurveyUnit {} from Sample {}", surveyUnitId, sampleId);
-        surveyUnitService.removeSurveyUnitFromSample(surveyUnitId, sampleId);
+    @DeleteMapping(path = "/{surveyUnitId}/partitions/{partitionId}")
+    public ResponseEntity<Object> removeSurveyUnitFromPartition(@PathVariable("surveyUnitId") final Long surveyUnitId,
+                                                                @PathVariable("partitionId") final Long partitionId) {
+        log.info("DELETE Remove SurveyUnit {} from Partition {}", surveyUnitId, partitionId);
+        surveyUnitService.removeSurveyUnitFromPartition(surveyUnitId, partitionId);
         Response response = new Response(String
-                .format("SurveyUnit %s removed from sample %s", surveyUnitId, sampleId), HttpStatus.OK);
-        log.info("DELETE /survey-units/{surveyUnitId}/sample/{sampleId} resulting in {} with response [{}]", response
-                .getHttpStatus(), response.getMessage());
+                .format("SurveyUnit %s removed from partition %s", surveyUnitId, partitionId), HttpStatus.OK);
+        log.info("DELETE /survey-units/{surveyUnitId}/partition/{partitionId} resulting in {} with response [{}]",
+                response.getHttpStatus(), response.getMessage());
         return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
     }
 
-    @Operation(summary = "Get SurveyUnits by Sample", responses = {
+    @Tag(name = "2. Export data")
+    @Operation(summary = "Get SurveyUnits by Partition", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully recovered"),
-            @ApiResponse(responseCode = "404", description = "Sample Not Found")
+            @ApiResponse(responseCode = "404", description = "Partition Not Found")
     })
-    @GetMapping(path = "/samples/{sampleId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SurveyUnitDto>> getSurveyUnitsBySample(@PathVariable("sampleId") final Long sampleId) {
-        log.info("Get SurveyUnits by Sample {}", sampleId);
-        List<SurveyUnitDto> suList = surveyUnitService.getSurveyUnitsBySampleId(sampleId).stream()
-                .map(SampleSurveyUnitDto::getSurveyUnit).sorted(Comparator.comparing(SurveyUnitDto::getRepositoryId))
+    @GetMapping(path = "/partitions/{partitionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SurveyUnitDto>> getSurveyUnitsByPartition(@PathVariable("partitionId") final Long partitionId) {
+        log.info("Get SurveyUnits by Partition {}", partitionId);
+        List<SurveyUnitDto> suList = surveyUnitService.getSurveyUnitsByPartitionId(partitionId).stream()
+                .map(PartitionSurveyUnitLinkDto::getSurveyUnit).sorted(Comparator.comparing(SurveyUnitDto::getRepositoryId))
                 .toList();
         return new ResponseEntity<>(suList, HttpStatus.OK);
     }
 
+    @Tag(name = "2. Export data")
     @Operation(summary = "Get list of Survey Units Ids", responses = {
             @ApiResponse(responseCode = "200", description = "List of Survey Units Ids successfully recovered"),
-            @ApiResponse(responseCode = "404", description = "Sample Not Found")
+            @ApiResponse(responseCode = "404", description = "Partition Not Found")
     })
-    @GetMapping(path = "/samples/{sampleId}/ids")
-    public ResponseEntity<List<Long>> getListOfIds(@PathVariable("sampleId") final Long sampleId) {
-        log.info("Get list of Survey Units Ids for sample {}", sampleId);
-        List<Long> ids = surveyUnitService.getSurveyUnitIdsBySampleId(sampleId);
+    @GetMapping(path = "/partitions/{partitionId}/ids")
+    public ResponseEntity<List<Long>> getListOfIds(@PathVariable("partitionId") final Long partitionId) {
+        log.info("Get list of Survey Units Ids for partition {}", partitionId);
+        List<Long> ids = surveyUnitService.getSurveyUnitIdsByPartitionId(partitionId);
         Collections.sort(ids);
         return new ResponseEntity<>(ids, HttpStatus.OK);
     }
 
+    @Tag(name = "2. Export data")
     @Operation(summary = "Export identifiers mapping table", responses = {
             @ApiResponse(responseCode = "200", description = "Identifiers mapping table successfully recovered"),
-            @ApiResponse(responseCode = "404", description = "Sample Not Found")
+            @ApiResponse(responseCode = "404", description = "Partition Not Found")
     })
-    @GetMapping(path = "/samples/{sampleId}/ids-mapping-table", produces = "text/csv")
-    public ResponseEntity<Object> getIdentifiersMappingTable(@PathVariable("sampleId") final Long sampleId) {
-        log.info("Get identifiers mapping table for sample {}", sampleId);
-        List<SuIdMappingRecord> records = surveyUnitService.getIdMappingTableBySampleId(sampleId);
-        List<SuIdMappingCsvTarget> targets = records.stream().map(r -> SuIdMappingCsvTarget.builder().idRem(String
-                .valueOf(r.repositoryId())).idSource(r.externalId()).build()).sorted(Comparator
-                .comparing(SuIdMappingCsvTarget::getIdRem)).toList();
-        ByteArrayInputStream csvStream = BeanToCsvUtils.write(targets);
-        String fileName = "ids-mapping-table-sample-" + sampleId + ".csv";
+    @GetMapping(path = "/partitions/{partitionId}/ids-mapping-table", produces = "text/csv")
+    public ResponseEntity<Object> getIdentifiersMappingTable(@PathVariable("partitionId") final Long partitionId) {
+        log.info("Get identifiers mapping table for partition {}", partitionId);
+        List<SuIdMappingRecord> surveyUnitIdsMappingRecords =
+                surveyUnitService.getSurveyUnitIdsMappingTableByPartitionId(partitionId);
+        List<SuIdMappingCsvTarget> surveyUnitIdsMappingCsvTargets =
+                surveyUnitIdsMappingRecords.stream().map(r -> SuIdMappingCsvTarget.builder().idRem(String
+                        .valueOf(r.repositoryId())).idSource(r.externalId()).build()).sorted(Comparator
+                        .comparing(SuIdMappingCsvTarget::getIdRem)).toList();
+        ByteArrayInputStream csvStream = BeanToCsvUtils.write(surveyUnitIdsMappingCsvTargets);
+        String fileName = "ids-mapping-table-partition-" + partitionId + ".csv";
 
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                 .contentType(MediaType.parseMediaType("text/csv")).body(new InputStreamResource(csvStream));
     }
 
+    @Tag(name = "4. Update data")
     @Operation(summary = "Replace SurveyUnit Data", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnit successfully updated"),
             @ApiResponse(responseCode = "400", description = "Data error"),
             @ApiResponse(responseCode = "404", description = "SurveyUnit Not Found")
     })
     @PutMapping(path = "/update")
-    public ResponseEntity<Object> replaceSurveyUnitData(@RequestBody SurveyUnitDto surveyUnitDto) {
+    public ResponseEntity<Object> replaceSurveyUnitData(@RequestBody SurveyUnitDto surveyUnit) {
         log.info("PUT Replace SurveyUnit data replaced");
-        SurveyUnitDto suDto = surveyUnitService.updateSurveyUnit(surveyUnitDto);
-        Response response = new Response(String.format("SurveyUnit %s data replaced", suDto
+        SurveyUnitDto updatedSurveyUnit = surveyUnitService.updateSurveyUnit(surveyUnit);
+        Response response = new Response(String.format("SurveyUnit %s data replaced", updatedSurveyUnit
                 .getRepositoryId()), HttpStatus.OK);
         log.info("PUT /survey-units/{surveyUnitId}/update resulting in {} with response [{}]", response
                 .getHttpStatus(), response.getMessage());

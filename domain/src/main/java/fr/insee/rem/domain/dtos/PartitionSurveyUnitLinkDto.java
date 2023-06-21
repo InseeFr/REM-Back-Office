@@ -1,15 +1,15 @@
 package fr.insee.rem.domain.dtos;
 
-import java.util.Date;
-
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Date;
+
 @Builder
 @Data
-public class SampleSurveyUnitDto {
+public class PartitionSurveyUnitLinkDto {
 
-    private SampleDto sample;
+    private PartitionDto partition;
 
     private SurveyUnitDto surveyUnit;
 

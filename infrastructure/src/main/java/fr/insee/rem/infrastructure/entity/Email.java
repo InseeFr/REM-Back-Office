@@ -1,12 +1,11 @@
 package fr.insee.rem.infrastructure.entity;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import fr.insee.rem.domain.dtos.Source;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 @JsonInclude(Include.NON_EMPTY)

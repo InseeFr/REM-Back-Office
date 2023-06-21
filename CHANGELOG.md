@@ -4,7 +4,7 @@
 
 ### Features
 
-#### Load a new partition (sample) of survey units for a household survey
+#### Load a new partition (partitionEntity) of survey units for a household survey
 - Create a new partition from a label
 - Import new survey units from a csv file and add them to the new partition
 - Import new survey units from a json and add them to the new partition
@@ -47,3 +47,11 @@
 - mapstruct-processor: 1.5.3.Final -> 1.5.5.Final
 - lombok: 1.18.26 -> 1.18.28
 - slf4j-api: 2.0.6 -> 2.0.7
+
+## 1.2.0
+
+### Refactoring
+- Replaced the name "Sample" with "Partition" (many files changes)
+- Created ApiError class to manage errors feedback
+- Used Tags for groups of endpoints
+- Replace name of TypeUnit enum to Context

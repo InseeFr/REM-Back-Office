@@ -1,18 +1,17 @@
 package fr.insee.rem.infrastructure.entity;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 @JsonInclude(Include.NON_EMPTY)
 public class OtherIdentifier implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3113498426456374157L;
     private String numfa;

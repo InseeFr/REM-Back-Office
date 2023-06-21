@@ -1,5 +1,7 @@
 package fr.insee.rem.controller.utils;
 
+import fr.insee.rem.domain.dtos.GPSLocation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
@@ -7,9 +9,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-import fr.insee.rem.domain.dtos.GPSLocation;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class CoordinateConversionUtils {
@@ -20,7 +19,7 @@ public final class CoordinateConversionUtils {
         throw new UnsupportedOperationException("Utility class and cannot be instantiated");
     }
 
-    private static Coordinate transformCoordonneesToGPSSystem(double x, double y, TypeConversion type) throws Exception {
+    private static Coordinate transformCoordinatesToGPSSystem(double x, double y, TypeConversion type) throws Exception {
         try {
             Coordinate coordinate = new Coordinate(x, y);
             MathTransform transform = CRS.findMathTransform(CRS.decode(type.epsg), CRS.decode(GPS_SYSTEM), false);
@@ -53,7 +52,7 @@ public final class CoordinateConversionUtils {
                     case "971" -> TypeConversion.ANTILLES;
                     default -> TypeConversion.LAMBERT;
                 };
-                Coordinate c = transformCoordonneesToGPSSystem(x, y, type);
+                Coordinate c = transformCoordinatesToGPSSystem(x, y, type);
                 return GPSLocation.builder().latitude(c.x).longitude(c.y).build();
             } catch (Exception e) {
                 return GPSLocation.builder().latitude(0d).longitude(0d).build();

@@ -29,10 +29,10 @@ public class SurveyUnitPersistenceInMemory implements SurveyUnitPersistencePort 
     }
 
     @Override
-    public SurveyUnitDto update(SurveyUnitDto surveyUnitDto) {
-        surveyUnitListInMemory.removeIf(su -> su.getRepositoryId().equals(surveyUnitDto.getRepositoryId()));
-        surveyUnitListInMemory.add(surveyUnitDto);
-        return surveyUnitDto;
+    public SurveyUnitDto update(SurveyUnitDto surveyUnit) {
+        surveyUnitListInMemory.removeIf(su -> su.getRepositoryId().equals(surveyUnit.getRepositoryId()));
+        surveyUnitListInMemory.add(surveyUnit);
+        return surveyUnit;
     }
 
     public SurveyUnitDto save(SurveyUnitDto su) {
