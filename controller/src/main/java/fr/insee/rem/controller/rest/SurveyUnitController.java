@@ -5,6 +5,7 @@ import fr.insee.rem.controller.exception.CsvFileException;
 import fr.insee.rem.controller.response.Response;
 import fr.insee.rem.controller.sources.HouseholdCsvSource;
 import fr.insee.rem.controller.targets.SuIdMappingCsvTarget;
+import fr.insee.rem.controller.targets.SuIdMappingJsonTarget;
 import fr.insee.rem.controller.utils.BeanToCsvUtils;
 import fr.insee.rem.controller.utils.CsvToBeanUtils;
 import fr.insee.rem.domain.dtos.PartitionSurveyUnitLinkDto;
@@ -52,7 +53,7 @@ public class SurveyUnitController {
     @PostMapping(path = "/households/partitions/{partitionId}/csv-upload", consumes = {
             MediaType.MULTIPART_FORM_DATA_VALUE
     })
-    public ResponseEntity<Object> addHouseholdSurveyUnitsFromCSVFile(
+    public ResponseEntity<SuIdMappingJsonTarget> addHouseholdSurveyUnitsFromCSVFile(
             @PathVariable("partitionId") final Long partitionId,
             @RequestPart("partition") MultipartFile partitionFile) throws PartitionNotFoundException, CsvFileException {
         log.info("POST add partition {} from csv file {}", partitionId, partitionFile.getOriginalFilename());
@@ -62,11 +63,15 @@ public class SurveyUnitController {
         List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnitLinks =
                 surveyUnitService.importSurveyUnitsIntoPartition(partitionId,
                         surveyUnits);
-        Response response = new Response(String.format("%s surveyUnits created",
-                importedPartitionSurveyUnitLinks.size()), HttpStatus.OK);
-        log.info("POST /survey-units/partitions/{partitionId} resulting in {} with response [{}]", response
-                .getHttpStatus(), response.getMessage());
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+        SuIdMappingJsonTarget suIdMappingJsonTarget = SuIdMappingJsonTarget.builder()
+                .partitionId(partitionId)
+                .data(importedPartitionSurveyUnitLinks.stream()
+                        .map(p -> new SuIdMappingRecord(p.getSurveyUnit().getRepositoryId(),
+                                p.getSurveyUnit().getExternalId()))
+                        .toList())
+                .count(importedPartitionSurveyUnitLinks.size())
+                .build();
+        return new ResponseEntity<>(suIdMappingJsonTarget, HttpStatus.OK);
     }
 
     @Tag(name = "1. Import data")
@@ -75,9 +80,9 @@ public class SurveyUnitController {
             @ApiResponse(responseCode = "404", description = "Partition Not Found")
     })
     @PostMapping(path = "/households/partitions/{partitionId}/json-upload")
-    public ResponseEntity<Object> addHouseholdSurveyUnitsFromJson(
+    public ResponseEntity<SuIdMappingJsonTarget> addHouseholdSurveyUnitsFromJson(
             @PathVariable("partitionId") final Long partitionId, @RequestBody List<SurveyUnitDto> surveyUnits) {
-        log.info("POST add partition {} from json {}", partitionId);
+        log.info("POST add partition {} from json", partitionId);
         boolean hasRepositoryId = surveyUnitService.checkRepositoryId(surveyUnits);
         if (hasRepositoryId) {
             throw new SettingsException("Survey units already contain a repository identifier");
@@ -85,11 +90,16 @@ public class SurveyUnitController {
         List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnitLinks =
                 surveyUnitService.importSurveyUnitsIntoPartition(partitionId,
                         surveyUnits);
-        Response response = new Response(String.format("%s surveyUnits created",
-                importedPartitionSurveyUnitLinks.size()), HttpStatus.OK);
-        log.info("POST /survey-units/partitions/{partitionId} resulting in {} with response [{}]", response
-                .getHttpStatus(), response.getMessage());
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+
+        SuIdMappingJsonTarget suIdMappingJsonTarget = SuIdMappingJsonTarget.builder()
+                .partitionId(partitionId)
+                .data(importedPartitionSurveyUnitLinks.stream()
+                        .map(p -> new SuIdMappingRecord(p.getSurveyUnit().getRepositoryId(),
+                                p.getSurveyUnit().getExternalId()))
+                        .toList())
+                .count(importedPartitionSurveyUnitLinks.size())
+                .build();
+        return new ResponseEntity<>(suIdMappingJsonTarget, HttpStatus.OK);
     }
 
     @Tag(name = "3. Manage a partition")

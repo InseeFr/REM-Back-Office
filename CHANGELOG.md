@@ -10,7 +10,7 @@
 - Import new survey units from a json and add them to the new partition
 
 #### Manage a partition of survey units
-- Add a existing survey unit to another partition
+- Add an existing survey unit to another partition
 - Add a list of survey units to another partition
 - Remove a survey unit from a partition (survey unit is not deleted)
 
@@ -55,3 +55,12 @@
 - Created ApiError class to manage errors feedback
 - Used Tags for groups of endpoints
 - Replace name of TypeUnit enum to Context
+
+## 1.3.0
+
+### Features
+- Add list of ids into import returns
+
+### Dependencies updates
+- spring-boot: 3.1.0 -> 3.1.1
+- pitest-maven: 1.14.1 -> 1.14.2

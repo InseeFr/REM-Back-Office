@@ -3,28 +3,15 @@ package fr.insee.rem.controller.response;
 import org.springframework.http.HttpStatus;
 
 public class Response {
-    /**
-     * label
-     */
     private String message;
 
     private HttpStatus httpStatus;
 
-    /**
-     * Defaut constructor for a Status
-     * 
-     * @param label
-     */
     public Response(String message, HttpStatus httpStatus) {
         this.message = message;
         this.httpStatus = httpStatus;
     }
 
-    /**
-     * Get the label for a Status
-     * 
-     * @return label
-     */
     public String getMessage() {
         return message;
     }

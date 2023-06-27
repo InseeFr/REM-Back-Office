@@ -8,7 +8,7 @@
 		<version>${revision}</version>
 	</parent>
 	<artifactId>controller</artifactId>
-	<description>Survey unit repository - Rest Controler</description>
+	<description>Survey unit repository - Rest Controller</description>
 	<dependencies>
 	
 		<dependency>
@@ -34,6 +34,12 @@
 		    <groupId>com.opencsv</groupId>
 		    <artifactId>opencsv</artifactId>
 		    <version>5.7.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 		    <groupId>org.geotools</groupId>

@@ -29,8 +29,8 @@ public class ApiError {
         if (errorMessage == null || errorMessage.isEmpty()) {
             errorMessage = status.getReasonPhrase();
         }
-        String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-        createApiError(status.value(), path, timestamp, errorMessage);
+        createApiError(status.value(), ((ServletWebRequest) request).getRequest().getRequestURI(), timestamp,
+                errorMessage);
     }
 
     private void createApiError(int code, String path, LocalDateTime timestamp, String errorMessage) {
