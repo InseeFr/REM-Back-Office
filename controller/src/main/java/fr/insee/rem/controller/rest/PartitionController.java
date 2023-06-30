@@ -1,9 +1,12 @@
 package fr.insee.rem.controller.rest;
 
+import fr.insee.rem.controller.exception.ApiError;
 import fr.insee.rem.controller.response.Response;
 import fr.insee.rem.domain.dtos.PartitionDto;
 import fr.insee.rem.domain.ports.api.PartitionServicePort;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
@@ -30,8 +33,10 @@ public class PartitionController {
             @Tag(name = "1. Import data")
     })
     @Operation(summary = "Create partition", responses = {
-            @ApiResponse(responseCode = "200", description = "Partition successfully created"),
-            @ApiResponse(responseCode = "409", description = "Partition Already Exists")
+            @ApiResponse(responseCode = "200", description = "Partition successfully created", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = PartitionDto.class))),
+            @ApiResponse(responseCode = "409", description = "Partition Already Exists", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     @PostMapping(path = "/", consumes = {
             MediaType.TEXT_PLAIN_VALUE
@@ -43,8 +48,10 @@ public class PartitionController {
 
     @Tag(name = "2. Export data")
     @Operation(summary = "Get partition", responses = {
-            @ApiResponse(responseCode = "200", description = "Partition successfully recovered"),
-            @ApiResponse(responseCode = "404", description = "Partition Not Found")
+            @ApiResponse(responseCode = "200", description = "Partition successfully recovered", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = PartitionDto.class))),
+            @ApiResponse(responseCode = "404", description = "Partition Not Found", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     @GetMapping(path = "/{partitionId}")
     public ResponseEntity<PartitionDto> getPartition(@PathVariable("partitionId") final Long partitionId) {
@@ -54,7 +61,8 @@ public class PartitionController {
 
     @Tag(name = "2. Export data")
     @Operation(summary = "Get all partitions", responses = {
-            @ApiResponse(responseCode = "200", description = "Partitions successfully recovered")
+            @ApiResponse(responseCode = "200", description = "Partitions successfully recovered", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = PartitionDto.class)))
     })
     @GetMapping(path = "/")
     public ResponseEntity<List<PartitionDto>> getAllPartitions() {
@@ -64,8 +72,10 @@ public class PartitionController {
 
     @Tag(name = "5. Clean data")
     @Operation(summary = "Delete partition", responses = {
-            @ApiResponse(responseCode = "200", description = "Partition successfully deleted"),
-            @ApiResponse(responseCode = "404", description = "Partition Not Found")
+            @ApiResponse(responseCode = "200", description = "Partition successfully deleted", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class))),
+            @ApiResponse(responseCode = "404", description = "Partition Not Found", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     @DeleteMapping(path = "/{partitionId}")
     public ResponseEntity<Object> deletePartition(@PathVariable("partitionId") final Long partitionId) {

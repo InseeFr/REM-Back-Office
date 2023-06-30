@@ -60,6 +60,11 @@
 
 ### Features
 - Add list of ids into import returns
+- Add "externals" field into survey unit: save in database without modification
+
+### Refactoring
+- use JsonView to manage the fields to return
+- add content description in the OpenAPI documentation
 
 ### Dependencies updates
 - spring-boot: 3.1.0 -> 3.1.1

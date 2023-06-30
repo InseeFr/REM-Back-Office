@@ -1,6 +1,7 @@
 package fr.insee.rem.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.rem.domain.dtos.Context;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -38,6 +39,10 @@ public class SurveyUnitEntity implements Serializable {
     @Column(columnDefinition = "jsonb", name = "data")
     @Basic(fetch = FetchType.EAGER)
     private SurveyUnitData surveyUnitData;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "json", name = "externals")
+    private JsonNode externals;
 
     @OneToMany(mappedBy = "surveyUnit", orphanRemoval = false, cascade = CascadeType.REMOVE)
     @JsonIgnore
