@@ -61,6 +61,8 @@
 ### Features
 - Add list of ids into import returns
 - Add "externals" field into survey unit: save in database without modification
+- Add number of SurveyUnit into partition endpoint
+- WIP: Import census survey units
 
 ### Refactoring
 - use JsonView to manage the fields to return

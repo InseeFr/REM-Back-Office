@@ -1,13 +1,15 @@
 package fr.insee.rem.controller.rest;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import fr.insee.rem.controller.adapter.CensusAdapter;
 import fr.insee.rem.controller.adapter.HouseholdCsvAdapter;
 import fr.insee.rem.controller.exception.ApiError;
 import fr.insee.rem.controller.exception.CsvFileException;
 import fr.insee.rem.controller.response.Response;
+import fr.insee.rem.controller.response.SuIdMappingCsv;
+import fr.insee.rem.controller.response.SuIdMappingJson;
+import fr.insee.rem.controller.sources.CensusSource;
 import fr.insee.rem.controller.sources.HouseholdCsvSource;
-import fr.insee.rem.controller.targets.SuIdMappingCsvTarget;
-import fr.insee.rem.controller.targets.SuIdMappingJsonTarget;
 import fr.insee.rem.controller.utils.BeanToCsvUtils;
 import fr.insee.rem.controller.utils.CsvToBeanUtils;
 import fr.insee.rem.domain.dtos.PartitionSurveyUnitLinkDto;
@@ -51,10 +53,13 @@ public class SurveyUnitController {
     @Autowired
     HouseholdCsvAdapter householdCsvAdapter;
 
+    @Autowired
+    CensusAdapter censusAdapter;
+
     @Tag(name = "1. Import data")
     @Operation(summary = "Add Household SurveyUnits into existing partition from CSV file", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added", content =
-            @Content(mediaType = "application/json", schema = @Schema(implementation = SuIdMappingJsonTarget.class))),
+            @Content(mediaType = "application/json", schema = @Schema(implementation = SuIdMappingJson.class))),
             @ApiResponse(responseCode = "400", description = "CSV File Error", content =
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(responseCode = "404", description = "Partition Not Found", content = @Content(schema =
@@ -63,7 +68,7 @@ public class SurveyUnitController {
     @PostMapping(path = "/households/partitions/{partitionId}/csv-upload", consumes = {
             MediaType.MULTIPART_FORM_DATA_VALUE
     })
-    public ResponseEntity<SuIdMappingJsonTarget> addHouseholdSurveyUnitsFromCSVFile(
+    public ResponseEntity<SuIdMappingJson> addHouseholdSurveyUnitsFromCSVFile(
             @PathVariable("partitionId") final Long partitionId,
             @RequestPart("partition") MultipartFile partitionFile) throws PartitionNotFoundException, CsvFileException {
         log.info("POST add partition {} from csv file {}", partitionId, partitionFile.getOriginalFilename());
@@ -71,7 +76,7 @@ public class SurveyUnitController {
         List<SurveyUnitDto> surveyUnits = householdCsvList.stream().map(h -> householdCsvAdapter.convert(h)).toList();
         List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnitLinks =
                 surveyUnitService.importSurveyUnitsIntoPartition(partitionId, surveyUnits);
-        SuIdMappingJsonTarget suIdMappingJsonTarget = SuIdMappingJsonTarget.builder()
+        SuIdMappingJson suIdMappingJson = SuIdMappingJson.builder()
                 .partitionId(partitionId)
                 .data(importedPartitionSurveyUnitLinks.stream()
                         .map(p -> new SuIdMappingRecord(p.getSurveyUnit().getRepositoryId(),
@@ -79,18 +84,18 @@ public class SurveyUnitController {
                         .toList())
                 .count(importedPartitionSurveyUnitLinks.size())
                 .build();
-        return new ResponseEntity<>(suIdMappingJsonTarget, HttpStatus.OK);
+        return new ResponseEntity<>(suIdMappingJson, HttpStatus.OK);
     }
 
     @Tag(name = "1. Import data")
     @Operation(summary = "Add Household SurveyUnits into existing partition from json (REM Model)", responses = {
             @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added", content =
-            @Content(mediaType = "application/json", schema = @Schema(implementation = SuIdMappingJsonTarget.class))),
+            @Content(mediaType = "application/json", schema = @Schema(implementation = SuIdMappingJson.class))),
             @ApiResponse(responseCode = "404", description = "Partition Not Found", content =
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     @PostMapping(path = "/households/partitions/{partitionId}/json-upload")
-    public ResponseEntity<SuIdMappingJsonTarget> addHouseholdSurveyUnitsFromJson(
+    public ResponseEntity<SuIdMappingJson> addHouseholdSurveyUnitsFromJson(
             @PathVariable("partitionId") final Long partitionId,
             @RequestBody @JsonView(Views.SurveyUnitWithExternals.class) List<SurveyUnitDto> surveyUnits) {
         log.info("POST add partition {} from json", partitionId);
@@ -101,7 +106,7 @@ public class SurveyUnitController {
         List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnitLinks =
                 surveyUnitService.importSurveyUnitsIntoPartition(partitionId, surveyUnits);
 
-        SuIdMappingJsonTarget suIdMappingJsonTarget = SuIdMappingJsonTarget.builder()
+        SuIdMappingJson suIdMappingJson = SuIdMappingJson.builder()
                 .partitionId(partitionId)
                 .data(importedPartitionSurveyUnitLinks.stream()
                         .map(p -> new SuIdMappingRecord(p.getSurveyUnit().getRepositoryId(),
@@ -109,7 +114,35 @@ public class SurveyUnitController {
                         .toList())
                 .count(importedPartitionSurveyUnitLinks.size())
                 .build();
-        return new ResponseEntity<>(suIdMappingJsonTarget, HttpStatus.OK);
+        return new ResponseEntity<>(suIdMappingJson, HttpStatus.OK);
+    }
+
+    @Tag(name = "1. Import data")
+    @Operation(summary = "Add Census SurveyUnits into existing partition", responses = {
+            @ApiResponse(responseCode = "200", description = "SurveyUnits successfully added", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = SuIdMappingJson.class))),
+            @ApiResponse(responseCode = "404", description = "Partition Not Found", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
+    })
+    @PostMapping(path = "/households/partitions/{partitionId}/census-upload")
+    public ResponseEntity<SuIdMappingJson> addCensusSurveyUnits(
+            @PathVariable("partitionId") final Long partitionId,
+            @RequestBody @JsonView(Views.SurveyUnitWithExternals.class) List<CensusSource> censusSurveyUnits) {
+        log.info("POST add partition {} from json", partitionId);
+
+        List<SurveyUnitDto> surveyUnits = censusSurveyUnits.stream().map(c -> censusAdapter.convert(c)).toList();
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnitLinks =
+                surveyUnitService.importSurveyUnitsIntoPartition(partitionId, surveyUnits);
+
+        SuIdMappingJson suIdMappingJson = SuIdMappingJson.builder()
+                .partitionId(partitionId)
+                .data(importedPartitionSurveyUnitLinks.stream()
+                        .map(p -> new SuIdMappingRecord(p.getSurveyUnit().getRepositoryId(),
+                                p.getSurveyUnit().getExternalId()))
+                        .toList())
+                .count(importedPartitionSurveyUnitLinks.size())
+                .build();
+        return new ResponseEntity<>(suIdMappingJson, HttpStatus.OK);
     }
 
     @Tag(name = "3. Manage a partition")
@@ -120,7 +153,7 @@ public class SurveyUnitController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     @PutMapping(path = "/{surveyUnitId}/partitions/{partitionId}")
-    public ResponseEntity<Object> addSurveyUnitToPartition(
+    public ResponseEntity<Response> addSurveyUnitToPartition(
             @PathVariable("surveyUnitId") final Long surveyUnitId,
             @PathVariable("partitionId") final Long partitionId) {
         log.info("PUT Add SurveyUnit {} to Partition {}", surveyUnitId, partitionId);
@@ -132,7 +165,7 @@ public class SurveyUnitController {
         log.info("PUT /survey-units/{surveyUnitId}/partitions/{partitionId} resulting in {} with response [{}]",
                 response.getHttpStatus(), response.getMessage());
 
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+        return ResponseEntity.ok(response);
     }
 
     @Tag(name = "3. Manage a partition")
@@ -143,14 +176,14 @@ public class SurveyUnitController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     @PutMapping(path = "/partitions/{partitionId}")
-    public ResponseEntity<Object> addSurveyUnitsToPartition(@RequestBody List<Long> surveyUnitIds, @PathVariable(
+    public ResponseEntity<Response> addSurveyUnitsToPartition(@RequestBody List<Long> surveyUnitIds, @PathVariable(
             "partitionId") final Long partitionId) {
         log.info("PUT Add SurveyUnits List to Partition {}", partitionId);
         if (surveyUnitIds == null || surveyUnitIds.isEmpty()) {
             Response response = new Response("SurveyUnits List empty", HttpStatus.BAD_REQUEST);
             log.info("PUT /survey-units/partitions/{partitionId} resulting in {} with response [{}]",
                     response.getHttpStatus(), response.getMessage());
-            return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+            return ResponseEntity.badRequest().body(response);
         }
         int count = surveyUnitService.addExistingSurveyUnitsToPartition(surveyUnitIds, partitionId);
         Response response = new Response(String.format("%s SurveyUnits add to partition %s", count, partitionId)
@@ -158,7 +191,7 @@ public class SurveyUnitController {
         log.info("PUT /survey-units/partitions/{partitionId} resulting in {} with response [{}]", response
                 .getHttpStatus(), response.getMessage());
 
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+        return ResponseEntity.ok(response);
     }
 
     @Tag(name = "2. Export data")
@@ -190,13 +223,13 @@ public class SurveyUnitController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     @DeleteMapping(path = "/{surveyUnitId}")
-    public ResponseEntity<Object> deleteSurveyUnit(@PathVariable("surveyUnitId") final Long surveyUnitId) {
+    public ResponseEntity<Response> deleteSurveyUnit(@PathVariable("surveyUnitId") final Long surveyUnitId) {
         log.info("DELETE SurveyUnit {} ", surveyUnitId);
         surveyUnitService.deleteSurveyUnitById(surveyUnitId);
         Response response = new Response(String.format("SurveyUnit %s deleted", surveyUnitId), HttpStatus.OK);
         log.info("DELETE /survey-units/{surveyUnitId} resulting in {} with response [{}]", response
                 .getHttpStatus(), response.getMessage());
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+        return ResponseEntity.ok(response);
     }
 
     @Tag(name = "3. Manage a partition")
@@ -207,7 +240,7 @@ public class SurveyUnitController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     @DeleteMapping(path = "/{surveyUnitId}/partitions/{partitionId}")
-    public ResponseEntity<Object> removeSurveyUnitFromPartition(
+    public ResponseEntity<Response> removeSurveyUnitFromPartition(
             @PathVariable("surveyUnitId") final Long surveyUnitId,
             @PathVariable("partitionId") final Long partitionId) {
         log.info("DELETE Remove SurveyUnit {} from Partition {}", surveyUnitId, partitionId);
@@ -216,7 +249,7 @@ public class SurveyUnitController {
                 .format("SurveyUnit %s removed from partition %s", surveyUnitId, partitionId), HttpStatus.OK);
         log.info("DELETE /survey-units/{surveyUnitId}/partition/{partitionId} resulting in {} with response [{}]",
                 response.getHttpStatus(), response.getMessage());
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+        return ResponseEntity.ok(response);
     }
 
     @Tag(name = "2. Export data")
@@ -271,10 +304,10 @@ public class SurveyUnitController {
         log.info("Get identifiers mapping table for partition {}", partitionId);
         List<SuIdMappingRecord> surveyUnitIdsMappingRecords =
                 surveyUnitService.getSurveyUnitIdsMappingTableByPartitionId(partitionId);
-        List<SuIdMappingCsvTarget> surveyUnitIdsMappingCsvTargets =
-                surveyUnitIdsMappingRecords.stream().map(r -> SuIdMappingCsvTarget.builder().idRem(String
+        List<SuIdMappingCsv> surveyUnitIdsMappingCsvTargets =
+                surveyUnitIdsMappingRecords.stream().map(r -> SuIdMappingCsv.builder().idRem(String
                         .valueOf(r.repositoryId())).idSource(r.externalId()).build()).sorted(Comparator
-                        .comparing(SuIdMappingCsvTarget::getIdRem)).toList();
+                        .comparing(SuIdMappingCsv::getIdRem)).toList();
         ByteArrayInputStream csvStream = BeanToCsvUtils.write(surveyUnitIdsMappingCsvTargets);
         String fileName = "ids-mapping-table-partition-" + partitionId + ".csv";
 
@@ -292,7 +325,7 @@ public class SurveyUnitController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
     })
     @PutMapping(path = "/update")
-    public ResponseEntity<Object> replaceSurveyUnitData(@RequestBody @JsonView(Views.SurveyUnitWithIdAndExternals.class) SurveyUnitDto surveyUnit) {
+    public ResponseEntity<Response> replaceSurveyUnitData(@RequestBody @JsonView(Views.SurveyUnitWithIdAndExternals.class) SurveyUnitDto surveyUnit) {
         log.info("PUT Replace SurveyUnit data replaced");
         SurveyUnitDto updatedSurveyUnit = surveyUnitService.updateSurveyUnit(surveyUnit);
         Response response = new Response(String.format("SurveyUnit %s data replaced", updatedSurveyUnit
@@ -300,7 +333,7 @@ public class SurveyUnitController {
         log.info("PUT /survey-units/{surveyUnitId}/update resulting in {} with response [{}]", response
                 .getHttpStatus(), response.getMessage());
 
-        return new ResponseEntity<>(response.getMessage(), response.getHttpStatus());
+        return ResponseEntity.ok(response);
     }
 
 }

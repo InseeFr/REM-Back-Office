@@ -1,4 +1,4 @@
-package fr.insee.rem.controller.targets;
+package fr.insee.rem.controller.response;
 
 import fr.insee.rem.domain.records.SuIdMappingRecord;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SuIdMappingJsonTarget {
+public class SuIdMappingJson {
     private long partitionId;
     private List<SuIdMappingRecord> data;
     private int count;
