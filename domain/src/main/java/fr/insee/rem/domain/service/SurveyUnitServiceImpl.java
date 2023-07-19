@@ -165,4 +165,13 @@ public class SurveyUnitServiceImpl implements SurveyUnitServicePort {
         return surveyUnitPersistencePort.update(surveyUnit);
     }
 
+    @Override
+    public long countSurveyUnitsByPartition(Long partitionId) {
+        log.debug("domain: countSurveyUnitsByPartition({})", partitionId);
+        if (!partitionPersistencePort.existsById(partitionId)) {
+            throw new PartitionNotFoundException(partitionId);
+        }
+        return partitionSurveyUnitLinkPersistencePort.countByPartitionId(partitionId);
+    }
+
 }

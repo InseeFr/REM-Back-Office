@@ -73,4 +73,11 @@ public class PartitionSurveyUnitLinkPersistenceInMemory implements PartitionSurv
                         link.getSurveyUnit().getExternalId()))
                 .toList();
     }
+
+    @Override
+    public long countByPartitionId(Long partitionId) {
+        return partitionSurveyUnitLinks.stream()
+                .filter(link -> link.getPartition().getPartitionId().equals(partitionId))
+                .count();
+    }
 }

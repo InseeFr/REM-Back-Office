@@ -20,4 +20,5 @@ public interface PartitionSurveyUnitLinkPersistencePort {
 
     List<SuIdMappingRecord> findSurveyUnitIdsMappingTableByPartitionId(Long partitionId);
 
+    long countByPartitionId(Long partitionId);
 }

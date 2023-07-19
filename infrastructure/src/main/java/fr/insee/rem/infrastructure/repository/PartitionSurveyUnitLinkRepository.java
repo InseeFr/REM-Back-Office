@@ -1,6 +1,7 @@
 package fr.insee.rem.infrastructure.repository;
 
 import fr.insee.rem.domain.records.SuIdMappingRecord;
+import fr.insee.rem.infrastructure.entity.PartitionEntity;
 import fr.insee.rem.infrastructure.entity.PartitionSurveyUnitLinkEntity;
 import fr.insee.rem.infrastructure.entity.PartitionSurveyUnitLinkPK;
 import fr.insee.rem.infrastructure.entity.SurveyUnitEntity;
@@ -33,4 +34,5 @@ public interface PartitionSurveyUnitLinkRepository extends JpaRepository<Partiti
                     "su.repositoryId and link.partition.partitionId = ?1")
     List<SuIdMappingRecord> findSuIdMappingByPartitionId(Long partitionId);
 
+    long countByPartition(PartitionEntity partition);
 }
