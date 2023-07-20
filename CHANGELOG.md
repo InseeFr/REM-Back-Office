@@ -67,6 +67,7 @@
 ### Refactoring
 - use JsonView to manage the fields to return
 - add content description in the OpenAPI documentation
+- delete Serializable from Entity classes
 
 ### Dependencies updates
 - spring-boot: 3.1.0 -> 3.1.1
