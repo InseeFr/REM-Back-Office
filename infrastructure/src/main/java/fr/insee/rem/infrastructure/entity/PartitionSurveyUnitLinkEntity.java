@@ -3,19 +3,14 @@ package fr.insee.rem.infrastructure.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
 @Entity
 @Table(name = "partition_survey_unit_link")
 @Data
-public class PartitionSurveyUnitLinkEntity implements Serializable {
+public class PartitionSurveyUnitLinkEntity {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 7546818970816616680L;
 
     @EmbeddedId
     private PartitionSurveyUnitLinkPK id;

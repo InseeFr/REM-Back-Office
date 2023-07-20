@@ -1,22 +1,15 @@
 package fr.insee.rem.infrastructure.entity;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
-import lombok.Data;
-
 @Data
 @JsonInclude(Include.NON_EMPTY)
-public class Person implements Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 7165854120895777787L;
+public class Person {
 
     private Integer index;
     private String externalId;

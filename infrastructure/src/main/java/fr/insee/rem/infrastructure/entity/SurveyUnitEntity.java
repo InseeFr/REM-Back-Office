@@ -10,19 +10,13 @@ import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Data
 @Table(name = "survey_unit")
-public class SurveyUnitEntity implements Serializable {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 5458959377889736946L;
+public class SurveyUnitEntity {
 
     @Id
     @GeneratedValue(generator = "seq_survey_unit", strategy = GenerationType.SEQUENCE)
