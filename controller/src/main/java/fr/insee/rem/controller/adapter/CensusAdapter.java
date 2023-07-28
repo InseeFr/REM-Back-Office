@@ -10,7 +10,7 @@ import java.util.List;
 public class CensusAdapter {
     public SurveyUnitDto convert(CensusSource c) {
 
-        return SurveyUnitDto.builder().externalId(c.getIdinternaute()).context(Context.HOUSEHOLD)
+        return SurveyUnitDto.builder().externalId(String.valueOf(c.getId())).context(Context.HOUSEHOLD)
                 .address(convertAddress(c)).persons(convertPersons(c))
                 .additionalInformations(convertAdditionalInformation(c))
                 .externals(c.getExternals()).build();
@@ -18,19 +18,20 @@ public class CensusAdapter {
 
     private List<AdditionalInformationDto> convertAdditionalInformation(CensusSource c) {
         AdditionalInformationDto addInfo = AdditionalInformationDto.builder()
-                .key("identifiantCompte").value(c.getIdentifiant()).build();
+                .key("identifiantCompte").value(c.getIdentifiantCompte()).build();
         return List.of(addInfo);
     }
 
     private List<PersonDto> convertPersons(CensusSource c) {
         EmailDto mail = EmailDto.builder().favorite(false).source(Source.INITIAL).mailAddress(c.getMail()).build();
-        PersonDto main = PersonDto.builder().index(1).main(true).externalId(c.getIdenq()).emails(List.of(mail)).build();
+        PersonDto main = PersonDto.builder().index(1).main(true).externalId(String.valueOf(c.getIdInternaute()))
+                .emails(List.of(mail)).build();
         return List.of(main);
     }
 
     private AddressDto convertAddress(CensusSource c) {
         return AddressDto.builder().streetNumber(c.getNumvoiloc()).repetitionIndex(c.getBisterloc())
                 .streetType(c.getTypevoiloc()).streetName(c.getNomvoiloc()).addressSupplement(c.getResloc())
-                .cityName(c.getCloc()).zipCode(c.getCpostloc()).build();
+                .cityName(c.getCar()).zipCode(c.getCpostloc()).build();
     }
 }

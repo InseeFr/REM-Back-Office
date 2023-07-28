@@ -9,16 +9,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CensusSource {
-    private String idinternaute;
+    private Long id;
     private String numvoiloc;
     private String bisterloc;
     private String typevoiloc;
     private String nomvoiloc;
     private String resloc;
-    private String cloc;
+    private String car;
     private String cpostloc;
-    private String idenq;
+    private Long idInternaute;
     private String mail;
-    private String identifiant;
+    private String identifiantCompte;
     private JsonNode externals;
 }
