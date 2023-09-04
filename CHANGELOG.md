@@ -62,7 +62,8 @@
 - Add list of ids into import returns
 - Add "externals" field into survey unit: save in database without modification
 - Add number of SurveyUnit into partition endpoint
-- WIP: Import census survey units
+- Import census survey units
+- Empty a partition
 
 ### Refactoring
 - use JsonView to manage the fields to return
@@ -71,4 +72,4 @@
 
 ### Dependencies updates
 - spring-boot: 3.1.0 -> 3.1.1
-- pitest-maven: 1.14.1 -> 1.14.2
+- pitest-maven: 1.14.1 -> 1.14.4

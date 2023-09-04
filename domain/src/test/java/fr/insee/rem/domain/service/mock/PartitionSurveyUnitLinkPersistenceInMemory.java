@@ -80,4 +80,9 @@ public class PartitionSurveyUnitLinkPersistenceInMemory implements PartitionSurv
                 .filter(link -> link.getPartition().getPartitionId().equals(partitionId))
                 .count();
     }
+
+    @Override
+    public void removeSurveyUnitsFromPartition(Long partitionId) {
+        partitionSurveyUnitLinks.removeIf(link -> link.getPartition().getPartitionId().equals(partitionId));
+    }
 }

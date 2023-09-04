@@ -1,8 +1,5 @@
 package fr.insee.rem.application.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import fr.insee.rem.domain.ports.api.PartitionServicePort;
 import fr.insee.rem.domain.ports.api.SurveyUnitServicePort;
 import fr.insee.rem.domain.ports.spi.PartitionPersistencePort;
@@ -13,6 +10,8 @@ import fr.insee.rem.domain.service.SurveyUnitServiceImpl;
 import fr.insee.rem.infrastructure.adapter.PartitionJpaAdapter;
 import fr.insee.rem.infrastructure.adapter.PartitionSurveyUnitLinkJpaAdapter;
 import fr.insee.rem.infrastructure.adapter.SurveyUnitJpaAdapter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class PortConfig {
@@ -34,7 +33,7 @@ public class PortConfig {
 
     @Bean
     PartitionServicePort partitionService() {
-        return new PartitionServiceImpl(partitionPersistance());
+        return new PartitionServiceImpl(partitionPersistance(), partitionSurveyUnitLinkPersistance());
     }
 
     @Bean

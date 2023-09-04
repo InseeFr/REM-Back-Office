@@ -27,7 +27,8 @@ class SurveyUnitServiceTest {
 
     SurveyUnitServicePort surveyUnitService = new SurveyUnitServiceImpl(surveyUnitPersistenceInMemory,
             partitionSurveyUnitLinkPersistenceInMemory, partitionPersistenceInMemory);
-    PartitionServicePort partitionService = new PartitionServiceImpl(partitionPersistenceInMemory);
+    PartitionServicePort partitionService = new PartitionServiceImpl(partitionPersistenceInMemory,
+            partitionSurveyUnitLinkPersistenceInMemory);
 
     private List<PartitionSurveyUnitLinkDto> initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits(String label) {
         PartitionDto existingPartition = partitionService.createPartition(label);

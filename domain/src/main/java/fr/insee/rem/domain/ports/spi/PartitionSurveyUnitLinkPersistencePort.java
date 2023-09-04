@@ -21,4 +21,6 @@ public interface PartitionSurveyUnitLinkPersistencePort {
     List<SuIdMappingRecord> findSurveyUnitIdsMappingTableByPartitionId(Long partitionId);
 
     long countByPartitionId(Long partitionId);
+
+    void removeSurveyUnitsFromPartition(Long partitionId);
 }

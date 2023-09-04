@@ -102,4 +102,22 @@ public class PartitionController {
                 response.getMessage());
         return ResponseEntity.ok(response);
     }
+
+    @Tag(name = "5. Clean data")
+    @Operation(summary = "Empty a partition", responses = {
+            @ApiResponse(responseCode = "200", description = "Partition successfully emptied", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = PartitionWithCount.class))),
+            @ApiResponse(responseCode = "404", description = "Partition Not Found", content =
+            @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
+    })
+    @DeleteMapping(path = "/{partitionId}/empty")
+    public ResponseEntity<PartitionWithCount> emptyPartition(@PathVariable("partitionId") final Long partitionId) {
+        log.info("Empty partition {}", partitionId);
+        partitionService.emptyPartitionById(partitionId);
+        Response response = new Response(String.format("partition %s empty", partitionId), HttpStatus.OK);
+        PartitionDto partition = partitionService.getPartitionById(partitionId);
+        long count = surveyUnitService.countSurveyUnitsByPartition(partitionId);
+        return new ResponseEntity<>(PartitionWithCount.builder().partition(partition).count(count).build(),
+                HttpStatus.OK);
+    }
 }
