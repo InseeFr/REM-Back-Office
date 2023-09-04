@@ -114,7 +114,6 @@ public class PartitionController {
     public ResponseEntity<PartitionWithCount> emptyPartition(@PathVariable("partitionId") final Long partitionId) {
         log.info("Empty partition {}", partitionId);
         partitionService.emptyPartitionById(partitionId);
-        Response response = new Response(String.format("partition %s empty", partitionId), HttpStatus.OK);
         PartitionDto partition = partitionService.getPartitionById(partitionId);
         long count = surveyUnitService.countSurveyUnitsByPartition(partitionId);
         return new ResponseEntity<>(PartitionWithCount.builder().partition(partition).count(count).build(),
