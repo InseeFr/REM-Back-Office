@@ -1,7 +1,6 @@
-package fr.insee.rem.controller.targets;
+package fr.insee.rem.controller.response;
 
 import com.opencsv.bean.CsvBindByName;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SuIdMappingCsvTarget {
+public class SuIdMappingCsv {
 
     @CsvBindByName(column = "ID_REM")
     private String idRem;

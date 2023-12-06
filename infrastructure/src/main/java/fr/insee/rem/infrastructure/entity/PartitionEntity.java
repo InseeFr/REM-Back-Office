@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,12 +14,8 @@ import java.util.Set;
 @Table(name = "partition")
 @Data
 @NoArgsConstructor
-public class PartitionEntity implements Serializable {
+public class PartitionEntity {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -1680693250888586880L;
 
     @Id
     @GeneratedValue(generator = "seq_partition", strategy = GenerationType.SEQUENCE)

@@ -1,5 +1,8 @@
 package fr.insee.rem.domain.dtos;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.rem.domain.views.Views;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -13,22 +16,24 @@ import java.util.Optional;
 @Data
 public class SurveyUnitDto {
 
+    @JsonView(value = {Views.SurveyUnitWithId.class, Views.SurveyUnitWithIdAndExternals.class})
     private Long repositoryId;
-
+    @JsonView(Views.SurveyUnitBase.class)
     private String externalId;
-
+    @JsonView(Views.SurveyUnitBase.class)
     private String externalName;
-
+    @JsonView(Views.SurveyUnitBase.class)
     private Context context;
-
+    @JsonView(Views.SurveyUnitBase.class)
     private AddressDto address;
-
     @Getter(AccessLevel.NONE)
     private List<PersonDto> persons;
-
+    @JsonView(Views.SurveyUnitBase.class)
     private OtherIdentifierDto otherIdentifier;
-
+    @JsonView(Views.SurveyUnitBase.class)
     private List<AdditionalInformationDto> additionalInformations;
+    @JsonView(value = {Views.SurveyUnitWithExternals.class, Views.SurveyUnitWithIdAndExternals.class})
+    private JsonNode externals;
 
     /**
      * Defining everyone's role (surveyed, main, coDeclarant)
@@ -36,6 +41,7 @@ public class SurveyUnitDto {
      *
      * @return the persons
      */
+    @JsonView(Views.SurveyUnitBase.class)
     public List<PersonDto> getPersons() {
         if (persons == null) {
             return List.of();

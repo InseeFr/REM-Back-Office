@@ -30,4 +30,5 @@ public interface SurveyUnitServicePort {
 
     SurveyUnitDto updateSurveyUnit(SurveyUnitDto surveyUnit);
 
+    long countSurveyUnitsByPartition(Long partitionId);
 }

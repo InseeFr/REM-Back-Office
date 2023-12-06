@@ -4,16 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Data;
 
-import java.io.Serializable;
-
 @Data
 @JsonInclude(Include.NON_EMPTY)
-public class OtherIdentifier implements Serializable {
+public class OtherIdentifier {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 3113498426456374157L;
     private String numfa;
     private String rges;
     private String ssech;

@@ -5,6 +5,7 @@ import fr.insee.rem.domain.exception.PartitionAlreadyExistsException;
 import fr.insee.rem.domain.exception.PartitionNotFoundException;
 import fr.insee.rem.domain.ports.api.PartitionServicePort;
 import fr.insee.rem.domain.ports.spi.PartitionPersistencePort;
+import fr.insee.rem.domain.ports.spi.PartitionSurveyUnitLinkPersistencePort;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -14,9 +15,12 @@ import java.util.Optional;
 public class PartitionServiceImpl implements PartitionServicePort {
 
     private PartitionPersistencePort partitionPersistencePort;
+    private PartitionSurveyUnitLinkPersistencePort partitionSurveyUnitLinkPersistencePort;
 
-    public PartitionServiceImpl(PartitionPersistencePort partitionPersistencePort) {
+    public PartitionServiceImpl(PartitionPersistencePort partitionPersistencePort,
+                                PartitionSurveyUnitLinkPersistencePort partitionSurveyUnitLinkPersistencePort) {
         this.partitionPersistencePort = partitionPersistencePort;
+        this.partitionSurveyUnitLinkPersistencePort = partitionSurveyUnitLinkPersistencePort;
     }
 
     @Override
@@ -51,6 +55,15 @@ public class PartitionServiceImpl implements PartitionServicePort {
     public List<PartitionDto> getAllPartitions() {
         log.debug("domain: getAllPartitions()");
         return partitionPersistencePort.findAll();
+    }
+
+    @Override
+    public void emptyPartitionById(Long partitionId) {
+        log.debug("domain: emptyPartitionById({})", partitionId);
+        if (!partitionPersistencePort.existsById(partitionId)) {
+            throw new PartitionNotFoundException(partitionId);
+        }
+        partitionSurveyUnitLinkPersistencePort.removeSurveyUnitsFromPartition(partitionId);
     }
 
 }

@@ -27,7 +27,8 @@ class SurveyUnitServiceTest {
 
     SurveyUnitServicePort surveyUnitService = new SurveyUnitServiceImpl(surveyUnitPersistenceInMemory,
             partitionSurveyUnitLinkPersistenceInMemory, partitionPersistenceInMemory);
-    PartitionServicePort partitionService = new PartitionServiceImpl(partitionPersistenceInMemory);
+    PartitionServicePort partitionService = new PartitionServiceImpl(partitionPersistenceInMemory,
+            partitionSurveyUnitLinkPersistenceInMemory);
 
     private List<PartitionSurveyUnitLinkDto> initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits(String label) {
         PartitionDto existingPartition = partitionService.createPartition(label);
@@ -551,6 +552,46 @@ class SurveyUnitServiceTest {
         Assertions.assertEquals(surveyUnitToUpdate.getRepositoryId(), updatedSurveyUnit.getRepositoryId());
         Assertions.assertEquals(surveyUnitToUpdate.getExternalId(), updatedSurveyUnit.getExternalId());
         Assertions.assertEquals(surveyUnitToUpdate.getContext(), updatedSurveyUnit.getContext());
+    }
+
+    @Test
+    void shouldReturn0WhenPartitionHaveNoSurveyUnit() {
+        // Given
+        PartitionDto partition = partitionService.createPartition("partition");
+        Long partitionId = partition.getPartitionId();
+
+        // When
+        long count = surveyUnitService.countSurveyUnitsByPartition(partitionId);
+
+        // Then
+        Assertions.assertEquals(0, count);
+    }
+
+    @Test
+    void shouldReturnNumberOfSurveyUnitWhenPartitionHaveSurveyUnit() {
+        // Given
+        List<PartitionSurveyUnitLinkDto> importedPartitionSurveyUnits =
+                initDataPersistenceInMemoryWithOnePartitionAndTwoSurveyUnits("init partition");
+        Long partitionId = importedPartitionSurveyUnits.get(0).getPartition().getPartitionId();
+
+        // When
+        long count = surveyUnitService.countSurveyUnitsByPartition(partitionId);
+
+        // Then
+        Assertions.assertEquals(2, count);
+    }
+
+    @Test
+    void shouldReturnPartitionNotFoundExceptionWhenCountSurveyUnitByNotExistingPartition() {
+        // Given
+        Long notExistingPartitionId = 99L;
+
+        // When + Then
+        PartitionNotFoundException exception =
+                Assertions.assertThrows(PartitionNotFoundException.class,
+                        () -> surveyUnitService.countSurveyUnitsByPartition(notExistingPartitionId));
+        Assertions.assertEquals(String.format("Partition [%s] doesn't exist", notExistingPartitionId),
+                exception.getMessage());
     }
 
 }

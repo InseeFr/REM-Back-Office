@@ -10,7 +10,7 @@
 - Import new survey units from a json and add them to the new partition
 
 #### Manage a partition of survey units
-- Add a existing survey unit to another partition
+- Add an existing survey unit to another partition
 - Add a list of survey units to another partition
 - Remove a survey unit from a partition (survey unit is not deleted)
 
@@ -55,3 +55,21 @@
 - Created ApiError class to manage errors feedback
 - Used Tags for groups of endpoints
 - Replace name of TypeUnit enum to Context
+
+## 1.3.0
+
+### Features
+- Add list of ids into import returns
+- Add "externals" field into survey unit: save in database without modification
+- Add number of SurveyUnit into partition endpoint
+- Import census survey units
+- Empty a partition
+
+### Refactoring
+- use JsonView to manage the fields to return
+- add content description in the OpenAPI documentation
+- delete Serializable from Entity classes
+
+### Dependencies updates
+- spring-boot: 3.1.0 -> 3.1.1
+- pitest-maven: 1.14.1 -> 1.14.4

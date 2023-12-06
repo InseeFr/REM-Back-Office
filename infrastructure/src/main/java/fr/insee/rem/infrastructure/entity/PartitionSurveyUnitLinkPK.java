@@ -3,16 +3,11 @@ package fr.insee.rem.infrastructure.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class PartitionSurveyUnitLinkPK implements Serializable {
+public class PartitionSurveyUnitLinkPK {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -1449181380370389057L;
 
     @Column(name = "partition_id")
     private Long partitionId;

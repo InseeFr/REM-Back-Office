@@ -91,4 +91,19 @@ public class PartitionSurveyUnitLinkJpaAdapter implements PartitionSurveyUnitLin
         return partitionSurveyUnitLinkRepository.findSuIdMappingByPartitionId(partitionId);
     }
 
+    @Override
+    public long countByPartitionId(Long partitionId) {
+        PartitionEntity partitionEntity = entityManager.find(PartitionEntity.class, partitionId);
+        return partitionSurveyUnitLinkRepository.countByPartition(partitionEntity);
+    }
+
+    @Override
+    public void removeSurveyUnitsFromPartition(Long partitionId) {
+        List<PartitionSurveyUnitLinkEntity> links =
+                partitionSurveyUnitLinkRepository.findAllSurveyUnitsByPartitionId(partitionId);
+        for (PartitionSurveyUnitLinkEntity link : links) {
+            partitionSurveyUnitLinkRepository.delete(link);
+        }
+    }
+
 }

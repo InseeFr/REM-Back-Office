@@ -14,4 +14,5 @@ public interface PartitionServicePort {
 
     List<PartitionDto> getAllPartitions();
 
+    void emptyPartitionById(Long partitionId);
 }

@@ -10,7 +10,7 @@
 	<artifactId>domain</artifactId>
 	<description>Survey unit repository - Business Logic</description>
 	<properties>
-		<pitest.version>1.14.1</pitest.version>
+		<pitest.version>1.14.4</pitest.version>
 		<pitest.junit.version>1.2.0</pitest.junit.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.language>java</sonar.language>
@@ -34,6 +34,11 @@
 		    <groupId>org.junit.jupiter</groupId>
 		    <artifactId>junit-jupiter</artifactId>
 		    <scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.2</version>
 		</dependency>
 	</dependencies>	
 	<build>

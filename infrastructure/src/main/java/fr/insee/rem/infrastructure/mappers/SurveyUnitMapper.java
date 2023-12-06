@@ -23,12 +23,14 @@ public interface SurveyUnitMapper {
     @Mapping(source = "persons", target = "surveyUnitData.persons")
     @Mapping(source = "otherIdentifier", target = "surveyUnitData.otherIdentifier")
     @Mapping(source = "additionalInformations", target = "surveyUnitData.additionalInformations")
+    @Mapping(source = "externals", target = "externals")
     SurveyUnitEntity dtoToEntity(SurveyUnitDto surveyUnit);
 
     @Mapping(target = "address", source = "surveyUnitData.address")
     @Mapping(target = "persons", source = "surveyUnitData.persons")
     @Mapping(target = "otherIdentifier", source = "surveyUnitData.otherIdentifier")
     @Mapping(target = "additionalInformations", source = "surveyUnitData.additionalInformations")
+    @Mapping(source = "externals", target = "externals")
     SurveyUnitDto entityToDto(SurveyUnitEntity surveyUnitEntity);
 
     List<SurveyUnitDto> listEntityToListDto(List<SurveyUnitEntity> surveyUnitEntities);
