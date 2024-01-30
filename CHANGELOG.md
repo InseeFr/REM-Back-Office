@@ -73,3 +73,15 @@
 ### Dependencies updates
 - spring-boot: 3.1.0 -> 3.1.1
 - pitest-maven: 1.14.1 -> 1.14.4
+
+## 1.3.1
+
+### Dependencies updates
+- spring-boot: 3.1.1 -> 3.2.2
+- lombok: 1.18.28 -> 1.18.30
+- slf4j-api: 2.0.7 -> 2.0.11
+- springdoc-openapi-stater-webmvc-ui: 2.1.0 -> 2.3.0
+- opencsv: 5.7.1 -> 5.9
+- pitest-maven: 1.14.4 -> 1.15.6
+- pitest-junit5-plugin: 1.2.0 -> 1.2.1
+- jacoco-maven-plugin: 0.8.10 -> 0.8.11
