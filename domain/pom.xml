@@ -10,12 +10,12 @@
 	<artifactId>domain</artifactId>
 	<description>Survey unit repository - Business Logic</description>
 	<properties>
-		<pitest.version>1.14.4</pitest.version>
-		<pitest.junit.version>1.2.0</pitest.junit.version>
+		<pitest.version>1.15.6</pitest.version>
+		<pitest.junit.version>1.2.1</pitest.junit.version>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.language>java</sonar.language>
 		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
-		<maven-jacoco.version>0.8.10</maven-jacoco.version>
+		<maven-jacoco.version>0.8.11</maven-jacoco.version>
 		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml
     	</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
