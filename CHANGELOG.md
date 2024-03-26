@@ -77,7 +77,7 @@
 ## 1.3.1
 
 ### Dependencies updates
-- spring-boot: 3.1.1 -> 3.2.2
+- spring-boot: 3.1.1 -> 3.2.4
 - lombok: 1.18.28 -> 1.18.30
 - slf4j-api: 2.0.7 -> 2.0.11
 - springdoc-openapi-stater-webmvc-ui: 2.1.0 -> 2.3.0
